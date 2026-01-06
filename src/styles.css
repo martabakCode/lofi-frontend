@@ -1,0 +1,6 @@
+/* Main Entry Point for Application Styles */
+@import "./styles/themes.css";
+@import "./styles/tailwind.css";
+@import "./styles/primeng.css";
+
+/* Additional global overrides can go here */
