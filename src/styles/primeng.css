@@ -1,3 +1,5 @@
+@reference "tailwindcss";
+
 /* PrimeNG Component Overrides using Tailwind @apply */
 
 .p-button {

@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.antigravity.dev/v1'
+  apiUrl: 'https://api.Lofi Apps.dev/v1'
 };

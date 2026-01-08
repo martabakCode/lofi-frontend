@@ -1,8 +1,8 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap, of, delay } from 'rxjs';
-import { User, AuthResponse } from '../models/auth.models';
+import { Observable, tap } from 'rxjs';
+import { User, AuthResponse } from '../../../core/models/rbac.models';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
@@ -11,8 +11,8 @@ import { environment } from '../../../../environments/environment';
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private readonly TOKEN_KEY = 'antigravity_token';
-  private readonly USER_KEY = 'antigravity_user';
+  private readonly TOKEN_KEY = 'lofi_token';
+  private readonly USER_KEY = 'lofi_user';
 
   // State signals
   currentUser = signal<User | null>(this.getStoredUser());
@@ -21,20 +21,13 @@ export class AuthService {
   constructor() {}
 
   login(credentials: any): Observable<AuthResponse> {
-    // In a real app: return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, credentials)
-    // Simulating API response for boilerplate
-    // const mockResponse: AuthResponse = {
-    //   token: 'mock-jwt-token',
-    //   user: {
-    //     id: '1',
-    //     email: credentials.email,
-    //     name: 'Admin User',
-    //     role: 'ADMIN'
-    //   }
-    // };
     return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, credentials).pipe(
       tap(response => this.setSession(response))
     );
+  }
+
+  register(userData: any): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/auth/register`, userData);
   }
 
   logout() {
@@ -48,10 +41,29 @@ export class AuthService {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
+  hasPermission(permissionName: string): boolean {
+    const user = this.currentUser();
+    if (!user) return false;
+    // The backend returns a flat list of roles and permissions in the 'roles' array.
+    // We check if the permission exists in that list.
+    return user.roleNames?.includes(permissionName) || false;
+  }
+
   private setSession(authResult: AuthResponse) {
     localStorage.setItem(this.TOKEN_KEY, authResult.token);
-    localStorage.setItem(this.USER_KEY, JSON.stringify(authResult.user));
-    this.currentUser.set(authResult.user);
+    
+    // Construct a User object from the response
+    const user: User = {
+      id: 'current', // ID not provided in login response, using placeholder
+      username: authResult.email.split('@')[0],
+      fullName: authResult.email.split('@')[0], // Placeholder, will update if we fetch user details
+      email: authResult.email,
+      roles: [], // We don't have detailed Role objects yet
+      roleNames: authResult.roles // Store the flat list of roles/permissions here
+    };
+
+    localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+    this.currentUser.set(user);
   }
 
   private getStoredUser(): User | null {

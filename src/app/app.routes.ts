@@ -18,6 +18,14 @@ export const routes: Routes = [
         loadChildren: () => import('./features/users/users.routes').then(m => m.USER_ROUTES)
       },
       {
+        path: 'branches',
+        loadChildren: () => import('./features/branches/branches.routes').then(m => m.BRANCH_ROUTES)
+      },
+      {
+        path: 'roles',
+        loadChildren: () => import('./features/roles/roles.routes').then(m => m.ROLE_ROUTES)
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full'

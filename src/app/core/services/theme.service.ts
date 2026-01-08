@@ -5,7 +5,7 @@ import { isPlatformBrowser } from '@angular/common';
   providedIn: 'root'
 })
 export class ThemeService {
-  private readonly THEME_KEY = 'antigravity-theme';
+  private readonly THEME_KEY = 'Lofi Apps-theme';
   private isBrowser: boolean;
   
   // Theme state signal
