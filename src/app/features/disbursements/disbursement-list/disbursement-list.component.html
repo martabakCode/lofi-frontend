@@ -1,0 +1,47 @@
+<div
+    class="card p-6 border rounded-xl bg-surface-0 dark:bg-surface-900 shadow-sm border-surface-200 dark:border-surface-800">
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+        <div>
+            <h2 class="text-2xl font-bold m-0 text-surface-900 dark:text-surface-0">Loan Disbursement</h2>
+            <p class="text-surface-500 dark:text-surface-400 mt-2">Execute disbursement for approved loans</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="p-input-icon-left w-full md:w-auto">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" placeholder="Search..." class="w-full md:w-auto" />
+            </span>
+            <button pButton icon="pi pi-refresh" class="p-button-outlined" (click)="loadLoans()"></button>
+        </div>
+    </div>
+
+    <p-table [value]="loans()" [loading]="loading()" [paginator]="true" [rows]="10" [totalRecords]="totalRecords()"
+        responsiveLayout="scroll" styleClass="p-datatable-gridlines">
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="customerName">Customer <p-sortIcon field="customerName"></p-sortIcon></th>
+                <th pSortableColumn="productName">Product <p-sortIcon field="productName"></p-sortIcon></th>
+                <th pSortableColumn="amount">Amount <p-sortIcon field="amount"></p-sortIcon></th>
+                <th pSortableColumn="appliedDate">Approved Date <p-sortIcon field="appliedDate"></p-sortIcon></th>
+                <th>Status</th>
+                <th style="width: 8rem">Actions</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-loan>
+            <tr>
+                <td>{{ loan.customerName }}</td>
+                <td>{{ loan.productName }}</td>
+                <td>{{ loan.amount | currency }}</td>
+                <td>{{ loan.appliedDate | date }}</td>
+                <td>
+                    <p-tag [value]="loan.status" [severity]="getStatusSeverity(loan.status)"></p-tag>
+                </td>
+                <td class="text-center">
+                    <button pButton icon="pi pi-wallet" class="p-button-text p-button-info p-button-sm"
+                        pTooltip="Disburse"></button>
+                    <button pButton icon="pi pi-file-pdf" class="p-button-text p-button-secondary p-button-sm"
+                        pTooltip="Print Agreement"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>

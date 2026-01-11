@@ -1,0 +1,37 @@
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+    <div class="flex flex-col gap-2">
+        <label for="username" class="font-semibold">Username</label>
+        <input pInputText id="username" formControlName="username" placeholder="Enter your username"
+            [class.ng-invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched" />
+        <small class="text-red-500" *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
+            Username is required
+        </small>
+    </div>
+
+    <div class="flex flex-col gap-2">
+        <label for="password" class="font-semibold">Password</label>
+        <p-password id="password" formControlName="password" [toggleMask]="true" [feedback]="false"
+            placeholder="Enter your password" styleClass="w-full" inputStyleClass="w-full"
+            [class.ng-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"></p-password>
+        <small class="text-red-500" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+            Password is required
+        </small>
+    </div>
+
+    <div class="flex items-center justify-between mt-2">
+        <div class="flex items-center gap-2">
+            <input type="checkbox" id="remember"
+                class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
+            <label for="remember" class="text-sm text-surface-600 dark:text-surface-400">Remember me</label>
+        </div>
+        <a routerLink="/auth/forgot-password" class="text-sm font-medium text-primary-600 hover:text-primary-500">Forgot
+            password?</a>
+    </div>
+
+    <button pButton type="submit" label="Log In" class="w-full mt-4" [loading]="loading"
+        [disabled]="loginForm.invalid"></button>
+
+    <p class="text-center text-sm text-surface-500 dark:text-surface-400 mt-4">
+        Don't have an account? <a href="#" class="font-medium text-primary-600 hover:text-primary-500">Contact IT</a>
+    </p>
+</form>

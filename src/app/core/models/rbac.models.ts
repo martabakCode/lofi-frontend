@@ -25,8 +25,10 @@ export interface User {
   username: string;
   fullName: string;
   email: string;
+  phone?: string;
   avatar?: string;
   roles: Role[];
+  branch?: Branch;
   roleNames?: string[]; // Helper for display
   status?: 'Active' | 'Inactive';
 }
@@ -37,8 +39,3 @@ export interface AuthResponse {
   roles: string[];
 }
 
-export interface ApiResponse<T> {
-  success: boolean;
-  message: string;
-  data: T;
-}

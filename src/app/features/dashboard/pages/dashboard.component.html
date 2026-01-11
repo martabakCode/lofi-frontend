@@ -1,0 +1,64 @@
+<div class="space-y-6">
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0">Staff Dashboard</h2>
+            <p class="text-surface-500 dark:text-surface-400">Welcome back! Manage the loan lifecycle efficiently.</p>
+        </div>
+        <div
+            class="hidden md:block text-sm font-medium text-surface-500 bg-surface-100 dark:bg-surface-800 px-4 py-2 rounded-lg">
+            {{ today | date:'fullDate' }}
+        </div>
+    </header>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="card p-6 border rounded-xl bg-white dark:bg-surface-900 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-surface-500 font-medium">Pending Reviews</span>
+                <i class="pi pi-clock text-orange-500"></i>
+            </div>
+            <p class="text-3xl font-bold">24</p>
+            <p class="text-xs text-surface-400 mt-2">Marketing stage</p>
+        </div>
+
+        <div class="card p-6 border rounded-xl bg-white dark:bg-surface-900 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-surface-500 font-medium">Approvals Needed</span>
+                <i class="pi pi-verified text-blue-500"></i>
+            </div>
+            <p class="text-3xl font-bold">12</p>
+            <p class="text-xs text-surface-400 mt-2">Manager approval</p>
+        </div>
+
+        <div class="card p-6 border rounded-xl bg-white dark:bg-surface-900 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-surface-500 font-medium">Total Disbursed</span>
+                <i class="pi pi-wallet text-green-500"></i>
+            </div>
+            <p class="text-3xl font-bold">$1.2M</p>
+            <p class="text-xs text-surface-400 mt-2">This month</p>
+        </div>
+
+        <div class="card p-6 border rounded-xl bg-white dark:bg-surface-900 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-surface-500 font-medium">Active Products</span>
+                <i class="pi pi-package text-purple-500"></i>
+            </div>
+            <p class="text-3xl font-bold">8</p>
+            <p class="text-xs text-surface-400 mt-2">Current offerings</p>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card p-6 border rounded-xl bg-white dark:bg-surface-900 shadow-sm">
+            <h3 class="text-lg font-bold mb-4">Loans by Status</h3>
+            <p-chart type="pie" [data]="pieData" [options]="pieOptions" height="300px"></p-chart>
+        </div>
+
+        <div class="card p-6 border rounded-xl bg-white dark:bg-surface-900 shadow-sm">
+            <h3 class="text-lg font-bold mb-4">Disbursement Volume (USD)</h3>
+            <p-chart type="bar" [data]="barData" [options]="barOptions" height="300px"></p-chart>
+        </div>
+    </div>
+</div>

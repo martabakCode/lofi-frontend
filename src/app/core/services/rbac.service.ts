@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { Branch, Permission, Role, User, ApiResponse } from '../models/rbac.models';
+import { ApiResponse } from '../models/api.models';
+import { Branch, Permission, Role, User } from '../models/rbac.models';
 import { environment } from '../../../environments/environment';
 
 @Injectable({

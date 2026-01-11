@@ -1,0 +1,23 @@
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.active-link {
+    background-color: var(--primary-50);
+    color: var(--primary-600);
+    font-weight: 700;
+}
+
+:host-context(.dark) .active-link {
+    background-color: rgba(90, 122, 205, 0.2);
+    color: var(--primary-400);
+}
+
+:host-context(.dark) .nav-link:hover {
+    background-color: rgba(39, 39, 42, 0.5);
+}

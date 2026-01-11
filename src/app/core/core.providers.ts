@@ -3,14 +3,15 @@ import { EnvironmentProviders, Provider } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
-import { jwtInterceptor } from './interceptors/jwt.interceptor';
+import { authInterceptor } from './interceptors/auth.interceptor';
+import { errorInterceptor } from './interceptors/error.interceptor';
 
 export const provideCore = (): (Provider | EnvironmentProviders)[] => {
   return [
     provideAnimationsAsync(),
     provideHttpClient(
       withFetch(),
-      withInterceptors([jwtInterceptor])
+      withInterceptors([authInterceptor, errorInterceptor])
     ),
     providePrimeNG({
       theme: {
