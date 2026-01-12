@@ -1,19 +1,28 @@
 <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+    <!-- General Error Message -->
+    <div *ngIf="error()"
+        class="w-full bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+        <span>!</span>
+        <span>{{ error() }}</span>
+    </div>
+
     <div class="flex flex-col gap-2">
-        <label for="username" class="font-semibold">Username</label>
-        <input pInputText id="username" formControlName="username" placeholder="Enter your username"
-            [class.ng-invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched" />
-        <small class="text-red-500" *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
-            Username is required
+        <label for="email" class="font-semibold text-sm text-slate-700 dark:text-slate-300">Email</label>
+        <input type="email" id="email" formControlName="email" placeholder="Enter your Email"
+            class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            [class.border-red-500]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" />
+        <small class="text-red-500 text-xs" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+            Email is required
         </small>
     </div>
 
     <div class="flex flex-col gap-2">
-        <label for="password" class="font-semibold">Password</label>
-        <p-password id="password" formControlName="password" [toggleMask]="true" [feedback]="false"
-            placeholder="Enter your password" styleClass="w-full" inputStyleClass="w-full"
-            [class.ng-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"></p-password>
-        <small class="text-red-500" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+        <label for="password" class="font-semibold text-sm text-slate-700 dark:text-slate-300">Password</label>
+        <input type="password" id="password" formControlName="password" placeholder="Enter your password"
+            class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            [class.border-red-500]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" />
+        <small class="text-red-500 text-xs"
+            *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
             Password is required
         </small>
     </div>
@@ -21,17 +30,22 @@
     <div class="flex items-center justify-between mt-2">
         <div class="flex items-center gap-2">
             <input type="checkbox" id="remember"
-                class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
-            <label for="remember" class="text-sm text-surface-600 dark:text-surface-400">Remember me</label>
+                class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+            <label for="remember" class="text-sm text-slate-600 dark:text-slate-400 cursor-pointer">Remember me</label>
         </div>
         <a routerLink="/auth/forgot-password" class="text-sm font-medium text-primary-600 hover:text-primary-500">Forgot
             password?</a>
     </div>
 
-    <button pButton type="submit" label="Log In" class="w-full mt-4" [loading]="loading"
-        [disabled]="loginForm.invalid"></button>
+    <button type="submit"
+        class="w-full mt-4 bg-primary-500 hover:bg-primary-600 text-white font-medium py-2.5 rounded-lg transition-colors duration-200 shadow-sm active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        [disabled]="loginForm.invalid || loading()">
+        <span *ngIf="loading()">...</span>
+        <span *ngIf="!loading()">Log In</span>
+        <span *ngIf="loading()">Logging in...</span>
+    </button>
 
-    <p class="text-center text-sm text-surface-500 dark:text-surface-400 mt-4">
+    <p class="text-center text-sm text-slate-500 dark:text-slate-400 mt-4">
         Don't have an account? <a href="#" class="font-medium text-primary-600 hover:text-primary-500">Contact IT</a>
     </p>
 </form>

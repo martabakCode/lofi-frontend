@@ -1,109 +1,117 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { DialogModule } from 'primeng/dialog';
-import { MultiSelectModule } from 'primeng/multiselect';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RbacService } from '../../../core/services/rbac.service';
 import { Role, Permission } from '../../../core/models/rbac.models';
-import { MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-role-list',
   standalone: true,
   imports: [
-    CommonModule, 
-    TableModule, 
-    ButtonModule, 
-    InputTextModule, 
-    DialogModule, 
-    MultiSelectModule,
-    ReactiveFormsModule,
-    ToastModule
+    CommonModule,
+    ReactiveFormsModule
   ],
-  providers: [MessageService],
   template: `
     <div class="space-y-6">
       <header class="flex items-center justify-between">
         <div>
-          <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0">Roles</h2>
-          <p class="text-surface-500 dark:text-surface-400">Manage user roles and their associated permissions.</p>
+          <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Roles</h2>
+          <p class="text-slate-500 dark:text-slate-400">Manage user roles and their associated permissions.</p>
         </div>
-        <button (click)="openNew()" class="btn-primary">
-          <i class="pi pi-plus mr-2"></i> Add Role
+        <button (click)="openNew()" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
+          <span class="mr-2">+</span> Add Role
         </button>
       </header>
 
-      <div class="card p-0 overflow-hidden">
-        <p-table [value]="roles()" [rows]="10" [paginator]="true" [loading]="isLoading()" responsiveLayout="scroll">
-          <ng-template pTemplate="header">
-            <tr>
-              <th class="bg-surface-50 dark:bg-surface-800 text-surface-700 dark:text-surface-300 font-semibold px-6 py-4">Role Name</th>
-              <th class="bg-surface-50 dark:bg-surface-800 text-surface-700 dark:text-surface-300 font-semibold px-6 py-4">Permissions</th>
-              <th class="bg-surface-50 dark:bg-surface-800 text-surface-700 dark:text-surface-300 font-semibold px-6 py-4">Actions</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-role>
-            <tr class="border-b border-surface-100 dark:border-surface-800 hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-colors">
-              <td class="px-6 py-4 font-medium text-surface-900 dark:text-surface-0">{{role.name}}</td>
-              <td class="px-6 py-4">
-                <div class="flex flex-wrap gap-1">
-                  <span *ngFor="let perm of role.permissions" class="px-2 py-0.5 bg-surface-100 text-surface-600 dark:bg-surface-800 dark:text-surface-400 rounded text-xs font-medium">
-                    {{perm.name}}
-                  </span>
-                  <span *ngIf="!role.permissions?.length" class="text-surface-400 italic text-sm">No permissions</span>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex gap-2">
-                  <button (click)="editRole(role)" class="p-2 text-surface-400 hover:text-primary-500 transition-colors">
-                    <i class="pi pi-pencil"></i>
-                  </button>
-                  <button (click)="deleteRole(role)" class="p-2 text-surface-400 hover:text-red-500 transition-colors">
-                    <i class="pi pi-trash"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
+      <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 font-medium border-b border-slate-200 dark:border-slate-700">
+              <tr>
+                <th class="px-6 py-4">Role Name</th>
+                <th class="px-6 py-4">Permissions</th>
+                <th class="px-6 py-4">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+              <tr *ngFor="let role of roles()" class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+                <td class="px-6 py-4 font-medium text-slate-900 dark:text-white">{{role.name}}</td>
+                <td class="px-6 py-4">
+                  <div class="flex flex-wrap gap-1">
+                    <span *ngFor="let perm of role.permissions" class="px-2 py-0.5 bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 rounded text-xs font-medium border border-slate-200 dark:border-slate-600">
+                      {{perm.name}}
+                    </span>
+                    <span *ngIf="!role.permissions || role.permissions.length === 0" class="text-slate-400 italic text-sm">No permissions</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex gap-2">
+                    <button (click)="editRole(role)" class="p-1 px-2 text-primary-600 hover:bg-primary-50 rounded transition-colors" title="Edit">
+                      Edit
+                    </button>
+                    <button (click)="deleteRole(role)" class="p-1 px-2 text-red-600 hover:bg-red-50 rounded transition-colors" title="Delete">
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="roles().length === 0 && !isLoading()">
+                  <td colspan="3" class="px-6 py-8 text-center text-slate-500">No roles found.</td>
+              </tr>
+               <tr *ngIf="isLoading()">
+                  <td colspan="3" class="px-6 py-8 text-center text-slate-500">Loading...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <p-dialog [(visible)]="displayDialog" [header]="isEdit ? 'Edit Role' : 'New Role'" [modal]="true" class="p-fluid" [style]="{width: '500px'}">
-      <form [formGroup]="roleForm" (ngSubmit)="saveRole()" class="space-y-4 pt-4">
-        <div class="space-y-2">
-          <label for="name" class="font-medium">Role Name</label>
-          <input pInputText id="name" formControlName="name" placeholder="ROLE_ADMIN" />
+    <!-- Modal/Dialog -->
+    <div *ngIf="displayDialog" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="displayDialog = false"></div>
+      <div class="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-lg z-10 overflow-hidden border border-slate-200 dark:border-slate-700">
+        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+            <h3 class="text-lg font-bold text-slate-800 dark:text-white">{{isEdit ? 'Edit Role' : 'New Role'}}</h3>
+            <button (click)="displayDialog = false" class="text-slate-400 hover:text-slate-600">✕</button>
         </div>
-        <div class="space-y-2">
-          <label for="permissions" class="font-medium">Assign Permissions</label>
-          <p-multiSelect 
-            [options]="allPermissions()" 
-            formControlName="permissions" 
-            optionLabel="name" 
-            placeholder="Select Permissions"
-            display="chip"
-            class="w-full">
-          </p-multiSelect>
-        </div>
-        <div class="flex justify-end gap-3 pt-6 border-t border-surface-100">
-          <p-button label="Cancel" icon="pi pi-times" styleClass="p-button-text" (onClick)="displayDialog = false"></p-button>
-          <p-button label="Save" icon="pi pi-check" type="submit" [loading]="isSaving()" [disabled]="roleForm.invalid"></p-button>
-        </div>
-      </form>
-    </p-dialog>
+        
+        <form [formGroup]="roleForm" (ngSubmit)="saveRole()" class="p-6 space-y-4">
+            <div class="space-y-1">
+                <label for="name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Role Name</label>
+                <input id="name" formControlName="name" placeholder="ROLE_ADMIN" 
+                    class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none bg-transparent" />
+            </div>
 
-    <p-toast></p-toast>
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Assign Permissions</label>
+                <div class="border border-slate-300 dark:border-slate-600 rounded-lg p-2 h-48 overflow-y-auto space-y-1">
+                    <label *ngFor="let perm of allPermissions()" class="flex items-center gap-2 p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded cursor-pointer">
+                        <input type="checkbox" 
+                            [checked]="hasPermission(perm)" 
+                            (change)="togglePermission(perm, $event)"
+                            class="rounded border-slate-300 text-primary-600 focus:ring-primary-500">
+                        <span class="text-sm text-slate-700 dark:text-slate-300">{{perm.name}}</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4">
+                <button type="button" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" (click)="displayDialog = false">Cancel</button>
+                <button type="submit" 
+                    [disabled]="roleForm.invalid || isSaving()"
+                    class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2">
+                    <span *ngIf="isSaving()">...</span> Save
+                </button>
+            </div>
+        </form>
+      </div>
+    </div>
   `
 })
 export class RoleListComponent implements OnInit {
   private rbacService = inject(RbacService);
   private fb = inject(FormBuilder);
-  private messageService = inject(MessageService);
 
   roles = signal<Role[]>([]);
   allPermissions = signal<Permission[]>([]);
@@ -157,6 +165,25 @@ export class RoleListComponent implements OnInit {
     this.displayDialog = true;
   }
 
+  hasPermission(perm: Permission): boolean {
+    const currentPerms = this.roleForm.value.permissions as Permission[];
+    return currentPerms?.some(p => p.id === perm.id) || false;
+  }
+
+  togglePermission(perm: Permission, event: any) {
+    const checked = event.target.checked;
+    const currentPerms = (this.roleForm.value.permissions as Permission[]) || [];
+
+    let newPerms: Permission[];
+    if (checked) {
+      newPerms = [...currentPerms, perm];
+    } else {
+      newPerms = currentPerms.filter(p => p.id !== perm.id);
+    }
+
+    this.roleForm.patchValue({ permissions: newPerms });
+  }
+
   saveRole() {
     if (this.roleForm.invalid) return;
 
@@ -169,7 +196,7 @@ export class RoleListComponent implements OnInit {
           this.isSaving.set(false);
           this.displayDialog = false;
           this.loadRoles();
-          this.messageService.add({severity:'success', summary: 'Success', detail: 'Role updated'});
+          // Toast or helper notification
         },
         error: () => this.isSaving.set(false)
       });
@@ -179,7 +206,6 @@ export class RoleListComponent implements OnInit {
           this.isSaving.set(false);
           this.displayDialog = false;
           this.loadRoles();
-          this.messageService.add({severity:'success', summary: 'Success', detail: 'Role created'});
         },
         error: () => this.isSaving.set(false)
       });
@@ -191,7 +217,6 @@ export class RoleListComponent implements OnInit {
       this.rbacService.deleteRole(role.id).subscribe({
         next: () => {
           this.loadRoles();
-          this.messageService.add({severity:'success', summary: 'Success', detail: 'Role removed'});
         }
       });
     }

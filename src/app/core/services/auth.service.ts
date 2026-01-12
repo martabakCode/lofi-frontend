@@ -1,52 +1,44 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
+import { TokenStorageService } from './token-storage.service';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api.models';
 import { AuthResponse, User } from '../models/rbac.models';
+
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
     private http = inject(HttpClient);
-    private router = inject(Router);
+    private tokenStorage = inject(TokenStorageService);
+
     private readonly baseUrl = `${environment.apiUrl}/auth`;
 
-    // Signals for UI state
     currentUser = signal<User | null>(null);
-    token = signal<string | null>(localStorage.getItem('token'));
+    token = signal<string | null>(this.tokenStorage.getToken());
 
     constructor() {
-        // Initial load if token exists
         if (this.token()) {
             this.fetchCurrentUser().subscribe();
         }
     }
 
-    login(credentials: any): Observable<ApiResponse<AuthResponse>> {
-        return this.http.post<ApiResponse<AuthResponse>>(`${this.baseUrl}/login`, credentials).pipe(
+    login(credentials: any): Observable<AuthResponse> {
+        return this.http.post<AuthResponse>(`${this.baseUrl}/login`, credentials).pipe(
             tap(res => {
-                if (res.success) {
-                    this.setSession(res.data);
-                }
+                this.tokenStorage.saveToken(res.token);
+                this.token.set(res.token);
+                this.fetchCurrentUser().subscribe();
             })
         );
     }
 
     logout(): void {
-        localStorage.removeItem('token');
+        this.tokenStorage.clearToken();
         this.token.set(null);
         this.currentUser.set(null);
-        this.router.navigate(['/auth/login']);
-    }
-
-    private setSession(auth: AuthResponse): void {
-        localStorage.setItem('token', auth.token);
-        this.token.set(auth.token);
-        this.fetchCurrentUser().subscribe();
-        this.router.navigate(['/dashboard']);
     }
 
     private fetchCurrentUser(): Observable<ApiResponse<User>> {

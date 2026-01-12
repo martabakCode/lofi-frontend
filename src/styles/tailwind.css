@@ -39,6 +39,8 @@
     --color-accent-950: var(--accent-950);
 }
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
     body {
         @apply bg-surface-50 text-surface-900 antialiased selection:bg-primary-500/30;

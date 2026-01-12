@@ -2,15 +2,32 @@ import { Routes } from '@angular/router';
 import { MainLayoutComponent } from './core/layouts/main-layout/main-layout.component';
 import { AuthLayoutComponent } from './core/layouts/auth-layout/auth-layout.component';
 import { authGuard } from './core/guards/auth.guard';
+import { LandingComponent } from './features/landing/landing.component';
 
 export const routes: Routes = [
   {
     path: '',
+    component: LandingComponent,
+    pathMatch: 'full'
+  },
+  {
+    path: 'auth',
+    component: AuthLayoutComponent,
+    children: [
+      {
+        path: '',
+        loadChildren: () =>
+          import('./features/auth/auth.routes').then(m => m.AUTH_ROUTES)
+      }
+    ]
+  },
+  {
+    path: 'dashboard',
     component: MainLayoutComponent,
     canActivate: [authGuard],
     children: [
       {
-        path: 'dashboard',
+        path: '',
         loadChildren: () => import('./features/dashboard/dashboard.routes').then(m => m.DASHBOARD_ROUTES)
       },
       {
@@ -36,26 +53,11 @@ export const routes: Routes = [
       {
         path: 'roles',
         loadChildren: () => import('./features/roles/roles.routes').then(m => m.ROLE_ROUTES)
-      },
-      {
-        path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full'
-      }
-    ]
-  },
-  {
-    path: 'auth',
-    component: AuthLayoutComponent,
-    children: [
-      {
-        path: '',
-        loadChildren: () => import('./features/auth/auth.routes').then(m => m.AUTH_ROUTES)
       }
     ]
   },
   {
     path: '**',
-    redirectTo: 'auth/login'
+    redirectTo: ''
   }
 ];

@@ -1,14 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
 import { RouterLink } from '@angular/router';
 
 @Component({
     selector: 'app-forgot-password',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, ButtonModule, InputTextModule, RouterLink],
+    imports: [CommonModule, ReactiveFormsModule, RouterLink],
     templateUrl: './forgot-password.component.html',
     styleUrls: ['./forgot-password.component.css']
 })

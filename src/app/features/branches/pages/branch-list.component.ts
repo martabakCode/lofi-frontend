@@ -1,14 +1,11 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
 import { Branch } from '../../../core/models/rbac.models';
 
 @Component({
   selector: 'app-branch-list',
   standalone: true,
-  imports: [CommonModule, TableModule, ButtonModule, InputTextModule],
+  imports: [CommonModule],
   templateUrl: './branch-list.component.html',
   styleUrls: ['./branch-list.component.css']
 })

@@ -8,6 +8,11 @@
   "newProjectRoot": "projects",
   "projects": {
     "lofi-frontend": {
+      "compilerOptions": {
+        "moduleResolution": "node",
+        "module": "es2022",
+        "target": "es2022"
+      },
       "projectType": "application",
       "schematics": {},
       "root": "",

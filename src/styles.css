@@ -1,6 +1,3 @@
-@reference "tailwindcss";
-
 /* order MATTERS */
-@import "./styles/tailwind.css";
 @import "./styles/themes.css";
-@import "./styles/primeng.css";
+@import "./styles/tailwind.css";

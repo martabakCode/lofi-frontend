@@ -1,15 +1,11 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
 import { Loan, LoanService } from '../../../core/services/loan.service';
 
 @Component({
   selector: 'app-loan-review',
   standalone: true,
-  imports: [CommonModule, TableModule, TagModule, ButtonModule, InputTextModule],
+  imports: [CommonModule],
   templateUrl: './loan-review.component.html',
   styleUrls: ['./loan-review.component.css']
 })

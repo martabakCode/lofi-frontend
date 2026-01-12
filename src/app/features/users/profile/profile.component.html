@@ -40,18 +40,23 @@
                 <form [formGroup]="profileForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="flex flex-col gap-2">
                         <label for="fullName" class="font-semibold text-sm">Full Name</label>
-                        <input pInputText id="fullName" formControlName="fullName" />
+                        <input id="fullName" formControlName="fullName"
+                            class="w-full p-2 border rounded-lg bg-surface-50 dark:bg-surface-800 focus:ring-2 focus:ring-primary-500 outline-none transition-all" />
                     </div>
                     <div class="flex flex-col gap-2">
                         <label for="email" class="font-semibold text-sm">Email</label>
-                        <input pInputText id="email" formControlName="email" />
+                        <input id="email" formControlName="email"
+                            class="w-full p-2 border rounded-lg bg-surface-50 dark:bg-surface-800 focus:ring-2 focus:ring-primary-500 outline-none transition-all" />
                     </div>
                     <div class="flex flex-col gap-2">
                         <label for="phone" class="font-semibold text-sm">Phone</label>
-                        <input pInputText id="phone" formControlName="phone" />
+                        <input id="phone" formControlName="phone"
+                            class="w-full p-2 border rounded-lg bg-surface-50 dark:bg-surface-800 focus:ring-2 focus:ring-primary-500 outline-none transition-all" />
                     </div>
                     <div class="col-span-1 md:col-span-2 flex justify-end">
-                        <button pButton label="Save Changes" class="p-button-sm"></button>
+                        <button
+                            class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">Save
+                            Changes</button>
                     </div>
                 </form>
             </div>
@@ -62,23 +67,25 @@
                 <form [formGroup]="passwordForm" class="space-y-4">
                     <div class="flex flex-col gap-2">
                         <label for="currentPassword" class="font-semibold text-sm">Current Password</label>
-                        <p-password id="currentPassword" [feedback]="false" [toggleMask]="true" styleClass="w-full"
-                            inputStyleClass="w-full"></p-password>
+                        <input type="password" id="currentPassword" formControlName="currentPassword"
+                            class="w-full p-2 border rounded-lg bg-surface-50 dark:bg-surface-800 focus:ring-2 focus:ring-primary-500 outline-none transition-all" />
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="flex flex-col gap-2">
                             <label for="newPassword" class="font-semibold text-sm">New Password</label>
-                            <p-password id="newPassword" [toggleMask]="true" styleClass="w-full"
-                                inputStyleClass="w-full"></p-password>
+                            <input type="password" id="newPassword" formControlName="newPassword"
+                                class="w-full p-2 border rounded-lg bg-surface-50 dark:bg-surface-800 focus:ring-2 focus:ring-primary-500 outline-none transition-all" />
                         </div>
                         <div class="flex flex-col gap-2">
                             <label for="confirmPassword" class="font-semibold text-sm">Confirm Password</label>
-                            <p-password id="confirmPassword" [feedback]="false" [toggleMask]="true" styleClass="w-full"
-                                inputStyleClass="w-full"></p-password>
+                            <input type="password" id="confirmPassword" formControlName="confirmPassword"
+                                class="w-full p-2 border rounded-lg bg-surface-50 dark:bg-surface-800 focus:ring-2 focus:ring-primary-500 outline-none transition-all" />
                         </div>
                     </div>
                     <div class="flex justify-end">
-                        <button pButton label="Update Password" class="p-button-sm p-button-secondary"></button>
+                        <button
+                            class="bg-slate-200 dark:bg-surface-700 text-slate-800 dark:text-surface-200 hover:bg-slate-300 dark:hover:bg-surface-600 px-4 py-2 rounded-lg font-medium transition-colors">Update
+                            Password</button>
                     </div>
                 </form>
             </div>

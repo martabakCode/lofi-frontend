@@ -1,10 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { PasswordModule } from 'primeng/password';
-import { MessageModule } from 'primeng/message';
 import { AuthService } from '../../../core/services/auth.service';
 import { Router } from '@angular/router';
 
@@ -13,11 +9,7 @@ import { Router } from '@angular/router';
     standalone: true,
     imports: [
         CommonModule,
-        ReactiveFormsModule,
-        ButtonModule,
-        InputTextModule,
-        PasswordModule,
-        MessageModule
+        ReactiveFormsModule
     ],
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css']
@@ -28,23 +20,25 @@ export class LoginComponent {
     private router = inject(Router);
 
     loginForm: FormGroup = this.fb.group({
-        username: ['', [Validators.required]],
+        email: ['', [Validators.required, Validators.email]],
         password: ['', [Validators.required]]
     });
 
-    loading = false;
-    error = '';
+    loading = signal(false);
+    error = signal('');
 
     onSubmit() {
         if (this.loginForm.valid) {
-            this.loading = true;
+            this.error.set('');
+
             this.authService.login(this.loginForm.value).subscribe({
-                next: () => {
-                    this.loading = false;
+                next: (res) => {
+                    this.loading.set(false);
+                    this.router.navigate(['/dashboard']);
                 },
                 error: (err) => {
-                    this.loading = false;
-                    this.error = 'Invalid credentials';
+                    this.loading.set(false);
+                    this.error.set('Invalid credentials');
                 }
             });
         }
