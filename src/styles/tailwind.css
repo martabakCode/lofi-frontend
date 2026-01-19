@@ -26,28 +26,40 @@
     --color-surface-900: var(--surface-900);
     --color-surface-950: var(--surface-950);
 
-    --color-accent-50: var(--accent-50);
-    --color-accent-100: var(--accent-100);
-    --color-accent-200: var(--accent-200);
-    --color-accent-300: var(--accent-300);
-    --color-accent-400: var(--accent-400);
-    --color-accent-500: var(--accent-500);
-    --color-accent-600: var(--accent-600);
-    --color-accent-700: var(--accent-700);
-    --color-accent-800: var(--accent-800);
-    --color-accent-900: var(--accent-900);
-    --color-accent-950: var(--accent-950);
+    /* Semantic Aliases */
+    --color-bg-page: var(--bg-page);
+    --color-bg-surface: var(--bg-surface);
+    --color-bg-muted: var(--bg-muted);
+
+    --color-text-primary: var(--text-primary);
+    --color-text-secondary: var(--text-secondary);
+    --color-text-muted: var(--text-muted);
+
+    --color-brand-main: var(--brand-main);
+    --color-brand-hover: var(--brand-hover);
+    --color-brand-soft: var(--brand-soft);
+
+    --color-border-default: var(--border-default);
+    --color-border-muted: var(--border-muted);
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
     body {
-        @apply bg-surface-50 text-surface-900 antialiased selection:bg-primary-500/30;
+        background-color: var(--bg-page);
+        color: var(--text-primary);
+        @apply antialiased selection:bg-brand-main/30;
         font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+        transition: background-color 0.2s ease, color 0.2s ease;
     }
 
-    .dark body {
-        @apply bg-surface-950 text-surface-50;
+    * {
+        @apply border-border-default;
+    }
+
+    hr,
+    .divider {
+        border-color: var(--border-muted);
     }
 }

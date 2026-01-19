@@ -7,7 +7,19 @@ export interface Permission {
 export interface Role {
   id: string;
   name: string;
+  description?: string;
   permissions: Permission[];
+}
+
+export interface UpdateRoleRequest {
+  description?: string;
+  permissionIds?: string[];
+}
+
+export interface CreateRoleRequest {
+  name: string;
+  description?: string;
+  permissionIds?: string[];
 }
 
 export interface Branch {
@@ -34,9 +46,10 @@ export interface User {
 }
 
 export interface AuthResponse {
-  token: string;
-  email: string;
-  roles: string[];
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  tokenType: string;
 }
 
 export const PERMISSIONS = {
@@ -56,9 +69,10 @@ export const PERMISSIONS = {
 
 export const ROLES = {
   ADMIN: 'ROLE_ADMIN',
+  SUPER_ADMIN: 'ROLE_SUPER_ADMIN',
   CUSTOMER: 'ROLE_CUSTOMER',
   MARKETING: 'ROLE_MARKETING',
-  BRANCH_MANAGER: 'BRANCH_MANAGER',
-  BACKOFFICE: 'BACKOFFICE'
+  BRANCH_MANAGER: 'ROLE_BRANCH_MANAGER',
+  BACK_OFFICE: 'ROLE_BACK_OFFICE'
 };
 

@@ -5,9 +5,16 @@ export interface ApiResponse<T> {
 }
 
 export interface PaginatedResponse<T> {
-  content: T[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
+  items?: T[];
+  content?: T[];
+  meta?: {
+    page: number;
+    size: number;
+    totalItems: number;
+    totalPages: number;
+  };
+  totalElements?: number;
+  totalPages?: number;
+  size?: number;
+  number?: number;
 }

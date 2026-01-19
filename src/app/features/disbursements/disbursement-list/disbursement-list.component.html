@@ -1,64 +1,142 @@
-<div
-    class="card p-6 border rounded-xl bg-surface-0 dark:bg-surface-900 shadow-sm border-surface-200 dark:border-surface-800">
-    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
-        <div>
-            <h2 class="text-2xl font-bold m-0 text-surface-900 dark:text-surface-0">Loan Disbursement</h2>
-            <p class="text-surface-500 dark:text-surface-400 mt-2">Execute disbursement for approved loans</p>
-        </div>
-        <div class="flex items-center gap-2">
-            <div class="relative">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
-                <input type="text" placeholder="Search..."
-                    class="pl-10 pr-3 py-2 border rounded-lg bg-surface-50 dark:bg-surface-800 focus:ring-primary-500 w-full md:w-auto" />
+<div class="space-y-6">
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <div class="w-14 h-14 bg-brand-soft text-brand-main rounded-2xl flex items-center justify-center shadow-sm">
+                <i class="pi pi-wallet text-2xl"></i>
             </div>
-            <button class="px-3 py-2 border rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
-                (click)="loadLoans()" title="Refresh">
-                ↻
+            <div>
+                <h1 class="text-2xl font-bold text-text-primary m-0">Loan Disbursement</h1>
+                <p class="text-text-secondary m-0">Execute disbursement for approved loans</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="relative hidden md:block">
+                <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"></i>
+                <input type="text" placeholder="Search loans..." class="form-input pl-10 py-2 w-64 text-sm" />
+            </div>
+            <button class="btn-secondary px-3" (click)="loadLoans()" title="Refresh" [disabled]="loading()">
+                <i class="pi pi-refresh" [class.pi-spin]="loading()"></i>
             </button>
         </div>
     </div>
 
-    <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm border-collapse">
-            <thead class="bg-surface-50 dark:bg-surface-800 text-surface-500 dark:text-surface-400 font-medium">
-                <tr>
-                    <th class="p-4 cursor-pointer hover:bg-surface-100 dark:hover:bg-surface-700">Customer ↕</th>
-                    <th class="p-4 cursor-pointer hover:bg-surface-100 dark:hover:bg-surface-700">Product ↕</th>
-                    <th class="p-4 cursor-pointer hover:bg-surface-100 dark:hover:bg-surface-700">Amount ↕</th>
-                    <th class="p-4 cursor-pointer hover:bg-surface-100 dark:hover:bg-surface-700">Approved Date ↕</th>
-                    <th class="p-4">Status</th>
-                    <th class="p-4 text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-surface-200 dark:divide-surface-800">
-                <tr *ngFor="let loan of loans()"
-                    class="hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-colors">
-                    <td class="p-4">{{ loan.customerName }}</td>
-                    <td class="p-4">{{ loan.productName }}</td>
-                    <td class="p-4">{{ loan.amount | currency }}</td>
-                    <td class="p-4">{{ loan.appliedDate | date }}</td>
-                    <td class="p-4">
-                        <span
-                            [class]="'px-2 py-1 rounded text-xs font-semibold ' + 
-                            (getStatusSeverity(loan.status) === 'success' ? 'bg-green-100 text-green-700' : 
-                             getStatusSeverity(loan.status) === 'info' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700')">
-                            {{ loan.status }}
-                        </span>
-                    </td>
-                    <td class="p-4 text-center flex gap-2 justify-center">
-                        <button class="text-blue-600 hover:text-blue-700 font-medium text-sm"
-                            title="Disburse">Disburse</button>
-                        <button class="text-slate-500 hover:text-slate-700 font-medium text-sm"
-                            title="Print Agreement">Print</button>
-                    </td>
-                </tr>
-                <tr *ngIf="loans().length === 0 && !loading()">
-                    <td colspan="6" class="p-4 text-center text-surface-500">No approved loans found.</td>
-                </tr>
-                <tr *ngIf="loading()">
-                    <td colspan="6" class="p-4 text-center text-surface-500">Loading...</td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon pending">
+                <i class="pi pi-clock"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-value">{{ loans().length }}</span>
+                <span class="stat-label">Pending Disbursement</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon amount">
+                <i class="pi pi-money-bill"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-value">{{ formatCurrency(totalAmount()) }}</span>
+                <span class="stat-label">Total Amount</span>
+            </div>
+        </div>
     </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error()" class="error-alert">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>{{ error() }}</span>
+        <button class="btn-link" (click)="loadLoans()">Try Again</button>
+    </div>
+
+    <!-- Table Card -->
+    <div class="table-card">
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th>Amount</th>
+                        <th>Tenure</th>
+                        <th>Applied Date</th>
+                        <th>Status</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Loading State -->
+                    <tr *ngIf="loading()">
+                        <td colspan="7" class="loading-cell">
+                            <div class="loading-spinner">
+                                <i class="pi pi-spin pi-spinner"></i>
+                                <span>Loading approved loans...</span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Empty State -->
+                    <tr *ngIf="!loading() && loans().length === 0 && !error()">
+                        <td colspan="7" class="empty-cell">
+                            <div class="empty-state">
+                                <i class="pi pi-check-circle"></i>
+                                <span>All caught up!</span>
+                                <p>No loans pending disbursement</p>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Data Rows -->
+                    <tr *ngFor="let loan of loans()" class="data-row">
+                        <td>
+                            <div class="customer-info">
+                                <div class="customer-avatar">
+                                    {{ loan.customerName.charAt(0) }}
+                                </div>
+                                <span class="customer-name">{{ loan.customerName }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="product-badge">{{ loan.productName }}</span>
+                        </td>
+                        <td>
+                            <span class="amount-value">{{ formatCurrency(loan.amount) }}</span>
+                        </td>
+                        <td>
+                            <span class="tenure-value">{{ loan.tenure }} <span class="tenure-unit">months</span></span>
+                        </td>
+                        <td>
+                            <span class="date-value">{{ loan.appliedDate | date:'mediumDate' }}</span>
+                        </td>
+                        <td>
+                            <span class="status-badge" [class]="getStatusSeverity(loan.status)">
+                                <i class="pi pi-check-circle"></i>
+                                {{ loan.status }}
+                            </span>
+                        </td>
+                        <td class="actions-cell">
+                            <button class="btn-disburse" (click)="onDisburseClick(loan)"
+                                [disabled]="processingId() === loan.id" title="Disburse Loan">
+                                <i class="pi" [class.pi-spin]="processingId() === loan.id"
+                                    [class.pi-spinner]="processingId() === loan.id"
+                                    [class.pi-send]="processingId() !== loan.id"></i>
+                                <span>{{ processingId() === loan.id ? 'Processing...' : 'Disburse' }}</span>
+                            </button>
+                            <button class="btn-action print" title="Print Agreement">
+                                <i class="pi pi-print"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Disbursement Confirmation Modal -->
+    <app-confirmation-modal [isOpen]="modal().isOpen" [title]="modal().title" [message]="modal().message"
+        [confirmLabel]="modal().confirmLabel" [confirmBtnClass]="modal().confirmBtnClass"
+        [requireNotes]="modal().requireNotes" [placeholder]="modal().placeholder"
+        (confirm)="executeDisbursement($event)" (close)="modal().isOpen = false">
+    </app-confirmation-modal>
 </div>

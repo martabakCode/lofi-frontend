@@ -53,11 +53,19 @@ export const routes: Routes = [
       {
         path: 'roles',
         loadChildren: () => import('./features/roles/roles.routes').then(m => m.ROLE_ROUTES)
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent)
+      },
+      {
+        path: 'settings/password',
+        loadComponent: () => import('./features/profile/change-password.component').then(m => m.ChangePasswordComponent)
       }
     ]
   },
   {
     path: '**',
-    redirectTo: ''
+    loadComponent: () => import('./features/errors/not-found.component').then(m => m.NotFoundComponent)
   }
 ];

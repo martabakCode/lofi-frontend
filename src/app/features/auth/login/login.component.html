@@ -1,51 +1,55 @@
-<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
     <!-- General Error Message -->
     <div *ngIf="error()"
-        class="w-full bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
-        <span>!</span>
-        <span>{{ error() }}</span>
+        class="w-full bg-red-500/10 border border-red-500/20 text-red-600 px-4 py-3 rounded-xl text-sm flex items-center gap-3">
+        <i class="pi pi-exclamation-circle"></i>
+        <span class="font-medium">{{ error() }}</span>
     </div>
 
-    <div class="flex flex-col gap-2">
-        <label for="email" class="font-semibold text-sm text-slate-700 dark:text-slate-300">Email</label>
-        <input type="email" id="email" formControlName="email" placeholder="Enter your Email"
-            class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            [class.border-red-500]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" />
-        <small class="text-red-500 text-xs" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
-            Email is required
+    <div class="space-y-2">
+        <label for="email" class="form-label">Email Address</label>
+        <div class="relative">
+            <i class="pi pi-envelope absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"></i>
+            <input type="email" id="email" formControlName="email" placeholder="Enter your email"
+                class="form-input pl-10"
+                [class.border-red-500]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" />
+        </div>
+        <small class="form-error" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+            Please enter a valid email address
         </small>
     </div>
 
-    <div class="flex flex-col gap-2">
-        <label for="password" class="font-semibold text-sm text-slate-700 dark:text-slate-300">Password</label>
-        <input type="password" id="password" formControlName="password" placeholder="Enter your password"
-            class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            [class.border-red-500]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" />
-        <small class="text-red-500 text-xs"
-            *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+    <div class="space-y-2">
+        <label for="password" class="form-label">Password</label>
+        <div class="relative">
+            <i class="pi pi-lock absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"></i>
+            <input type="password" id="password" formControlName="password" placeholder="••••••••"
+                class="form-input pl-10"
+                [class.border-red-500]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" />
+        </div>
+        <small class="form-error" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
             Password is required
         </small>
     </div>
 
-    <div class="flex items-center justify-between mt-2">
+    <div class="flex items-center justify-between mt-1">
         <div class="flex items-center gap-2">
             <input type="checkbox" id="remember"
-                class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
-            <label for="remember" class="text-sm text-slate-600 dark:text-slate-400 cursor-pointer">Remember me</label>
+                class="w-4 h-4 text-brand-main border-border-default rounded focus:ring-brand-main bg-bg-surface">
+            <label for="remember" class="text-sm text-text-secondary cursor-pointer">Remember me</label>
         </div>
-        <a routerLink="/auth/forgot-password" class="text-sm font-medium text-primary-600 hover:text-primary-500">Forgot
+        <a routerLink="/auth/forgot-password"
+            class="text-sm font-semibold text-brand-main hover:text-brand-hover">Forgot
             password?</a>
     </div>
 
-    <button type="submit"
-        class="w-full mt-4 bg-primary-500 hover:bg-primary-600 text-white font-medium py-2.5 rounded-lg transition-colors duration-200 shadow-sm active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-        [disabled]="loginForm.invalid || loading()">
-        <span *ngIf="loading()">...</span>
-        <span *ngIf="!loading()">Log In</span>
-        <span *ngIf="loading()">Logging in...</span>
+    <button type="submit" class="btn-primary w-full py-2.5 mt-2" [disabled]="loginForm.invalid || loading()">
+        <i *ngIf="loading()" class="pi pi-spin pi-spinner mr-2"></i>
+        <span>{{ loading() ? 'Signing in...' : 'Sign In' }}</span>
     </button>
 
-    <p class="text-center text-sm text-slate-500 dark:text-slate-400 mt-4">
-        Don't have an account? <a href="#" class="font-medium text-primary-600 hover:text-primary-500">Contact IT</a>
+    <p class="text-center text-sm text-text-muted mt-2">
+        Institutional Access Only. <a href="#"
+            class="font-bold text-brand-main hover:text-brand-hover transition-colors">Contact IT Support</a>
     </p>
 </form>

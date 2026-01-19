@@ -1,45 +1,145 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Loan, LoanService } from '../../../core/services/loan.service';
+import { LoanFacade } from '../../../core/facades/loan.facade';
+import { SlaBadgeComponent } from '../../../shared/components/sla-badge/sla-badge.component';
+import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
+import { LoanStatus } from '../../../core/models/loan.models';
+import { LoanEventBus } from '../../../core/patterns/loan-event-bus.service';
+import { ToastService } from '../../../core/services/toast.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-loan-approval',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SlaBadgeComponent, ConfirmationModalComponent],
   templateUrl: './loan-approval.component.html',
   styleUrls: ['./loan-approval.component.css']
 })
-export class LoanApprovalComponent implements OnInit {
-  private loanService = inject(LoanService);
+export class LoanApprovalComponent implements OnInit, OnDestroy {
+  private loanFacade = inject(LoanFacade);
+  private eventBus = inject(LoanEventBus);
+  private toast = inject(ToastService);
+  private destroy$ = new Subject<void>();
 
-  loans = signal<Loan[]>([]);
-  loading = signal<boolean>(false);
+  loans = signal<any[]>([]);
+  loading = this.loanFacade.loading;
+  error = signal<string | null>(null);
   totalRecords = signal<number>(0);
+
+  // Modal State
+  modal = signal({
+    isOpen: false,
+    title: '',
+    message: '',
+    confirmLabel: '',
+    confirmBtnClass: '',
+    requireNotes: false,
+    placeholder: '',
+    action: null as ((notes: string) => void) | null
+  });
 
   ngOnInit() {
     this.loadLoans();
+
+    this.eventBus.loanUpdated$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.loadLoans());
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadLoans() {
-    this.loading.set(true);
-    // Mocking for now
-    setTimeout(() => {
-      const mockLoans: Loan[] = [
-        { id: '101', customerName: 'Robert White', productName: 'Investment Loan', amount: 500000, tenure: 60, status: 'REVIEWED', appliedDate: '2024-03-05' },
-        { id: '102', customerName: 'Sarah Connor', productName: 'Tech Startup Loan', amount: 120000, tenure: 24, status: 'REVIEWED', appliedDate: '2024-03-06' },
-      ];
-      this.loans.set(mockLoans);
-      this.totalRecords.set(mockLoans.length);
-      this.loading.set(false);
-    }, 1000);
+    // Filter for loans in REVIEWED status for BM approval
+    this.loanFacade.getLatestLoans({ status: 'REVIEWED', page: 0, size: 50 }).subscribe({
+      next: (response) => {
+        this.loans.set(response.content ?? []);
+        this.totalRecords.set(response.totalElements ?? 0);
+      },
+      error: (err) => {
+        console.error('Failed to load approval queue', err);
+        this.error.set('Failed to load approval queue');
+      }
+    });
   }
 
-  getStatusSeverity(status: string) {
-    switch (status) {
-      case 'REVIEWED': return 'warn';
-      case 'APPROVED': return 'success';
-      case 'REJECTED': return 'danger';
-      default: return 'info';
+  openConfirmModal(config: any) {
+    this.modal.set({
+      isOpen: true,
+      ...config
+    });
+  }
+
+  onApprove(loanId: string) {
+    this.openConfirmModal({
+      title: 'Final Approval',
+      message: 'Authorize this loan for disbursement? This action cannot be undone.',
+      confirmLabel: 'Authorize',
+      confirmBtnClass: 'bg-amber-600',
+      requireNotes: true,
+      placeholder: 'Final approval notes...',
+      action: (notes: string) => {
+        this.loanFacade.approveLoan(loanId, notes).subscribe({
+          next: () => {
+            this.eventBus.emitLoanUpdated();
+            this.toast.show('Loan authorized successfully', 'success');
+          },
+          error: (err) => this.toast.show('Approval failed', 'error')
+        });
+      }
+    });
+  }
+
+  onReject(loanId: string) {
+    this.openConfirmModal({
+      title: 'Reject Application',
+      message: 'Are you sure you want to REJECT this application? The customer will be notified.',
+      confirmLabel: 'Reject Permanently',
+      confirmBtnClass: 'bg-red-600',
+      requireNotes: true,
+      placeholder: 'Rejection reason...',
+      action: (notes: string) => {
+        this.loanFacade.rollbackLoan(loanId, 'REJECTED: ' + notes).subscribe({
+          next: () => {
+            this.eventBus.emitLoanUpdated();
+            this.toast.show('Application rejected', 'info');
+          },
+          error: (err) => this.toast.show('Rejection failed', 'error')
+        });
+      }
+    });
+  }
+
+  closeModal() {
+    this.modal.update(m => ({ ...m, isOpen: false }));
+  }
+
+  onExecuteAction(notes: string) {
+    if (this.modal().action) {
+      this.modal().action!(notes);
+      this.modal.update(m => ({ ...m, isOpen: false }));
     }
+  }
+
+  formatStatus(status: string): string {
+    return status ? status.replace(/_/g, ' ') : '';
+  }
+
+  getStatusClass(status: string): string {
+    switch (status) {
+      case 'REVIEWED': return 'badge-warning text-amber-600';
+      case 'APPROVED': return 'badge-success text-green-600';
+      default: return 'badge-info';
+    }
+  }
+
+  formatCurrency(value: number) {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0
+    }).format(value);
   }
 }

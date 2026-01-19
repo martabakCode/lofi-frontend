@@ -2,6 +2,10 @@ import { Routes } from '@angular/router';
 
 export const LOAN_ROUTES: Routes = [
     {
+        path: '',
+        loadComponent: () => import('./loan-list/loan-list.component').then(m => m.LoanListComponent)
+    },
+    {
         path: 'review',
         loadComponent: () => import('./loan-review/loan-review.component').then(m => m.LoanReviewComponent)
     },
@@ -10,8 +14,11 @@ export const LOAN_ROUTES: Routes = [
         loadComponent: () => import('./loan-approval/loan-approval.component').then(m => m.LoanApprovalComponent)
     },
     {
-        path: '',
-        redirectTo: 'review',
-        pathMatch: 'full'
+        path: 'apply',
+        loadComponent: () => import('./loan-application/loan-application.component').then(m => m.LoanApplicationComponent)
+    },
+    {
+        path: ':id',
+        loadComponent: () => import('./loan-detail/loan-detail.component').then(m => m.LoanDetailComponent)
     }
 ];

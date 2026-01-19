@@ -1,0 +1,76 @@
+<div class="relative">
+    <!-- Trigger Button -->
+    <button (click)="toggle()"
+        class="relative p-2.5 text-text-muted hover:bg-bg-muted hover:text-brand-main rounded-xl transition-all group"
+        [class.bg-bg-muted]="isOpen()" [class.text-brand-main]="isOpen()" title="Notifications">
+        <i class="pi pi-bell text-lg"></i>
+        @if (hasUnread()) {
+        <span
+            class="absolute top-2.5 right-2.5 w-2 h-2 bg-brand-main rounded-full border-2 border-bg-surface group-hover:scale-110 transition-transform"></span>
+        }
+    </button>
+
+    <!-- Panel -->
+    @if (isOpen()) {
+    <div
+        class="absolute right-0 top-full mt-2 w-80 md:w-96 bg-bg-surface border border-border-default rounded-2xl shadow-xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+        <!-- Header -->
+        <div
+            class="p-4 border-b border-border-default flex items-center justify-between bg-bg-muted/30 backdrop-blur-sm">
+            <h3 class="font-bold text-text-primary">Notifications</h3>
+            <span class="text-xs font-medium text-brand-main bg-brand-soft px-2 py-1 rounded-full">
+                {{ unreadCount() }} New
+            </span>
+        </div>
+
+        <!-- List -->
+        <div class="max-h-[400px] overflow-y-auto">
+            @for (item of notifications(); track item.id) {
+            <div (click)="markAsRead(item.id)"
+                class="p-4 border-b border-border-default last:border-0 hover:bg-bg-muted/50 cursor-pointer transition-colors group relative"
+                [class.bg-bg-muted-5]="!item.read">
+                @if (!item.read) {
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-brand-main"></div>
+                }
+                <div class="flex gap-3">
+                    <div class="mt-1">
+                        @switch (item.type) {
+                        @case ('success') { <i class="pi pi-check-circle text-green-500"></i> }
+                        @case ('warning') { <i class="pi pi-exclamation-triangle text-amber-500"></i> }
+                        @case ('error') { <i class="pi pi-times-circle text-red-500"></i> }
+                        @default { <i class="pi pi-info-circle text-blue-500"></i> }
+                        }
+                    </div>
+                    <div class="flex-1">
+                        <p
+                            class="text-sm font-semibold text-text-primary mb-1 group-hover:text-brand-main transition-colors">
+                            {{ item.title }}
+                        </p>
+                        <p class="text-xs text-text-secondary leading-relaxed mb-2">
+                            {{ item.message }}
+                        </p>
+                        <p class="text-[10px] text-text-muted font-medium uppercase tracking-wider">
+                            {{ item.time }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            }
+            @if (notifications().length === 0) {
+            <div class="p-8 text-center text-text-muted">
+                <i class="pi pi-bell-slash text-2xl mb-2 opacity-50"></i>
+                <p class="text-sm">No notifications</p>
+            </div>
+            }
+        </div>
+
+        <!-- Footer -->
+        <div class="p-3 border-t border-border-default bg-bg-muted/30 text-center">
+            <button
+                class="text-xs font-bold text-brand-main hover:text-brand-dark transition-colors uppercase tracking-wide">
+                Mark all as read
+            </button>
+        </div>
+    </div>
+    }
+</div>

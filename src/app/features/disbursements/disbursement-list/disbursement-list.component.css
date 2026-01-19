@@ -1,1 +1,5 @@
-/* Component specific styles */
+/* Styles handled by global utilities */
+:host {
+    display: block;
+    width: 100%;
+}

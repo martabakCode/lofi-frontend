@@ -2,7 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RbacService } from '../../../core/services/rbac.service';
-import { Role, Permission } from '../../../core/models/rbac.models';
+import { Role, Permission, UpdateRoleRequest, CreateRoleRequest } from '../../../core/models/rbac.models';
 
 @Component({
   selector: 'app-role-list',
@@ -80,6 +80,13 @@ import { Role, Permission } from '../../../core/models/rbac.models';
             <div class="space-y-1">
                 <label for="name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Role Name</label>
                 <input id="name" formControlName="name" placeholder="ROLE_ADMIN" 
+                    [readonly]="isEdit"
+                    class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none bg-transparent" [class.bg-slate-100]="isEdit" />
+            </div>
+
+            <div class="space-y-1">
+                <label for="description" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Description</label>
+                <input id="description" formControlName="description" placeholder="Role description..." 
                     class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none bg-transparent" />
             </div>
 
@@ -123,6 +130,7 @@ export class RoleListComponent implements OnInit {
 
   roleForm = this.fb.group({
     name: ['', Validators.required],
+    description: [''],
     permissions: [[] as Permission[]]
   });
 
@@ -160,6 +168,7 @@ export class RoleListComponent implements OnInit {
     this.selectedId = role.id;
     this.roleForm.patchValue({
       name: role.name,
+      description: role.description || '',
       permissions: role.permissions || []
     });
     this.displayDialog = true;
@@ -188,10 +197,16 @@ export class RoleListComponent implements OnInit {
     if (this.roleForm.invalid) return;
 
     this.isSaving.set(true);
-    const data = this.roleForm.value as Partial<Role>;
+    const formValue = this.roleForm.value;
+    const permissions = (formValue.permissions as Permission[]) || [];
+    const permissionIds = permissions.map(p => p.id);
 
     if (this.isEdit && this.selectedId) {
-      this.rbacService.updateRole(this.selectedId, data).subscribe({
+      const updateData: UpdateRoleRequest = {
+        description: formValue.description || undefined,
+        permissionIds: permissionIds
+      };
+      this.rbacService.updateRole(this.selectedId, updateData).subscribe({
         next: () => {
           this.isSaving.set(false);
           this.displayDialog = false;
@@ -201,7 +216,12 @@ export class RoleListComponent implements OnInit {
         error: () => this.isSaving.set(false)
       });
     } else {
-      this.rbacService.createRole(data).subscribe({
+      const createData: CreateRoleRequest = {
+        name: formValue.name || '',
+        description: formValue.description || undefined,
+        permissionIds: permissionIds
+      };
+      this.rbacService.createRole(createData).subscribe({
         next: () => {
           this.isSaving.set(false);
           this.displayDialog = false;

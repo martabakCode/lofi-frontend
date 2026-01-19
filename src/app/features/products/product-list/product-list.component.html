@@ -1,56 +1,148 @@
-<div
-    class="card p-6 border rounded-xl bg-surface-0 dark:bg-surface-900 shadow-sm border-surface-200 dark:border-surface-800">
-    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
-        <div>
-            <h2 class="text-2xl font-bold m-0 text-surface-900 dark:text-surface-0">Product Management</h2>
-            <p class="text-surface-500 dark:text-surface-400 mt-2">Configure and manage loan products</p>
+<div class="space-y-6">
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <div class="w-14 h-14 bg-brand-soft text-brand-main rounded-2xl flex items-center justify-center shadow-sm">
+                <i class="pi pi-box text-2xl"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-text-primary m-0">Product Management</h1>
+                <p class="text-text-secondary m-0">Configure and manage loan products</p>
+            </div>
         </div>
-        <div class="flex items-center gap-2">
-            <button
-                class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
+        <div class="flex items-center gap-3">
+            <button class="btn-primary">
                 <i class="pi pi-plus mr-2"></i> New Product
             </button>
-            <button class="px-3 py-2 border rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
-                (click)="loadProducts()" title="Refresh">
-                <i class="pi pi-refresh"></i>
+            <button class="btn-secondary px-3" (click)="loadProducts()" title="Refresh" [disabled]="loading()">
+                <i class="pi pi-refresh" [class.pi-spin]="loading()"></i>
             </button>
         </div>
     </div>
 
-    <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm border-collapse">
-            <thead class="bg-surface-50 dark:bg-surface-800 text-surface-500 dark:text-surface-400 font-medium">
-                <tr>
-                    <th class="p-4">Name</th>
-                    <th class="p-4">Amount Range</th>
-                    <th class="p-4">Tenure Range (Months)</th>
-                    <th class="p-4">Int. Rate (%)</th>
-                    <th class="p-4">Status</th>
-                    <th class="p-4 text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-surface-200 dark:divide-surface-800">
-                <tr *ngFor="let product of products()"
-                    class="hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-colors">
-                    <td class="p-4 font-bold">{{ product.name }}</td>
-                    <td class="p-4">{{ product.minAmount | number }} - {{ product.maxAmount | number }}</td>
-                    <td class="p-4">{{ product.minTenure }} - {{ product.maxTenure }}</td>
-                    <td class="p-4">{{ product.interestRate }}% pm</td>
-                    <td class="p-4">
-                        <span
-                            [class]="'px-2 py-1 rounded text-xs font-semibold ' + (product.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700')">
-                            {{ product.active ? 'ACTIVE' : 'INACTIVE' }}
-                        </span>
-                    </td>
-                    <td class="p-4 text-center flex gap-2 justify-center">
-                        <button class="text-primary hover:text-primary-700 font-medium text-sm">Edit</button>
-                        <button class="text-red-600 hover:text-red-700 font-medium text-sm">Delete</button>
-                    </td>
-                </tr>
-                <tr *ngIf="products().length === 0">
-                    <td colspan="6" class="p-4 text-center text-surface-500">No products found.</td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon active">
+                <i class="pi pi-check-circle"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-value">{{ activeProductCount() }}</span>
+                <span class="stat-label">Active Products</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon inactive">
+                <i class="pi pi-times-circle"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-value">{{ inactiveProductCount() }}</span>
+                <span class="stat-label">Inactive Products</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon total">
+                <i class="pi pi-database"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-value">{{ products().length }}</span>
+                <span class="stat-label">Total Products</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error()" class="error-alert">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>{{ error() }}</span>
+        <button class="btn-link" (click)="loadProducts()">Try Again</button>
+    </div>
+
+    <!-- Table Card -->
+    <div class="table-card">
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Loan Amount Range</th>
+                        <th>Tenure Range</th>
+                        <th>Interest Rate</th>
+                        <th>Admin Fee</th>
+                        <th>Status</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Loading State -->
+                    <tr *ngIf="loading()">
+                        <td colspan="7" class="loading-cell">
+                            <div class="loading-spinner">
+                                <i class="pi pi-spin pi-spinner"></i>
+                                <span>Loading products...</span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Empty State -->
+                    <tr *ngIf="!loading() && products().length === 0 && !error()">
+                        <td colspan="7" class="empty-cell">
+                            <div class="empty-state">
+                                <i class="pi pi-inbox"></i>
+                                <span>No products found</span>
+                                <p>Create your first product to get started</p>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Data Rows -->
+                    <tr *ngFor="let product of products()" class="data-row">
+                        <td>
+                            <div class="product-info">
+                                <span class="product-name">{{ product.name }}</span>
+                                <span class="product-code">{{ product.code }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="range-info">
+                                <span class="range-value">{{ product.amountRangeLabel }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="tenure-info">
+                                <span>{{ product.tenorLabel }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="interest-rate">{{ product.interestRateLabel }}</span>
+                        </td>
+                        <td>
+                            <span class="admin-fee">{{ product.adminFee | currency:'IDR':'symbol-narrow':'1.0-0'
+                                }}</span>
+                        </td>
+                        <td>
+                            <span class="status-badge" [class.active]="product.isActive"
+                                [class.inactive]="!product.isActive">
+                                <i [class.pi-check-circle]="product.isActive"
+                                    [class.pi-times-circle]="!product.isActive" class="pi"></i>
+                                {{ product.isActive ? 'Active' : 'Inactive' }}
+                            </span>
+                        </td>
+                        <td class="actions-cell">
+                            <button class="btn-action edit" title="Edit Product">
+                                <i class="pi pi-pencil"></i>
+                            </button>
+                            <button class="btn-action toggle" [title]="product.isActive ? 'Deactivate' : 'Activate'">
+                                <i [class.pi-eye-slash]="product.isActive" [class.pi-eye]="!product.isActive"
+                                    class="pi"></i>
+                            </button>
+                            <button class="btn-action delete" title="Delete Product">
+                                <i class="pi pi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>

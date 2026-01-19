@@ -4,24 +4,36 @@ import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { User, AuthResponse } from '../../../core/models/rbac.models';
 import { environment } from '../../../../environments/environment';
+import { TokenStorageService } from '../../../core/services/token-storage.service';
+import { ApiResponse } from '../../../core/models/api.models';
+import { map } from 'rxjs/operators';
 
+/**
+ * SINGLETON PATTERN
+ * Angular services with 'providedIn: root' are Singletons by default.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  /**
+   * DEPENDENCY INJECTION PATTERN
+   * Using the inject() function to resolve dependencies.
+   */
   private http = inject(HttpClient);
   private router = inject(Router);
-  private readonly TOKEN_KEY = 'lofi_token';
+  private tokenStorage = inject(TokenStorageService);
   private readonly USER_KEY = 'lofi_user';
 
   // State signals
   currentUser = signal<User | null>(this.getStoredUser());
   isAuthenticated = computed(() => !!this.currentUser());
 
-  constructor() {}
+  constructor() { }
 
   login(credentials: any): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, credentials).pipe(
+    return this.http.post<ApiResponse<AuthResponse>>(`${environment.apiUrl}/auth/login`, credentials).pipe(
+      map(response => response.data),
       tap(response => this.setSession(response))
     );
   }
@@ -31,35 +43,46 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem(this.TOKEN_KEY);
+    this.tokenStorage.clearToken();
     localStorage.removeItem(this.USER_KEY);
     this.currentUser.set(null);
     this.router.navigate(['/auth/login']);
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
+    return this.tokenStorage.getToken();
   }
 
   hasPermission(permissionName: string): boolean {
+    return this.getUserRoles().includes(permissionName);
+  }
+
+  getUserRoles(): string[] {
     const user = this.currentUser();
-    if (!user) return false;
-    // The backend returns a flat list of roles and permissions in the 'roles' array.
-    // We check if the permission exists in that list.
-    return user.roleNames?.includes(permissionName) || false;
+    if (!user) return [];
+
+    // Extract role names from either roleNames or roles array
+    const rolesSource = user.roleNames && user.roleNames.length > 0 ? user.roleNames : user.roles;
+    if (!rolesSource) return [];
+
+    return (rolesSource as any[]).map(r => {
+      if (typeof r === 'string') return r;
+      return r.name;
+    }).filter(Boolean);
   }
 
   private setSession(authResult: AuthResponse) {
-    localStorage.setItem(this.TOKEN_KEY, authResult.token);
-    
-    // Construct a User object from the response
+    this.tokenStorage.saveToken(authResult.accessToken);
+
+    // Construct a basic User object from login
+    // Detailed user info will be fetched by the app or current-user resolve
     const user: User = {
-      id: 'current', // ID not provided in login response, using placeholder
-      username: authResult.email.split('@')[0],
-      fullName: authResult.email.split('@')[0], // Placeholder, will update if we fetch user details
-      email: authResult.email,
-      roles: [], // We don't have detailed Role objects yet
-      roleNames: authResult.roles // Store the flat list of roles/permissions here
+      id: 'current',
+      username: 'User', // Will be updated by /me request
+      fullName: 'User',
+      email: '',
+      roles: [],
+      roleNames: []
     };
 
     localStorage.setItem(this.USER_KEY, JSON.stringify(user));

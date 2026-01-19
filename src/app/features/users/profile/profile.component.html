@@ -11,10 +11,10 @@
         <div class="card p-6 border rounded-xl bg-white dark:bg-surface-900 shadow-sm flex flex-col items-center">
             <div
                 class="h-32 w-32 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-300 text-5xl font-bold border-4 border-white dark:border-surface-800 shadow-lg mb-4">
-                {{ user()?.fullName?.charAt(0) }}
+                {{ user()?.username?.charAt(0)?.toUpperCase() || 'U' }}
             </div>
-            <h3 class="text-xl font-bold">{{ user()?.fullName }}</h3>
-            <p class="text-primary-500 font-medium">{{ user()?.roles?.[0]?.name || 'Staff' }}</p>
+            <h3 class="text-xl font-bold">{{ user()?.username || 'User' }}</h3>
+            <p class="text-primary-500 font-medium">{{ user()?.roles?.[0] || 'Staff' }}</p>
 
             <div class="w-full mt-6 space-y-3">
                 <div class="flex items-center gap-3 text-sm">
@@ -22,12 +22,12 @@
                     <span>{{ user()?.email || 'no-email@lofi.com' }}</span>
                 </div>
                 <div class="flex items-center gap-3 text-sm">
-                    <i class="pi pi-phone text-surface-400"></i>
-                    <span>{{ user()?.phone || '+1 234 567 890' }}</span>
+                    <i class="pi pi-id-card text-surface-400"></i>
+                    <span>ID: {{ user()?.id?.substring(0, 8) || 'N/A' }}...</span>
                 </div>
                 <div class="flex items-center gap-3 text-sm">
                     <i class="pi pi-building text-surface-400"></i>
-                    <span>{{ user()?.branch?.name || 'Main Branch' }}</span>
+                    <span>Branch ID: {{ user()?.branchId?.substring(0, 8) || 'N/A' }}...</span>
                 </div>
             </div>
         </div>
@@ -39,8 +39,8 @@
                 <h3 class="text-lg font-bold mb-4">General Information</h3>
                 <form [formGroup]="profileForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="flex flex-col gap-2">
-                        <label for="fullName" class="font-semibold text-sm">Full Name</label>
-                        <input id="fullName" formControlName="fullName"
+                        <label for="username" class="font-semibold text-sm">Username</label>
+                        <input id="username" formControlName="username"
                             class="w-full p-2 border rounded-lg bg-surface-50 dark:bg-surface-800 focus:ring-2 focus:ring-primary-500 outline-none transition-all" />
                     </div>
                     <div class="flex flex-col gap-2">
@@ -48,10 +48,14 @@
                         <input id="email" formControlName="email"
                             class="w-full p-2 border rounded-lg bg-surface-50 dark:bg-surface-800 focus:ring-2 focus:ring-primary-500 outline-none transition-all" />
                     </div>
-                    <div class="flex flex-col gap-2">
-                        <label for="phone" class="font-semibold text-sm">Phone</label>
-                        <input id="phone" formControlName="phone"
-                            class="w-full p-2 border rounded-lg bg-surface-50 dark:bg-surface-800 focus:ring-2 focus:ring-primary-500 outline-none transition-all" />
+                    <div class="flex flex-col gap-2 md:col-span-2">
+                        <label class="font-semibold text-sm">Roles</label>
+                        <div class="flex flex-wrap gap-2">
+                            <span *ngFor="let role of user()?.roles"
+                                class="px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 rounded-full text-sm">
+                                {{ role }}
+                            </span>
+                        </div>
                     </div>
                     <div class="col-span-1 md:col-span-2 flex justify-end">
                         <button

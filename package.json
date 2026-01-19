@@ -36,7 +36,9 @@
     "@angular/ssr": "^21.0.2",
     "chart.js": "^4.5.1",
     "express": "^5.1.0",
+    "gsap": "^3.14.2",
     "ngx-cookie-service": "^21.1.0",
+    "primeicons": "^7.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

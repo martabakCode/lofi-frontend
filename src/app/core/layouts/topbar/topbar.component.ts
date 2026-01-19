@@ -1,66 +1,55 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ThemeToggleComponent } from '../../../shared/components/theme-toggle/theme-toggle.component';
+import { NotificationPanelComponent } from './notification-panel.component';
+import { ProfileMenuComponent } from './profile-menu.component';
 
 @Component({
     selector: 'app-topbar',
     standalone: true,
-    imports: [CommonModule, ThemeToggleComponent],
+    imports: [CommonModule, ThemeToggleComponent, NotificationPanelComponent, ProfileMenuComponent, FormsModule],
     template: `
-    <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 lg:px-8 z-40 sticky top-0">
-        <!-- Left: Mobile Toggle & Search -->
+    <header class="h-16 bg-bg-surface/80 border-b border-border-default flex items-center justify-between px-4 lg:px-8 z-40 sticky top-0 backdrop-blur-md transition-colors duration-200">
+        <!-- Left: Search & Mobile Toggle -->
         <div class="flex items-center gap-4 flex-1">
-            <button (click)="onToggleSidebar.emit()" class="lg:hidden p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
-                <span class="text-xl">☰</span>
+            <button (click)="onToggleSidebar.emit()" class="lg:hidden p-2 text-text-muted hover:bg-bg-muted rounded-lg transition-colors">
+                <i class="pi pi-bars text-xl"></i>
             </button>
-
-            <div class="hidden md:flex relative w-full max-w-md">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
-                <input type="text" placeholder="Search or type command..." 
-                    class="w-full pl-10 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-colors" />
-                <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                    <kbd class="px-2 py-0.5 text-xs font-semibold text-slate-500 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded">⌘K</kbd>
-                </div>
+            <div class="flex items-center gap-2 px-3 py-2 bg-bg-muted/50 rounded-xl border border-border-default text-text-muted group focus-within:border-brand-main focus-within:ring-2 focus-within:ring-brand-main/10 transition-all w-full max-w-[180px] sm:max-w-xs md:max-w-sm">
+                <i class="pi pi-search text-sm group-focus-within:text-brand-main"></i>
+                <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" placeholder="Search..." class="bg-transparent border-none outline-none text-sm w-full text-text-primary placeholder:text-text-muted/50" />
+                <kbd class="hidden lg:inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-mono font-medium bg-bg-surface border border-border-default rounded shadow-sm">⌘K</kbd>
             </div>
         </div>
 
         <!-- Right: Actions & Profile -->
-        <div class="flex items-center gap-3 sm:gap-4">
+        <div class="flex items-center gap-2 sm:gap-4">
+            <!-- Theme Toggle -->
             <app-theme-toggle></app-theme-toggle>
 
-            <button class="p-2 text-slate-500 hover:text-primary-600 transition-colors relative">
-                <span class="text-xl">🔔</span>
-                <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
-            </button>
+            <!-- Notifications -->
+            <app-notification-panel></app-notification-panel>
 
-            <div class="h-8 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
+            <!-- Divider -->
+            <div class="hidden sm:block h-8 w-px bg-border-default mx-1"></div>
 
-            <div class="relative group">
-                <button class="flex items-center gap-3 cursor-pointer p-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                    <div class="text-right hidden sm:block">
-                        <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">{{ user()?.fullName || 'User' }}</p>
-                        <p class="text-xs text-slate-500 capitalize">{{ user()?.roles?.[0] || 'Admin' }}</p>
-                    </div>
-                    <div class="w-9 h-9 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold">
-                        {{ (user()?.fullName?.[0] || 'U') }}
-                    </div>
-                </button>
-                
-                <!-- Simple Dropdown -->
-                <div class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 hidden group-hover:block hover:block">
-                    <a *ngFor="let item of menuItems" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer">
-                        <span *ngIf="item.label">{{item.label}}</span>
-                        <hr *ngIf="!item.label" class="border-slate-200 dark:border-slate-700 my-1">
-                    </a>
-                </div>
-            </div>
+            <!-- Profile -->
+            <app-profile-menu [user]="user()"></app-profile-menu>
         </div>
     </header>
-  `
+  `,
+    styles: [`
+    :host { display: block; width: 100%; }
+  `]
 })
 export class TopbarComponent {
     user = input<any>();
     onToggleSidebar = output<void>();
+
+    private router = inject(Router);
+    searchQuery = '';
 
     menuItems: any[] = [
         { label: 'Profile', icon: 'pi pi-user' },
@@ -68,4 +57,12 @@ export class TopbarComponent {
         { separator: true },
         { label: 'Logout', icon: 'pi pi-sign-out' }
     ];
+
+    onSearch() {
+        if (this.searchQuery.trim()) {
+            console.log('Searching for:', this.searchQuery);
+            // Navigate to loan review as a default search location
+            this.router.navigate(['/dashboard/loans/review'], { queryParams: { search: this.searchQuery } });
+        }
+    }
 }

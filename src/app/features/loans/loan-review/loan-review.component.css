@@ -1,1 +1,5 @@
-/* Component specific styles */
+/* Loan Review styles are now handled by global utility classes */
+:host {
+    display: block;
+    width: 100%;
+}

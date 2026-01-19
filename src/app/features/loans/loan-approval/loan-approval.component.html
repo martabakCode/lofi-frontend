@@ -1,63 +1,121 @@
-<div
-    class="card p-6 border rounded-xl bg-surface-0 dark:bg-surface-900 shadow-sm border-surface-200 dark:border-surface-800">
-    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
-        <div>
-            <h2 class="text-2xl font-bold m-0 text-surface-900 dark:text-surface-0">Loan Approval Queue</h2>
-            <p class="text-surface-500 dark:text-surface-400 mt-2">Final approval for reviewed loan applications</p>
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <div class="w-14 h-14 bg-amber-soft text-amber-600 rounded-2xl flex items-center justify-center shadow-sm">
+                <i class="pi pi-check-square text-2xl"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-text-primary m-0">Final Approval Queue</h1>
+                <p class="text-text-secondary m-0">Review and authorize loan disbursements</p>
+            </div>
         </div>
-        <div class="flex items-center gap-2">
-            <span class="p-input-icon-left w-full md:w-auto">
-                <i class="pi pi-search"></i>
-                <input pInputText type="text" placeholder="Search..." class="w-full md:w-auto" />
-            </span>
-            <button pButton icon="pi pi-refresh" class="p-button-outlined" (click)="loadLoans()"></button>
+        <div class="flex gap-3">
+            <button class="btn-secondary px-3" (click)="loadLoans()" [disabled]="loading()">
+                <i class="pi pi-refresh" [class.pi-spin]="loading()"></i>
+            </button>
         </div>
     </div>
 
-    <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm border-collapse">
-            <thead class="bg-surface-50 dark:bg-surface-800 text-surface-500 dark:text-surface-400 font-medium">
-                <tr>
-                    <th class="p-4 cursor-pointer hover:bg-surface-100 dark:hover:bg-surface-700">Customer ↕</th>
-                    <th class="p-4 cursor-pointer hover:bg-surface-100 dark:hover:bg-surface-700">Product ↕</th>
-                    <th class="p-4 cursor-pointer hover:bg-surface-100 dark:hover:bg-surface-700">Amount ↕</th>
-                    <th class="p-4 cursor-pointer hover:bg-surface-100 dark:hover:bg-surface-700">Date ↕</th>
-                    <th class="p-4">Status</th>
-                    <th class="p-4 text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-surface-200 dark:divide-surface-800">
-                <tr *ngFor="let loan of loans()"
-                    class="hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-colors">
-                    <td class="p-4">{{ loan.customerName }}</td>
-                    <td class="p-4">{{ loan.productName }}</td>
-                    <td class="p-4 font-bold text-primary-600">{{ loan.amount | currency }}</td>
-                    <td class="p-4">{{ loan.appliedDate | date }}</td>
-                    <td class="p-4">
-                        <span
-                            [class]="'px-2 py-1 rounded text-xs font-semibold ' + 
-                            (getStatusSeverity(loan.status) === 'success' ? 'bg-green-100 text-green-700' : 
-                             getStatusSeverity(loan.status) === 'info' ? 'bg-blue-100 text-blue-700' : 
-                             getStatusSeverity(loan.status) === 'danger' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700')">
-                            {{ loan.status }}
-                        </span>
-                    </td>
-                    <td class="p-4 text-center flex gap-2 justify-center">
-                        <button class="text-primary hover:text-primary-700 font-medium text-sm"
-                            title="View Details">View</button>
-                        <button class="text-green-600 hover:text-green-700 font-medium text-sm"
-                            title="Approve">Approve</button>
-                        <button class="text-red-600 hover:text-red-700 font-medium text-sm"
-                            title="Reject">Reject</button>
-                    </td>
-                </tr>
-                <tr *ngIf="loans().length === 0 && !loading()">
-                    <td colspan="6" class="p-4 text-center text-surface-500">No loans found.</td>
-                </tr>
-                <tr *ngIf="loading()">
-                    <td colspan="6" class="p-4 text-center text-surface-500">Loading...</td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- Error Alert -->
+    <div *ngIf="error()"
+        class="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 p-4 rounded-xl flex items-center gap-3 text-red-600">
+        <i class="pi pi-exclamation-circle text-xl"></i>
+        <div class="flex-1">
+            <p class="font-bold m-0 text-sm">Action Required</p>
+            <p class="m-0 text-xs">{{ error() }}</p>
+        </div>
+        <button (click)="loadLoans()" class="btn-primary bg-red-600 hover:bg-red-700 py-1.5 px-4 text-xs">Retry</button>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="card p-6 flex flex-col gap-1">
+            <span class="text-xs font-bold text-text-muted uppercase tracking-widest">Pending Final Signature</span>
+            <span class="text-2xl font-bold text-amber-600">{{ totalRecords() }}</span>
+        </div>
+    </div>
+
+    <!-- Queue Table -->
+    <div class="card">
+        <div class="table-container border-none rounded-none shadow-none">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="pl-6">Application ID</th>
+                        <th>Status</th>
+                        <th>SLA Status</th>
+                        <th class="text-right">Amount</th>
+                        <th class="text-center pr-6">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-border-muted">
+                    <tr *ngIf="loading() && loans().length === 0">
+                        <td colspan="5" class="py-20 text-center">
+                            <i class="pi pi-spin pi-spinner text-3xl text-brand-main"></i>
+                            <p class="mt-4 text-text-muted font-medium">Synchronizing approval queue...</p>
+                        </td>
+                    </tr>
+
+                    <tr *ngIf="!loading() && loans().length === 0">
+                        <td colspan="5" class="py-24 text-center">
+                            <div class="flex flex-col items-center gap-3">
+                                <div
+                                    class="w-16 h-16 bg-bg-muted rounded-full flex items-center justify-center text-text-muted">
+                                    <i class="pi pi-check text-2xl"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-text-primary">All Clear!</h3>
+                                <p class="text-text-secondary max-w-xs mx-auto">There are no applications waiting for
+                                    your final signature at the moment.</p>
+                                <button (click)="loadLoans()" class="btn-secondary mt-2">Check for Updates</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr *ngFor="let loan of loans()" class="group hover:bg-bg-muted/30 transition-all">
+                        <td class="pl-6 py-5">
+                            <div class="flex flex-col">
+                                <span
+                                    class="text-xs font-mono text-text-muted bg-bg-muted px-1.5 py-0.5 rounded w-fit mb-1">{{
+                                    loan.id.substring(0,8) }}</span>
+                                <span class="font-bold text-text-primary">#{{ loan.loanNumber || 'TBD' }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge" [class]="getStatusClass(loan.status)">
+                                {{ formatStatus(loan.status) }}
+                            </span>
+                        </td>
+                        <td>
+                            <app-sla-badge [startTime]="loan.submittedAt"></app-sla-badge>
+                        </td>
+                        <td class="text-right py-5">
+                            <div class="flex flex-col items-end">
+                                <span class="font-bold text-text-primary">{{ formatCurrency(loan.amount) }}</span>
+                                <span class="text-[10px] text-text-muted">{{ loan.productName }}</span>
+                            </div>
+                        </td>
+                        <td class="pr-6 py-5 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <button (click)="onApprove(loan.id)"
+                                    class="btn-primary bg-amber-600 hover:bg-amber-700 text-xs py-1.5 px-4 shadow-amber-600/20">
+                                    Approve
+                                </button>
+                                <button (click)="onReject(loan.id)"
+                                    class="btn-secondary text-red-500 hover:text-red-700 hover:bg-red-50 text-xs py-1.5 px-4">
+                                    Reject
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
+
+<!-- Modal -->
+<app-confirmation-modal [isOpen]="modal().isOpen" [title]="modal().title" [message]="modal().message"
+    [confirmLabel]="modal().confirmLabel" [confirmBtnClass]="modal().confirmBtnClass"
+    [requireNotes]="modal().requireNotes" [placeholder]="modal().placeholder" (confirm)="onExecuteAction($event)"
+    (close)="closeModal()"></app-confirmation-modal>

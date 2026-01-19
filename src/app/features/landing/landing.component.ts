@@ -1,162 +1,150 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, PLATFORM_ID, Inject, inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-
-import { animate, style, transition, trigger } from '@angular/animations';
+import { Meta, Title } from '@angular/platform-browser';
+import { ProductFacade } from '../products/facades/product.facade';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-landing',
     standalone: true,
-    imports: [
-        CommonModule,
-        RouterModule,
-
-    ],
+    imports: [CommonModule, RouterModule, FormsModule],
     templateUrl: './landing.component.html',
-    styleUrls: ['./landing.component.css'],
-    animations: [
-        trigger('fadeInUp', [
-            transition(':enter', [
-                style({ opacity: 0, transform: 'translateY(20px)' }),
-                animate('0.6s ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
-            ])
-        ])
-    ]
+    styleUrls: ['./landing.component.css']
 })
 export class LandingComponent implements OnInit {
-    items: any[] | undefined;
+    private isBrowser: boolean;
+    isMenuOpen = false;
+    isLoaded = true; // Set to true immediately for "langsung muncul"
+    isDarkMode = false;
 
+    // Problems & Solutions
+    problems = [
+        { text: 'Proses manual yang lambat dan tidak efisien' },
+        { text: 'Kurangnya transparansi status pengajuan' },
+        { text: 'Risiko kesalahan input data yang tinggi' },
+        { text: 'Kesulitan dalam melacak riwayat persetujuan' }
+    ];
+
+    solutions = [
+        { text: 'Digitalisasi alur kerja yang terstruktur' },
+        { text: 'Pelacakan real-time untuk setiap tahap' },
+        { text: 'Validasi otomatis untuk akurasi data' },
+        { text: 'Audit trail lengkap dan sistematis' }
+    ];
+
+    // How It Works Steps
+    steps = [
+        { title: 'Pengajuan', description: 'Isi formulir pengajuan secara digital dengan mudah.' },
+        { title: 'Verifikasi', description: 'Sistem dan tim melakukan pengecekan data.' },
+        { title: 'Persetujuan', description: 'Review bertahap sesuai dengan struktur organisasi.' },
+        { title: 'Pencairan', description: 'Dana diproses dan dikirim ke rekening tujuan.' }
+    ];
+
+    // Features
     features = [
-        {
-            icon: 'pi pi-shield',
-            title: 'Secure & Reliable',
-            description: 'Bank-grade security standards ensuring your data is always protected.'
-        },
-        {
-            icon: 'pi pi-bolt',
-            title: 'Lightning Fast',
-            description: 'Optimized performance for seamless loan processing and management.'
-        },
-        {
-            icon: 'pi pi-chart-line',
-            title: 'Real-time Analytics',
-            description: 'Comprehensive dashboard with real-time insights and reporting.'
-        },
-        {
-            icon: 'pi pi-users',
-            title: 'User Management',
-            description: 'Advanced role-based access control for your entire organization.'
-        },
-        {
-            icon: 'pi pi-mobile',
-            title: 'Mobile First',
-            description: 'Fully responsive design that works perfectly on any device.'
-        },
-        {
-            icon: 'pi pi-cloud',
-            title: 'Cloud Native',
-            description: 'Built for the cloud with scalability and reliability in mind.'
-        }
+        { title: 'Smart Validation', description: 'Memastikan data yang masuk sesuai dengan kriteria yang ditentukan.' },
+        { title: 'Workflow Engine', description: 'Alur persetujuan yang fleksibel dan dapat disesuaikan.' },
+        { title: 'Real-time Analytics', description: 'Pantau performa proses bisnis Anda secara langsung.' },
+        { title: 'Secure Integration', description: 'Keamanan data tingkat tinggi dengan enkripsi standar industri.' }
     ];
 
-    testimonials = [
-        {
-            name: 'Sarah Johnson',
-            role: 'Finance Director',
-            comment: 'This platform has transformed how we handle loan processing. The efficiency gains are remarkable.',
-            image: 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png'
-        },
-        {
-            name: 'Michael Chen',
-            role: 'Operations Manager',
-            comment: 'The user interface is incredibly intuitive. Our team was up and running in minutes.',
-            image: 'https://primefaces.org/cdn/primeng/images/demo/avatar/asiyajavayant.png'
-        },
-        {
-            name: 'Emily Davis',
-            role: 'Small Business Owner',
-            comment: 'Fast, reliable, and secure. Exactly what I needed for my business financing.',
-            image: 'https://primefaces.org/cdn/primeng/images/demo/avatar/onyamalimba.png'
-        }
+    // Benefits
+    benefits = [
+        { title: 'Efisiensi Waktu', description: 'Mengurangi waktu proses hingga 70% dibandingkan metode konvensional.' },
+        { title: 'Transparansi Penuh', description: 'Semua pihak memiliki visibilitas terhadap status proses.' },
+        { title: 'Keamanan Data', description: 'Data tersimpan aman dengan sistem backup berkala.' },
+        { title: 'Skalabilitas Tinggi', description: 'Sistem yang siap tumbuh bersama perkembangan bisnis Anda.' }
     ];
 
-    pricingPlans = [
-        {
-            name: 'Starter',
-            price: '$29',
-            period: 'per month',
-            features: ['Up to 100 Loans', 'Basic Analytics', 'Email Support', '1 Admin User'],
-            recommended: false
-        },
-        {
-            name: 'Professional',
-            price: '$99',
-            period: 'per month',
-            features: ['Unlimited Loans', 'Advanced Analytics', 'Priority Support', '5 Admin Users', 'API Access'],
-            recommended: true
-        },
-        {
-            name: 'Enterprise',
-            price: 'Custom',
-            period: 'contact us',
-            features: ['Unlimited Everything', 'Custom Integration', 'Dedicated Account Manager', 'SLA Guarantee'],
-            recommended: false
-        }
-    ];
+    heroWords = "Sistem Digital yang Menyederhanakan Proses Anda".split(' ');
 
-    responsiveOptions = [
-        {
-            breakpoint: '1024px',
-            numVisible: 3,
-            numScroll: 3
-        },
-        {
-            breakpoint: '768px',
-            numVisible: 2,
-            numScroll: 2
-        },
-        {
-            breakpoint: '560px',
-            numVisible: 1,
-            numScroll: 1
-        }
-    ];
+    // Simulation State
+    productFacade = inject(ProductFacade);
+    products = this.productFacade.products;
 
-    constructor(private router: Router) { }
+    simSelectedProductId = '';
+    simAmount: number | null = null;
+    simTenor: number | null = null;
+
+    constructor(
+        private router: Router,
+        private meta: Meta,
+        private title: Title,
+        @Inject(PLATFORM_ID) platformId: Object
+    ) {
+        this.isBrowser = isPlatformBrowser(platformId);
+    }
 
     ngOnInit() {
-        this.items = [
-            {
-                label: 'Home',
-                icon: 'pi pi-home',
-                command: () => this.scrollToSection('home')
-            },
-            {
-                label: 'Features',
-                icon: 'pi pi-star',
-                command: () => this.scrollToSection('features')
-            },
-            {
-                label: 'Pricing',
-                icon: 'pi pi-tag',
-                command: () => this.scrollToSection('pricing')
-            },
-            {
-                label: 'Testimonials',
-                icon: 'pi pi-users',
-                command: () => this.scrollToSection('testimonials')
+        this.title.setTitle('LoFi - Productivity, Focus, Calm Workflow System');
+        this.meta.updateTag({ name: 'description', content: 'Experience a calm, and highly focused loan approval workflow. LoFi simplifies digital processes with ease and music-like harmony.' });
+
+        // Load products for calculator
+        this.productFacade.loadProducts();
+
+        if (this.isBrowser) {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                this.isDarkMode = true;
+                document.documentElement.classList.add('dark');
             }
-        ];
+        }
+    }
+
+    get selectedProduct() {
+        return this.products().find(p => p.id === this.simSelectedProductId);
+    }
+
+    get simulationResult() {
+        const p = this.selectedProduct;
+        const amount = this.simAmount;
+        const tenor = this.simTenor;
+
+        if (!p || !amount || !tenor) return null;
+
+        // Validation limits
+        // Note: Backend might provide huge nums, keep JS safe.
+        // Assuming rate is per annum percentage (standard).
+        // Calculation: Simple Interest (Flat)
+        // Interest = Principal * Rate% * (Tenor/12)
+        const rate = p.interestRate || 0;
+        const totalInterest = amount * (rate / 100) * (tenor / 12);
+        const totalPayment = amount + totalInterest;
+        const monthlyInstallment = totalPayment / tenor;
+
+        return {
+            monthlyInstallment,
+            totalPayment
+        };
+    }
+
+    toggleTheme() {
+        this.isDarkMode = !this.isDarkMode;
+        if (this.isDarkMode) {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        }
     }
 
     scrollToSection(sectionId: string) {
-        const element = document.getElementById(sectionId);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
+        if (this.isBrowser) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
         }
     }
 
-    navigateToLogin() {
-        this.router.navigate(['/auth/login']);
+    onProductChange() {
+        const p = this.selectedProduct;
+        if (p) {
+            // Set defaults to minimum values when product changes
+            this.simAmount = p.minAmount;
+            this.simTenor = p.minTenor;
+        }
     }
 }

@@ -17,9 +17,8 @@ export class ProfileComponent implements OnInit {
     user = this.authService.currentUser;
 
     profileForm: FormGroup = this.fb.group({
-        fullName: ['', [Validators.required]],
-        email: ['', [Validators.required, Validators.email]],
-        phone: ['']
+        username: ['', [Validators.required]],
+        email: ['', [Validators.required, Validators.email]]
     });
 
     passwordForm: FormGroup = this.fb.group({
@@ -32,9 +31,8 @@ export class ProfileComponent implements OnInit {
         const currentUser = this.user();
         if (currentUser) {
             this.profileForm.patchValue({
-                fullName: currentUser.fullName,
-                email: currentUser.email,
-                phone: currentUser.phone
+                username: currentUser.username,
+                email: currentUser.email
             });
         }
     }

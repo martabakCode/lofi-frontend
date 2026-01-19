@@ -6,14 +6,22 @@ import { environment } from '../../../environments/environment';
     providedIn: 'root'
 })
 export class TokenStorageService {
-    private cookieService = inject(CookieService);
+    private cookieService: CookieService = inject(CookieService);
     private readonly TOKEN_KEY = 'token';
+    private readonly REFRESH_TOKEN_KEY = 'refresh_token';
 
     /**
      * Get the token from storage
      */
     getToken(): string | null {
         return this.cookieService.get(this.TOKEN_KEY) || null;
+    }
+
+    /**
+     * Get the refresh token from storage
+     */
+    getRefreshToken(): string | null {
+        return this.cookieService.get(this.REFRESH_TOKEN_KEY) || null;
     }
 
     /**
@@ -33,10 +41,27 @@ export class TokenStorageService {
     }
 
     /**
-     * Remove the token from storage
+     * Save the refresh token to storage
+     * @param refreshToken The refresh token
+     */
+    saveRefreshToken(refreshToken: string): void {
+        this.cookieService.set(
+            this.REFRESH_TOKEN_KEY,
+            refreshToken,
+            {
+                path: '/',
+                secure: environment.production,
+                sameSite: 'Strict'
+            }
+        );
+    }
+
+    /**
+     * Remove the tokens from storage
      */
     clearToken(): void {
         this.cookieService.delete(this.TOKEN_KEY, '/');
+        this.cookieService.delete(this.REFRESH_TOKEN_KEY, '/');
     }
 
     /**

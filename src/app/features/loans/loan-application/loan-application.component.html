@@ -1,0 +1,253 @@
+<div class="max-w-3xl mx-auto py-8 px-4">
+    <!-- Application Header -->
+    <div class="text-center mb-10">
+        <div
+            class="w-16 h-16 bg-brand-main text-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-brand-main/20">
+            <i class="pi pi-briefcase text-2xl"></i>
+        </div>
+        <h1 class="text-3xl font-bold text-text-primary">New Loan Application</h1>
+        <p class="text-text-secondary mt-2">Complete the form below to start your application process.</p>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="flex items-center justify-center gap-4 mb-10">
+        <div class="flex flex-col items-center gap-2">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300"
+                [class]="!submittedLoanId() ? 'bg-brand-main text-white shadow-md shadow-brand-main/30' : 'bg-green-500 text-white'">
+                @if (submittedLoanId()) { <i class="pi pi-check text-sm"></i> }
+                @else { <span>1</span> }
+            </div>
+            <span class="text-xs font-semibold"
+                [class]="!submittedLoanId() ? 'text-brand-main' : 'text-green-600'">Application</span>
+        </div>
+        <div class="h-0.5 w-16 bg-border-muted" [class.bg-green-500]="submittedLoanId()"></div>
+        <div class="flex flex-col items-center gap-2">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300"
+                [class]="submittedLoanId() ? 'bg-brand-main text-white shadow-md shadow-brand-main/30' : 'bg-bg-muted text-text-muted border border-border-default'">
+                2
+            </div>
+            <span class="text-xs font-semibold"
+                [class]="submittedLoanId() ? 'text-brand-main' : 'text-text-muted'">Confirmation</span>
+        </div>
+    </div>
+
+    <!-- Stage 1: Application Form -->
+    @if (!submittedLoanId()) {
+    <div class="bg-bg-surface border border-border-default rounded-2xl shadow-sm p-6 md:p-8">
+        <form [formGroup]="applyForm" (ngSubmit)="onApply()" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Product Selection -->
+                <div class="col-span-full">
+                    <label class="block text-sm font-medium text-text-primary mb-1.5" for="product">Select Loan
+                        Product</label>
+                    <div class="relative">
+                        <i class="pi pi-box absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"></i>
+                        <select id="product" formControlName="product"
+                            class="w-full pl-10 pr-4 py-2.5 bg-bg-surface border border-border-default rounded-xl focus:border-brand-main focus:ring-1 focus:ring-brand-main outline-none transition-all appearance-none cursor-pointer">
+                            <option value="" disabled selected>Select a product...</option>
+                            @for (p of filteredProducts(); track p.code) {
+                            <option [value]="p.code">
+                                {{ p.name }}
+                            </option>
+                            }
+                        </select>
+                        <i
+                            class="pi pi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <!-- Loan Amount -->
+                <div>
+                    <label class="block text-sm font-medium text-text-primary mb-1.5" for="amount">Loan Amount
+                        (IDR)</label>
+                    <div class="relative">
+                        <i class="pi pi-wallet absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"></i>
+                        <input type="number" id="amount" formControlName="loanAmount"
+                            class="w-full pl-10 pr-4 py-2.5 bg-bg-surface border border-border-default rounded-xl focus:border-brand-main focus:ring-1 focus:ring-brand-main outline-none transition-all placeholder:text-text-muted/50"
+                            placeholder="e.g. 5,000,000" />
+                    </div>
+                    @if (applyForm.get('loanAmount')?.touched && applyForm.get('loanAmount')?.invalid) {
+                    <!-- Error handled via Toast -->
+                    }
+                </div>
+
+                <!-- Tenor -->
+                <div>
+                    <label class="block text-sm font-medium text-text-primary mb-1.5" for="tenor">Tenor (Months)</label>
+                    <div class="relative">
+                        <i class="pi pi-calendar absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"></i>
+                        <input type="number" id="tenor" formControlName="tenor"
+                            class="w-full pl-10 pr-4 py-2.5 bg-bg-surface border border-border-default rounded-xl focus:border-brand-main focus:ring-1 focus:ring-brand-main outline-none transition-all placeholder:text-text-muted/50"
+                            placeholder="e.g. 12" />
+                    </div>
+                    @if (applyForm.get('tenor')?.touched && applyForm.get('tenor')?.invalid) {
+                    <!-- Error handled via Toast -->
+                    }
+                </div>
+            </div>
+
+            <div class="pt-4">
+                <button type="submit"
+                    class="w-full py-3 bg-brand-main hover:bg-brand-dark text-white font-bold rounded-xl shadow-lg shadow-brand-main/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    [disabled]="applyForm.invalid || loading()">
+                    @if (!loading()) {
+                    <span>Next: Review Application</span> <i class="pi pi-arrow-right"></i>
+                    } @else {
+                    <i class="pi pi-spin pi-spinner text-xl"></i>
+                    }
+                </button>
+            </div>
+        </form>
+    </div>
+    }
+
+    <!-- Stage 2: Final Confirmation -->
+    @if (submittedLoanId()) {
+    <div class="bg-bg-surface border border-border-default rounded-2xl shadow-sm overflow-hidden">
+        <div class="bg-brand-soft/30 py-8 text-center border-b border-border-default/50">
+            <div
+                class="w-16 h-16 bg-green-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-500/20 animate-in zoom-in duration-300">
+                <i class="pi pi-check-circle text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-text-primary">Application Initialized!</h3>
+            <p class="text-text-secondary mt-1">Review the details below and submit for final approval.</p>
+        </div>
+
+        <div class="p-6 md:p-8">
+            <div class="bg-bg-muted rounded-2xl p-6 space-y-4 mb-8">
+                <div class="flex justify-between items-center py-2 border-b border-border-muted/50">
+                    <span class="text-text-muted text-sm font-medium">Reference ID</span>
+                    <span class="text-text-primary font-mono font-bold">#{{ submittedLoanId()?.substring(0, 8) }}</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-border-muted/50">
+                    <span class="text-text-muted text-sm font-medium">Amount</span>
+                    <span class="text-green-600 font-bold text-lg">
+                        {{ applyForm.value.loanAmount | currency:'IDR':'symbol':'1.0-0' }}
+                    </span>
+                </div>
+                <div class="flex justify-between items-center py-2">
+                    <span class="text-text-muted text-sm font-medium">Tenor</span>
+                    <span class="text-text-primary font-bold">{{ applyForm.value.tenor }} Months</span>
+                </div>
+            </div>
+
+            <!-- Documents Section -->
+            <div class="bg-bg-muted rounded-2xl p-6 mb-8">
+                <h4 class="text-lg font-bold text-text-primary mb-4">Required Documents</h4>
+                <div class="space-y-4">
+                    <!-- KTP -->
+                    <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-border-default">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                                <i class="pi pi-id-card"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-text-primary">KTP</p>
+                                <p class="text-xs text-text-muted">Identity Card</p>
+                            </div>
+                        </div>
+                        <div>
+                            @if (ktpStatus() === 'done') {
+                            <span class="text-green-600 font-bold flex items-center gap-2"><i
+                                    class="pi pi-check-circle"></i> Uploaded</span>
+                            } @else if (ktpStatus() === 'uploading') {
+                            <i class="pi pi-spin pi-spinner text-brand-main"></i>
+                            } @else {
+                            <input type="file" id="ktp" (change)="onFileSelected($event, 'KTP')" class="hidden"
+                                accept="image/*,.pdf">
+                            <label for="ktp"
+                                class="cursor-pointer px-4 py-2 bg-white border border-border-default hover:bg-gray-50 text-text-primary rounded-lg text-sm font-medium transition-colors shadow-sm">
+                                Upload
+                            </label>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- NPWP -->
+                    <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-border-default">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center">
+                                <i class="pi pi-file"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-text-primary">NPWP</p>
+                                <p class="text-xs text-text-muted">Tax ID</p>
+                            </div>
+                        </div>
+                        <div>
+                            @if (npwpStatus() === 'done') {
+                            <span class="text-green-600 font-bold flex items-center gap-2"><i
+                                    class="pi pi-check-circle"></i> Uploaded</span>
+                            } @else if (npwpStatus() === 'uploading') {
+                            <i class="pi pi-spin pi-spinner text-brand-main"></i>
+                            } @else {
+                            <input type="file" id="npwp" (change)="onFileSelected($event, 'NPWP')" class="hidden"
+                                accept="image/*,.pdf">
+                            <label for="npwp"
+                                class="cursor-pointer px-4 py-2 bg-white border border-border-default hover:bg-gray-50 text-text-primary rounded-lg text-sm font-medium transition-colors shadow-sm">
+                                Upload
+                            </label>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- KK -->
+                    <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-border-default">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center">
+                                <i class="pi pi-users"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-text-primary">KK</p>
+                                <p class="text-xs text-text-muted">Family Card</p>
+                            </div>
+                        </div>
+                        <div>
+                            @if (kkStatus() === 'done') {
+                            <span class="text-green-600 font-bold flex items-center gap-2"><i
+                                    class="pi pi-check-circle"></i> Uploaded</span>
+                            } @else if (kkStatus() === 'uploading') {
+                            <i class="pi pi-spin pi-spinner text-brand-main"></i>
+                            } @else {
+                            <input type="file" id="kk" (change)="onFileSelected($event, 'KK')" class="hidden"
+                                accept="image/*,.pdf">
+                            <label for="kk"
+                                class="cursor-pointer px-4 py-2 bg-white border border-border-default hover:bg-gray-50 text-text-primary rounded-lg text-sm font-medium transition-colors shadow-sm">
+                                Upload
+                            </label>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                    <button (click)="onSubmitFinal()"
+                        class="w-full py-3 bg-brand-main hover:bg-brand-dark text-white font-bold rounded-xl shadow-lg shadow-brand-main/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                        [disabled]="loading()">
+                        @if (!loading()) {
+                        <span>Full Submit Application</span> <i class="pi pi-send"></i>
+                        } @else {
+                        <i class="pi pi-spin pi-spinner text-xl"></i>
+                        }
+                    </button>
+
+                    <button (click)="onCancel()"
+                        class="w-full py-3 bg-red-50 text-red-600 hover:bg-red-100 font-bold rounded-xl border border-red-200 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                        [disabled]="loading()">
+                        <i class="pi pi-trash"></i> Cancel Application
+                    </button>
+
+                    <button (click)="submittedLoanId.set(null)"
+                        class="w-full py-2 text-text-muted hover:text-text-primary font-medium text-sm transition-colors"
+                        [disabled]="loading()">
+                        Back to Edit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+</div>
