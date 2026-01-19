@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { RbacService } from '../../../core/services/rbac.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -9,7 +10,7 @@ import { User, Branch } from '../../../core/models/rbac.models';
 @Component({
   selector: 'app-user-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.css']
 })
@@ -22,6 +23,9 @@ export class UserListComponent implements OnInit {
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
 
+  searchQuery = signal<string>('');
+  isExporting = signal(false);
+
   isDeleteModalOpen = false;
   userToDelete: User | null = null;
 
@@ -32,6 +36,58 @@ export class UserListComponent implements OnInit {
   inactiveUserCount = computed(() =>
     this.users().filter(u => this.getUserStatus(u) === 'Inactive').length
   );
+
+  onSearch(query: Event) {
+    const value = (query.target as HTMLInputElement).value.toLowerCase();
+    this.searchQuery.set(value);
+  }
+
+  filteredUsers = computed(() => {
+    const query = this.searchQuery();
+    if (!query) return this.users();
+    return this.users().filter(u =>
+      u.fullName.toLowerCase().includes(query) ||
+      u.email.toLowerCase().includes(query) ||
+      u.username.toLowerCase().includes(query)
+    );
+  });
+
+  exportUsers() {
+    this.isExporting.set(true);
+    const data = this.filteredUsers();
+    if (data.length === 0) {
+      this.isExporting.set(false);
+      return;
+    }
+
+    this.downloadCsv(data);
+    this.isExporting.set(false);
+  }
+
+  private downloadCsv(data: User[]) {
+    const headers = ['Full Name', 'Username', 'Email', 'Role', 'Branch', 'Status'];
+    const rows = data.map(u => [
+      u.fullName,
+      u.username,
+      u.email,
+      this.getRoleNames(u),
+      u.branch ? u.branch.name : '-',
+      this.getUserStatus(u)
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `users-export-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
   ngOnInit() {
     this.loadData();
   }

@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { LoanFacade } from '../../../core/facades/loan.facade';
 import { SlaBadgeComponent } from '../../../shared/components/sla-badge/sla-badge.component';
 import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
@@ -11,7 +12,7 @@ import { Subject, takeUntil } from 'rxjs';
 @Component({
   selector: 'app-loan-approval',
   standalone: true,
-  imports: [CommonModule, SlaBadgeComponent, ConfirmationModalComponent],
+  imports: [CommonModule, RouterModule, SlaBadgeComponent, ConfirmationModalComponent],
   templateUrl: './loan-approval.component.html',
   styleUrls: ['./loan-approval.component.css']
 })
@@ -38,6 +39,9 @@ export class LoanApprovalComponent implements OnInit, OnDestroy {
     action: null as ((notes: string) => void) | null
   });
 
+  searchQuery = signal<string>('');
+  isExporting = signal(false);
+
   ngOnInit() {
     this.loadLoans();
 
@@ -51,9 +55,24 @@ export class LoanApprovalComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  onSearch(query: Event) {
+    const value = (query.target as HTMLInputElement).value;
+    this.searchQuery.set(value);
+    this.loadLoans();
+  }
+
   loadLoans() {
-    // Filter for loans in REVIEWED status for BM approval
-    this.loanFacade.getLatestLoans({ status: 'REVIEWED', page: 0, size: 50 }).subscribe({
+    const params: any = {
+      status: 'REVIEWED',
+      page: 0,
+      size: 10
+    };
+
+    if (this.searchQuery()) {
+      params.search = this.searchQuery();
+    }
+
+    this.loanFacade.getLatestLoans(params).subscribe({
       next: (response) => {
         this.loans.set(response.content ?? []);
         this.totalRecords.set(response.totalElements ?? 0);
@@ -63,6 +82,57 @@ export class LoanApprovalComponent implements OnInit, OnDestroy {
         this.error.set('Failed to load approval queue');
       }
     });
+  }
+
+  exportLoans() {
+    this.isExporting.set(true);
+    const params: any = { status: 'REVIEWED', size: 1000 };
+    if (this.searchQuery()) {
+      params.search = this.searchQuery();
+    }
+
+    this.loanFacade.getLatestLoans(params).subscribe({
+      next: (response) => {
+        const data = response.content || [];
+        this.downloadCsv(data);
+        this.isExporting.set(false);
+      },
+      error: (err) => {
+        this.toast.show('Failed to export loans', 'error');
+        this.isExporting.set(false);
+      }
+    });
+  }
+
+  private downloadCsv(data: any[]) {
+    if (data.length === 0) {
+      this.toast.show('No data to export', 'warning');
+      return;
+    }
+
+    const headers = ['ID', 'Customer', 'Product', 'Amount', 'Tenure', 'Status', 'Date'];
+    const rows = data.map(loan => [
+      loan.id,
+      loan.customerName,
+      loan.productName,
+      loan.amount,
+      loan.tenure,
+      loan.status,
+      loan.appliedDate
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `loan-approval-export-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
   }
 
   openConfirmModal(config: any) {

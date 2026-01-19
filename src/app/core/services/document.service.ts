@@ -17,11 +17,12 @@ export class DocumentService {
     private http = inject(HttpClient);
     private apiUrl = `${environment.apiUrl}/documents`;
 
-    presignUpload(loanId: string | null, fileName: string, documentType: string): Observable<PresignUploadResponse> {
+    presignUpload(loanId: string | null, fileName: string, documentType: string, contentType: string): Observable<PresignUploadResponse> {
         return this.http.post<ApiResponse<PresignUploadResponse>>(`${this.apiUrl}/presign-upload`, {
             loanId,
             fileName,
-            documentType
+            documentType,
+            contentType
         }).pipe(
             map(res => res.data)
         );
@@ -38,7 +39,7 @@ export class DocumentService {
     // Helper to do both steps
     uploadDocument(loanId: string | null, file: File, documentType: string): Observable<PresignUploadResponse> {
         let presignResponse: PresignUploadResponse;
-        return this.presignUpload(loanId, file.name, documentType).pipe(
+        return this.presignUpload(loanId, file.name, documentType, file.type).pipe(
             switchMap(presign => {
                 presignResponse = presign;
                 return this.uploadFileToUrl(presign.uploadUrl, file);
@@ -49,5 +50,11 @@ export class DocumentService {
 
     uploadProfilePicture(file: File): Observable<PresignUploadResponse> {
         return this.uploadDocument(null, file, 'PROFILE_PICTURE');
+    }
+
+    getDownloadUrl(documentId: string): Observable<string> {
+        return this.http.get<ApiResponse<{ downloadUrl: string }>>(`${this.apiUrl}/${documentId}/download`).pipe(
+            map(res => res.data.downloadUrl)
+        );
     }
 }

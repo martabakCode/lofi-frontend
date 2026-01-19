@@ -1,10 +1,13 @@
 import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { Subject, timer, of } from 'rxjs';
-import { switchMap, takeUntil, catchError } from 'rxjs/operators';
+import { Subject, forkJoin, of } from 'rxjs';
+import { takeUntil, catchError, map } from 'rxjs/operators';
 import { ReportService, LoanKpiResponse } from '../../../../../core/services/report.service';
 import { ToastService } from '../../../../../core/services/toast.service';
+import { LoanService } from '../../../../../core/services/loan.service';
+import { ProductService } from '../../../../../features/products/services/product.service';
+import { RbacService } from '../../../../../core/services/rbac.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -19,10 +22,6 @@ import { ToastService } from '../../../../../core/services/toast.service';
           <p class="text-text-secondary m-0">Central command for Lofi platform administration</p>
         </div>
         <div class="flex items-center gap-2">
-            <div *ngIf="isOutdated()" class="flex items-center gap-2 px-4 py-2 bg-yellow-500/10 text-yellow-600 rounded-xl border border-yellow-500/20 animate-pulse">
-                <i class="pi pi-exclamation-triangle"></i>
-                <span class="font-bold text-sm">Data may be outdated</span>
-            </div>
             <div class="flex items-center gap-2 px-4 py-2 bg-brand-soft text-brand-main rounded-xl border border-brand-main/10">
                 <i class="pi pi-shield"></i>
                 <span class="font-bold text-sm tracking-wider uppercase">Administrative Access</span>
@@ -30,34 +29,44 @@ import { ToastService } from '../../../../../core/services/toast.service';
         </div>
       </div>
 
-      <!-- Quick Stats -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="card p-6 flex flex-col gap-2 border-l-4 border-l-brand-main">
-          <span class="text-xs font-bold text-text-muted uppercase tracking-widest">Total Loans</span>
-          <span class="text-3xl font-bold text-text-primary tracking-tight">{{ kpiData()?.totalLoans || 0 }}</span>
-          <span class="text-xs text-text-muted flex items-center gap-1">
-             All time volume
-          </span>
-        </div>
+      <!-- Quick Stats Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        
+        <!-- Card 1: Pending Disbursement -->
         <div class="card p-6 flex flex-col gap-2 border-l-4 border-l-amber-500">
-          <span class="text-xs font-bold text-text-muted uppercase tracking-widest">Pending Review</span>
-          <span class="text-3xl font-bold text-text-primary tracking-tight">{{ kpiData()?.totalSubmitted || 0 }}</span>
-          <span class="text-xs text-text-muted">Awaiting Action</span>
+          <span class="text-xs font-bold text-text-muted uppercase tracking-widest">Pending Disbursement</span>
+          <span class="text-3xl font-bold text-text-primary tracking-tight">{{ pendingDisbursementCount() }}</span>
+          <span class="text-xs text-text-muted flex items-center gap-1">
+             {{ pendingDisbursementAmount() | currency:'IDR':'symbol':'1.0-0' }} Total Amount
+          </span>
+           <button (click)="navigateTo('/dashboard/disbursements')" class="mt-4 text-xs font-bold text-amber-600 hover:text-amber-700 flex items-center gap-1">
+             Process Disbursements <i class="pi pi-arrow-right"></i>
+           </button>
         </div>
+
+        <!-- Card 2: Products -->
+        <div class="card p-6 flex flex-col gap-2 border-l-4 border-l-brand-main">
+          <span class="text-xs font-bold text-text-muted uppercase tracking-widest">Products</span>
+          <div class="flex flex-col gap-1 mt-1">
+              <span class="text-sm text-text-primary"><span class="font-bold">{{ activeProducts() }}</span> Active Products</span>
+              <span class="text-sm text-text-secondary"><span class="font-bold">{{ inactiveProducts() }}</span> Inactive Products</span>
+              <span class="text-sm text-brand-main font-bold mt-1">{{ totalProducts() }} Total Products</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Users -->
         <div class="card p-6 flex flex-col gap-2 border-l-4 border-l-indigo-500">
-          <span class="text-xs font-bold text-text-muted uppercase tracking-widest">Disbursed</span>
-          <span class="text-3xl font-bold text-text-primary tracking-tight">{{ kpiData()?.totalDisbursed || 0 }}</span>
-          <span class="text-xs text-green-500 flex items-center gap-1">Completed Loans</span>
+          <span class="text-xs font-bold text-text-muted uppercase tracking-widest">Users</span>
+          <div class="flex flex-col gap-1 mt-1">
+              <span class="text-sm text-text-primary"><span class="font-bold">{{ activeUsers() }}</span> Active Users</span>
+              <span class="text-sm text-text-secondary"><span class="font-bold">{{ inactiveUsers() }}</span> Inactive Users</span>
+              <span class="text-sm text-indigo-600 font-bold mt-1">{{ totalUsers() }} Total Users</span>
+          </div>
         </div>
-        <div class="card p-6 flex flex-col gap-2 border-l-4 border-l-rose-500">
-          <span class="text-xs font-bold text-text-muted uppercase tracking-widest">Rejected</span>
-          <span class="text-3xl font-bold text-text-primary tracking-tight">{{ kpiData()?.totalRejected || 0 }}</span>
-          <span class="text-xs text-text-muted">Total Rejections</span>
-        </div>
+
       </div>
       
       <!-- Management Modules -->
-      <!-- ... (Same as before) ... -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         
         <!-- Staff & Roles -->
@@ -105,17 +114,30 @@ import { ToastService } from '../../../../../core/services/toast.service';
 })
 export class AdminDashboardComponent implements OnInit, OnDestroy {
   private router = inject(Router);
-  private reportService = inject(ReportService);
   private toastService = inject(ToastService);
+  private loanService = inject(LoanService);
+  private productService = inject(ProductService);
+  private rbacService = inject(RbacService);
 
-  kpiData = signal<LoanKpiResponse | null>(null);
+  // Card 1: Pending Disbursement
+  pendingDisbursementCount = signal(0);
+  pendingDisbursementAmount = signal(0);
+
+  // Card 2: Products
+  activeProducts = signal(0);
+  inactiveProducts = signal(0);
+  totalProducts = signal(0);
+
+  // Card 3: Users
+  activeUsers = signal(0);
+  inactiveUsers = signal(0);
+  totalUsers = signal(0);
+
   isLoading = signal(false);
-  isOutdated = signal(false);
-
   private destroy$ = new Subject<void>();
 
   ngOnInit() {
-    this.startPolling();
+    this.loadData();
   }
 
   ngOnDestroy() {
@@ -123,35 +145,52 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private startPolling() {
+  private loadData() {
     this.isLoading.set(true);
 
-    // Initial fetch + interval
-    timer(0, 30000) // Every 30 seconds
-      .pipe(
-        takeUntil(this.destroy$),
-        switchMap(() => this.reportService.getKpis().pipe(
-          catchError(err => {
-            console.error('KPI polling error:', err);
-            // If we have data, mark as outdated, otherwise show error
-            if (this.kpiData()) {
-              this.isOutdated.set(true);
-              this.toastService.show('Connection lost, dashboard may be outdated', 'warning');
-            } else {
-              this.toastService.show('Failed to load dashboard data', 'error');
-            }
-            return of(null);
-          })
-        ))
-      )
-      .subscribe((data) => {
-        if (data) {
-          this.kpiData.set(data);
-          this.isOutdated.set(false);
+    forkJoin({
+      loans: this.loanService.getLoans({ status: 'APPROVED', size: 100 }), // Fetch approved loans to calculate pending disbursement
+      products: this.productService.getProducts(),
+      users: this.rbacService.getUsers()
+    })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          // 1. Pending Disbursement Stats
+          const approvedLoans = data.loans.content || [];
+          this.pendingDisbursementCount.set(data.loans.totalElements || approvedLoans.length);
+
+          // Sum amount (Approximation based on fetched page, ideally backend provides this)
+          const totalAmount = approvedLoans.reduce((sum, loan) => sum + (loan.amount || 0), 0);
+          this.pendingDisbursementAmount.set(totalAmount);
+
+          // 2. Product Stats
+          const products = data.products || [];
+          this.totalProducts.set(products.length);
+          this.activeProducts.set(products.filter(p => p.isActive).length);
+          this.inactiveProducts.set(products.filter(p => !p.isActive).length);
+
+          // 3. User Stats
+          const users = data.users || [];
+          // Assuming status exists on User, defaulting to 'Active' if checked elsewhere
+          // Based on user-list.component.ts: status can be checked.
+          // User interface in rbac.models.ts might have status.
+          // Let's assume 'status' field presence based on user-list logic.
+          const activeCount = users.filter((u: any) => u.status === 'Active' || !u.status).length;
+          this.activeUsers.set(activeCount);
+          this.inactiveUsers.set(users.length - activeCount);
+          this.totalUsers.set(users.length);
+
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          console.error('Failed to load dashboard data', err);
+          this.toastService.show('Failed to load dashboard data', 'error');
+          this.isLoading.set(false);
         }
-        this.isLoading.set(false);
       });
   }
+
   navigateTo(path: string) {
     this.router.navigate([path]);
   }

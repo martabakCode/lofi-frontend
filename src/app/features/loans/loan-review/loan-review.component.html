@@ -14,12 +14,23 @@
             <div class="relative group">
                 <i
                     class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-brand-main transition-colors"></i>
-                <input type="text" placeholder="Search applications..."
+                <input type="text" placeholder="Search applications..." (input)="onSearch($event)"
                     class="form-input pl-10 w-64 bg-bg-surface hover:bg-bg-muted transition-all" />
             </div>
+            <button class="btn-secondary px-3" (click)="exportLoans()" title="Export" [disabled]="isExporting()">
+                <i class="pi pi-download" [class.pi-spin]="isExporting()"></i>
+            </button>
             <button class="btn-secondary px-3" (click)="loadLoans()" title="Refresh" [disabled]="loading()">
                 <i class="pi pi-refresh" [class.pi-spin]="loading()"></i>
             </button>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="card p-6 flex flex-col gap-1">
+            <span class="text-xs font-bold text-text-muted uppercase tracking-widest">Pending Review</span>
+            <span class="text-2xl font-bold text-brand-main">{{ totalRecords() }}</span>
         </div>
     </div>
 
@@ -90,10 +101,12 @@
                         </td>
                         <td class="pr-6 py-4">
                             <div class="flex items-center justify-center gap-2">
+                                <a [routerLink]="['/dashboard/loans', loan.id]" class="btn-icon" title="View Details">
+                                    <i class="pi pi-eye text-brand-main"></i>
+                                </a>
                                 <!-- Review Action (Marketing) -->
                                 <button *ngIf="loan.status === 'SUBMITTED'" (click)="onReview(loan.id)"
                                     class="btn-primary py-1.5 px-3 text-xs gap-2">
-                                    <i class="pi pi-eye"></i>
                                     <span>Review</span>
                                 </button>
 

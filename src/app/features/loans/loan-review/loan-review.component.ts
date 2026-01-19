@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { LoanFacade } from '../../../core/facades/loan.facade';
 import { ReportService } from '../../../core/services/report.service';
 import { SlaBadgeComponent } from '../../../shared/components/sla-badge/sla-badge.component';
@@ -12,7 +13,7 @@ import { Subject, takeUntil } from 'rxjs';
 @Component({
   selector: 'app-loan-review',
   standalone: true,
-  imports: [CommonModule, SlaBadgeComponent, ConfirmationModalComponent],
+  imports: [CommonModule, RouterModule, SlaBadgeComponent, ConfirmationModalComponent],
   templateUrl: './loan-review.component.html',
   styleUrls: ['./loan-review.component.css']
 })
@@ -40,6 +41,9 @@ export class LoanReviewComponent implements OnInit, OnDestroy {
     action: null as ((notes: string) => void) | null
   });
 
+  searchQuery = signal<string>('');
+  isExporting = signal(false);
+
   ngOnInit() {
     this.loadLoans();
 
@@ -54,8 +58,29 @@ export class LoanReviewComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  onSearch(query: Event) {
+    const value = (query.target as HTMLInputElement).value;
+    this.searchQuery.set(value);
+    this.loadLoans();
+  }
+
   loadLoans() {
-    this.loanFacade.getLatestLoans().subscribe({
+    const params: any = {
+      // status field might be handled by backend default or facade, checking getLatestLoans signature
+      // Facade calls service which takes params.
+      // Based on loan-approval component, we might want to filter by SUBMITTED here if this is review queue?
+      // Step 27 says "New loan applications will appear here for your review".
+      // TS matches loanFacade.getLatestLoans().
+      // I'll keep default but allow search.
+      page: 0,
+      size: 10
+    };
+
+    if (this.searchQuery()) {
+      params.search = this.searchQuery();
+    }
+
+    this.loanFacade.getLatestLoans(params).subscribe({
       next: (response) => {
         this.loans.set(response.content ?? []);
         this.totalRecords.set(response.totalElements ?? 0);
@@ -65,6 +90,56 @@ export class LoanReviewComponent implements OnInit, OnDestroy {
         this.error.set('Failed to load review queue');
       }
     });
+  }
+
+  exportLoans() {
+    this.isExporting.set(true);
+    const params: any = { size: 1000 };
+    if (this.searchQuery()) {
+      params.search = this.searchQuery();
+    }
+
+    this.loanFacade.getLatestLoans(params).subscribe({
+      next: (response) => {
+        const data = response.content || [];
+        this.downloadCsv(data);
+        this.isExporting.set(false);
+      },
+      error: (err) => {
+        this.toast.show('Failed to export loans', 'error');
+        this.isExporting.set(false);
+      }
+    });
+  }
+
+  private downloadCsv(data: any[]) {
+    if (data.length === 0) {
+      this.toast.show('No data to export', 'warning');
+      return;
+    }
+
+    const headers = ['ID', 'Customer', 'Product', 'Amount', 'Status', 'Date'];
+    const rows = data.map(loan => [
+      loan.id,
+      loan.customerName,
+      loan.productName,
+      loan.amount,
+      loan.status,
+      loan.appliedDate
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `loan-review-export-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
   }
 
   canApprove(loan: any): boolean {
@@ -90,7 +165,7 @@ export class LoanReviewComponent implements OnInit, OnDestroy {
       confirmBtnClass: 'bg-brand-main',
       requireNotes: false,
       action: () => {
-        this.loanFacade.approveLoan(loanId, 'Reviewed by Marketing').subscribe({
+        this.loanFacade.reviewLoan(loanId, 'Reviewed by Marketing').subscribe({
           next: () => {
             this.eventBus.emitLoanUpdated();
             this.toast.show('Application reviewed', 'success');

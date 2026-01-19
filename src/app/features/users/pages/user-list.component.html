@@ -11,6 +11,17 @@
             </div>
         </div>
         <div class="flex items-center gap-3">
+            <div class="relative group">
+                <i
+                    class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-brand-main transition-colors"></i>
+                <input type="text" placeholder="Search users..." (input)="onSearch($event)"
+                    class="form-input pl-10 w-64 bg-bg-surface hover:bg-bg-muted transition-all rounded-lg border-border-default focus:border-brand-main focus:ring-1 focus:ring-brand-main" />
+            </div>
+
+            <button class="btn-secondary px-3" (click)="exportUsers()" title="Export" [disabled]="isExporting()">
+                <i class="pi pi-download" [class.pi-spin]="isExporting()"></i>
+            </button>
+
             <button class="btn-primary" (click)="openInviteModal()">
                 <i class="pi pi-user-plus mr-2"></i> Invite Staff
             </button>
@@ -96,7 +107,7 @@
                     </tr>
 
                     <!-- Data Rows -->
-                    <tr *ngFor="let user of users()" class="data-row">
+                    <tr *ngFor="let user of filteredUsers()" class="data-row">
                         <td>
                             <div class="user-info">
                                 <div class="user-avatar" [class]="getRoleColor(user.roles[0])">
@@ -131,6 +142,9 @@
                             </span>
                         </td>
                         <td class="actions-cell">
+                            <button class="btn-action view" title="View Details">
+                                <i class="pi pi-eye"></i>
+                            </button>
                             <button class="btn-action edit" title="Edit User">
                                 <i class="pi pi-pencil"></i>
                             </button>

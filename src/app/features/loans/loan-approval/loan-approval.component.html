@@ -10,7 +10,20 @@
                 <p class="text-text-secondary m-0">Review and authorize loan disbursements</p>
             </div>
         </div>
-        <div class="flex gap-3">
+        <div class="flex items-center gap-3">
+            <div class="relative group">
+                <i
+                    class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-brand-main transition-colors"></i>
+                <input type="text" placeholder="Search approvals..." (input)="onSearch($event)"
+                    class="form-input pl-10 w-64 bg-bg-surface hover:bg-bg-muted transition-all rounded-lg border-border-default focus:border-brand-main focus:ring-1 focus:ring-brand-main" />
+            </div>
+
+            <button class="btn-secondary px-3 flex items-center gap-2" (click)="exportLoans()"
+                [disabled]="isExporting()">
+                <i class="pi pi-download" [class.pi-spin]="isExporting()"></i>
+                <span class="hidden sm:inline">Export</span>
+            </button>
+
             <button class="btn-secondary px-3" (click)="loadLoans()" [disabled]="loading()">
                 <i class="pi pi-refresh" [class.pi-spin]="loading()"></i>
             </button>
@@ -78,16 +91,19 @@
                                 <span
                                     class="text-xs font-mono text-text-muted bg-bg-muted px-1.5 py-0.5 rounded w-fit mb-1">{{
                                     loan.id.substring(0,8) }}</span>
-                                <span class="font-bold text-text-primary">#{{ loan.loanNumber || 'TBD' }}</span>
+                                <span class="font-bold text-text-primary">#{{ loan.customerId.substring(0,8) }}</span>
                             </div>
                         </td>
                         <td>
                             <span class="badge" [class]="getStatusClass(loan.status)">
                                 {{ formatStatus(loan.status) }}
+
                             </span>
                         </td>
                         <td>
-                            <app-sla-badge [startTime]="loan.submittedAt"></app-sla-badge>
+
+
+                            <app-sla-badge [startTime]="loan.appliedDate"></app-sla-badge>
                         </td>
                         <td class="text-right py-5">
                             <div class="flex flex-col items-end">
@@ -97,6 +113,9 @@
                         </td>
                         <td class="pr-6 py-5 text-center">
                             <div class="flex items-center justify-center gap-2">
+                                <a [routerLink]="['/dashboard/loans', loan.id]" class="btn-icon" title="View Details">
+                                    <i class="pi pi-eye text-brand-main"></i>
+                                </a>
                                 <button (click)="onApprove(loan.id)"
                                     class="btn-primary bg-amber-600 hover:bg-amber-700 text-xs py-1.5 px-4 shadow-amber-600/20">
                                     Approve

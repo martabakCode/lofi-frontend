@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { LoanFacade } from '../../../core/facades/loan.facade';
 import { LoanService, BackendLoanResponse } from '../../../core/services/loan.service';
+import { DocumentService } from '../../../core/services/document.service';
 import { LoanActionsComponent } from '../components/loan-actions/loan-actions.component';
 import { ToastService } from '../../../core/services/toast.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -122,22 +123,29 @@ import { AuthService } from '../../../core/services/auth.service';
                 </div>
              </div>
 
-             <!-- Documents (Read Only unless Draft - handled by separate component/view usually, here simple list) -->
+             <!-- Documents -->
              <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Documents</h2>
-                <div class="text-sm text-gray-500 italic">
-                    Document preview not implemented in this view. 
-                    <span *ngIf="l.loanStatus === 'DRAFT'" class="not-italic text-primary-600 cursor-pointer" routerLink="/loans/apply">Edit in Application</span>
+                
+                <div *ngIf="!l.documents || l.documents.length === 0" class="text-sm text-gray-500 italic">
+                    No documents uploaded.
+                    <span *ngIf="l.loanStatus === 'DRAFT'" class="not-italic text-primary-600 cursor-pointer hover:underline" routerLink="/loans/apply">Edit in Application</span>
                 </div>
-                <div class="mt-4 flex gap-2">
-                    <div class="bg-gray-100 p-2 rounded text-xs flex items-center">
-                        <i class="fas fa-id-card mr-2"></i> KTP (Uploaded)
-                    </div>
-                     <div class="bg-gray-100 p-2 rounded text-xs flex items-center">
-                        <i class="fas fa-users mr-2"></i> KK (Uploaded)
-                    </div>
-                    <div class="bg-gray-100 p-2 rounded text-xs flex items-center">
-                        <i class="fas fa-file-invoice mr-2"></i> NPWP (Uploaded)
+
+                <div class="space-y-3">
+                    <div *ngFor="let doc of l.documents" class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                                <i class="fas" [class.fa-file-alt]="doc.documentType === 'NPWP'" [class.fa-id-card]="doc.documentType === 'KTP'" [class.fa-users]="doc.documentType === 'KK'"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">{{ formatDocType(doc.documentType) }}</p>
+                                <p class="text-xs text-gray-500">{{ doc.fileName }}</p>
+                            </div>
+                        </div>
+                        <button (click)="viewDocument(doc.id)" class="text-primary-600 hover:text-primary-800 p-2" title="View Document">
+                            <i class="fas fa-eye"></i>
+                        </button>
                     </div>
                 </div>
              </div>
@@ -150,6 +158,7 @@ import { AuthService } from '../../../core/services/auth.service';
 export class LoanDetailComponent implements OnInit {
     private route = inject(ActivatedRoute);
     private loanService = inject(LoanService);
+    private documentService = inject(DocumentService);
     private toast = inject(ToastService);
     private router = inject(Router);
 
@@ -260,7 +269,6 @@ export class LoanDetailComponent implements OnInit {
         }
     }
 
-    // Helper to map BackendDTO to UI interface for ActionsComponent
     processedLoan(l: BackendLoanResponse): any {
         return {
             id: l.id,
@@ -268,5 +276,18 @@ export class LoanDetailComponent implements OnInit {
             amount: l.loanAmount,
             // ... other fields if needed by actions
         };
+    }
+
+    viewDocument(id: string) {
+        this.documentService.getDownloadUrl(id).subscribe({
+            next: (url) => {
+                window.open(url, '_blank');
+            },
+            error: (err) => this.toast.show('Failed to open document', 'error')
+        });
+    }
+
+    formatDocType(type: string): string {
+        return type.replace('_', ' ');
     }
 }

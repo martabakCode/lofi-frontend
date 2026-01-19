@@ -72,6 +72,10 @@ export class LoanFacade {
         return this.loanService.approveLoan(loanId, notes);
     }
 
+    reviewLoan(loanId: string, notes: string) {
+        return this.loanService.reviewLoan(loanId, notes);
+    }
+
     rollbackLoan(loanId: string, notes: string) {
         return this.loanService.rollbackLoan(loanId, notes);
     }

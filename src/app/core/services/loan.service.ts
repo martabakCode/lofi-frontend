@@ -34,6 +34,14 @@ export interface BackendLoanResponse {
     disbursedAt?: string;
     createdAt?: string;
     updatedAt?: string;
+    documents?: DocumentResponse[];
+}
+
+export interface DocumentResponse {
+    id: string;
+    fileName: string;
+    documentType: string;
+    uploadedAt: string;
 }
 
 // Request DTOs
@@ -69,6 +77,7 @@ export class LoanService {
                 const items = data.items || [];
                 const uiContent: Loan[] = items.map((l: any) => ({
                     id: l.id,
+                    customerId: l.customerId,
                     customerName: l.customerName,
                     productName: l.product ? l.product.productName : 'Unknown Product',
                     amount: l.loanAmount,
