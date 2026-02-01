@@ -1,9 +1,27 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { ApiResponse } from '../models/api.models';
+import { ApiResponse, PaginatedResponse, PaginationParams, toPaginatedResponse } from '../models/api.models';
 import { Branch, Permission, Role, User, CreateRoleRequest, UpdateRoleRequest } from '../models/rbac.models';
 import { environment } from '../../../environments/environment';
+
+export interface UserFilterParams extends PaginationParams {
+  role?: string;
+  branch?: string;
+  status?: string;
+}
+
+export interface BranchFilterParams extends PaginationParams {
+  search?: string;
+}
+
+export interface PermissionFilterParams extends PaginationParams {
+  search?: string;
+}
+
+export interface RoleFilterParams extends PaginationParams {
+  search?: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -12,9 +30,41 @@ export class RbacService {
   private http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}`;
 
-  // Branches
-  getBranches(): Observable<Branch[]> {
-    return this.http.get<ApiResponse<Branch[]>>(`${this.baseUrl}/rbac/branches`).pipe(map(res => res.data));
+  private buildParams(params: PaginationParams): HttpParams {
+    let httpParams = new HttpParams();
+    if (params.page !== undefined) {
+      httpParams = httpParams.set('page', params.page.toString());
+    }
+    if (params.pageSize !== undefined) {
+      httpParams = httpParams.set('size', params.pageSize.toString());
+    }
+    if (params.sort) {
+      httpParams = httpParams.set('sort', params.sort);
+    }
+    if (params.search) {
+      httpParams = httpParams.set('search', params.search);
+    }
+    return httpParams;
+  }
+
+  // Branches with pagination
+  getBranches(params?: BranchFilterParams): Observable<{ items: Branch[]; total: number; page: number; pageSize: number; totalPages: number }> {
+    const httpParams = params ? this.buildParams(params) : new HttpParams();
+    return this.http.get<ApiResponse<PaginatedResponse<Branch>>>(`${this.baseUrl}/rbac/branches`, { params: httpParams }).pipe(
+      map(res => toPaginatedResponse(res.data))
+    );
+  }
+
+  getAllBranches(): Observable<Branch[]> {
+    return this.http.get<ApiResponse<Branch[]>>(`${this.baseUrl}/rbac/branches/all`).pipe(
+      map(res => res.data)
+    );
+  }
+
+  getBranchById(id: string): Observable<Branch> {
+    return this.http.get<ApiResponse<Branch>>(`${this.baseUrl}/rbac/branches/${id}`).pipe(
+      map(res => res.data)
+    );
   }
 
   createBranch(branch: Partial<Branch>): Observable<Branch> {
@@ -29,9 +79,35 @@ export class RbacService {
     return this.http.delete<void>(`${this.baseUrl}/rbac/branches/${id}`);
   }
 
-  // Permissions
-  getPermissions(): Observable<Permission[]> {
-    return this.http.get<ApiResponse<Permission[]>>(`${this.baseUrl}/rbac/permissions`).pipe(map(res => res.data));
+  // Get staff by branch
+  getBranchStaff(branchId: string): Observable<User[]> {
+    return this.http.get<ApiResponse<User[]>>(`${this.baseUrl}/rbac/branches/${branchId}/staff`).pipe(
+      map(res => res.data)
+    );
+  }
+
+  // Assign staff to branch
+  assignStaffToBranch(branchId: string, userId: string, role: 'BRANCH_MANAGER' | 'MARKETING'): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/rbac/branches/${branchId}/assign-staff`, { userId, role });
+  }
+
+  // Remove staff from branch
+  removeStaffFromBranch(branchId: string, userId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/rbac/branches/${branchId}/remove-staff/${userId}`);
+  }
+
+  // Permissions with pagination
+  getPermissions(params?: PermissionFilterParams): Observable<{ items: Permission[]; total: number; page: number; pageSize: number; totalPages: number }> {
+    const httpParams = params ? this.buildParams(params) : new HttpParams();
+    return this.http.get<ApiResponse<PaginatedResponse<Permission>>>(`${this.baseUrl}/rbac/permissions`, { params: httpParams }).pipe(
+      map(res => toPaginatedResponse(res.data))
+    );
+  }
+
+  getAllPermissions(): Observable<Permission[]> {
+    return this.http.get<ApiResponse<Permission[]>>(`${this.baseUrl}/rbac/permissions/all`).pipe(
+      map(res => res.data)
+    );
   }
 
   createPermission(permission: Partial<Permission>): Observable<Permission> {
@@ -46,9 +122,18 @@ export class RbacService {
     return this.http.delete<void>(`${this.baseUrl}/rbac/permissions/${id}`);
   }
 
-  // Roles
-  getRoles(): Observable<Role[]> {
-    return this.http.get<ApiResponse<Role[]>>(`${this.baseUrl}/rbac/roles`).pipe(map(res => res.data));
+  // Roles with pagination
+  getRoles(params?: RoleFilterParams): Observable<{ items: Role[]; total: number; page: number; pageSize: number; totalPages: number }> {
+    const httpParams = params ? this.buildParams(params) : new HttpParams();
+    return this.http.get<ApiResponse<PaginatedResponse<Role>>>(`${this.baseUrl}/rbac/roles`, { params: httpParams }).pipe(
+      map(res => toPaginatedResponse(res.data))
+    );
+  }
+
+  getAllRoles(): Observable<Role[]> {
+    return this.http.get<ApiResponse<Role[]>>(`${this.baseUrl}/rbac/roles/all`).pipe(
+      map(res => res.data)
+    );
   }
 
   getRoleById(id: string): Observable<Role> {
@@ -67,10 +152,22 @@ export class RbacService {
     return this.http.delete<void>(`${this.baseUrl}/rbac/roles/${id}`);
   }
 
-  // Users Management
-  getUsers(): Observable<User[]> {
-    return this.http.get<ApiResponse<any>>(`${this.baseUrl}/users`).pipe(
-      map(res => res.data.items || [])
+  // Users Management with pagination
+  getUsers(params?: UserFilterParams): Observable<{ items: User[]; total: number; page: number; pageSize: number; totalPages: number }> {
+    let httpParams = this.buildParams(params || {});
+
+    if (params?.role) {
+      httpParams = httpParams.set('role', params.role);
+    }
+    if (params?.branch) {
+      httpParams = httpParams.set('branch', params.branch);
+    }
+    if (params?.status) {
+      httpParams = httpParams.set('status', params.status);
+    }
+
+    return this.http.get<ApiResponse<PaginatedResponse<User>>>(`${this.baseUrl}/users`, { params: httpParams }).pipe(
+      map(res => toPaginatedResponse(res.data))
     );
   }
 

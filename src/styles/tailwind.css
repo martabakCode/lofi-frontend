@@ -13,6 +13,17 @@
     --color-primary-900: var(--primary-900);
     --color-primary-950: var(--primary-950);
 
+    --color-accent-100: var(--accent-100);
+    --color-accent-200: var(--accent-200);
+    --color-accent-300: var(--accent-300);
+    --color-accent-400: var(--accent-400);
+    --color-accent-500: var(--accent-500);
+    --color-accent-600: var(--accent-600);
+    --color-accent-700: var(--accent-700);
+    --color-accent-800: var(--accent-800);
+    --color-accent-900: var(--accent-900);
+    --color-accent-950: var(--accent-950);
+
     --color-surface-0: var(--surface-0);
     --color-surface-50: var(--surface-50);
     --color-surface-100: var(--surface-100);
@@ -38,6 +49,7 @@
     --color-brand-main: var(--brand-main);
     --color-brand-hover: var(--brand-hover);
     --color-brand-soft: var(--brand-soft);
+    --color-brand-accent: var(--brand-accent);
 
     --color-border-default: var(--border-default);
     --color-border-muted: var(--border-muted);

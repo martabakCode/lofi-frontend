@@ -28,7 +28,27 @@
             </div>
             <div>
                 <p class="text-xs font-bold text-text-muted uppercase tracking-wider m-0">Total Branches</p>
-                <p class="text-2xl font-bold text-text-primary m-0">{{ branches().length }}</p>
+                <p class="text-2xl font-bold text-text-primary m-0">{{ totalItems() }}</p>
+            </div>
+        </div>
+        <div class="card p-6 flex items-center gap-4">
+            <div class="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center">
+                <i class="pi pi-map-marker text-xl"></i>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-text-muted uppercase tracking-wider m-0">With Coordinates</p>
+                <p class="text-2xl font-bold text-text-primary m-0">{{ branchesWithCoordinates() }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="card p-4">
+        <div class="flex flex-col md:flex-row gap-4">
+            <div class="relative flex-1">
+                <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"></i>
+                <input type="text" placeholder="Search branches..." (input)="onSearch($event)"
+                    class="form-input pl-10 w-full" [value]="searchQuery()" />
             </div>
         </div>
     </div>
@@ -46,10 +66,19 @@
             <table>
                 <thead>
                     <tr>
-                        <th class="pl-6">Branch Name</th>
-                        <th>Address</th>
-                        <th>Contact</th>
-                        <th>Status</th>
+                        <app-sortable-header field="name" [sortField]="sortField()" [sortDirection]="sortDirection()"
+                            (sort)="onSort($event)">
+                            Branch Name
+                        </app-sortable-header>
+                        <app-sortable-header field="address" [sortField]="sortField()" [sortDirection]="sortDirection()"
+                            (sort)="onSort($event)">
+                            Address
+                        </app-sortable-header>
+                        <app-sortable-header field="phone" [sortField]="sortField()" [sortDirection]="sortDirection()"
+                            (sort)="onSort($event)">
+                            Contact
+                        </app-sortable-header>
+                        <th>Coordinates</th>
                         <th class="text-center pr-6">Actions</th>
                     </tr>
                 </thead>
@@ -93,16 +122,35 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge badge-success">Active</span>
+                            @if (hasCoordinates(branch)) {
+                            <span class="badge badge-success">
+                                <i class="pi pi-map-marker mr-1"></i>
+                                {{ branch.latitude | number:'1.4-4' }}, {{ branch.longitude | number:'1.4-4' }}
+                            </span>
+                            } @else {
+                            <span class="badge badge-secondary">No coordinates</span>
+                            }
                         </td>
                         <td class="pr-6 py-4 text-center">
                             <div class="flex items-center justify-center gap-2">
+                                <button (click)="openDetailModal(branch)"
+                                    class="w-8 h-8 rounded-lg bg-bg-muted text-text-muted hover:text-blue-500 transition-all flex items-center justify-center"
+                                    title="View Details">
+                                    <i class="pi pi-eye"></i>
+                                </button>
+                                <button (click)="viewOnMap(branch)" [disabled]="!hasCoordinates(branch)"
+                                    class="w-8 h-8 rounded-lg bg-bg-muted text-text-muted hover:text-green-500 transition-all flex items-center justify-center"
+                                    [class.opacity-50]="!hasCoordinates(branch)" title="View on Map">
+                                    <i class="pi pi-map"></i>
+                                </button>
                                 <button (click)="openEditModal(branch)"
-                                    class="w-8 h-8 rounded-lg bg-bg-muted text-text-muted hover:text-brand-main transition-all flex items-center justify-center">
+                                    class="w-8 h-8 rounded-lg bg-bg-muted text-text-muted hover:text-brand-main transition-all flex items-center justify-center"
+                                    title="Edit">
                                     <i class="pi pi-pencil"></i>
                                 </button>
-                                <button (click)="onDelete(branch.id)"
-                                    class="w-8 h-8 rounded-lg bg-bg-muted text-text-muted hover:text-red-500 transition-all flex items-center justify-center">
+                                <button (click)="confirmDelete(branch)"
+                                    class="w-8 h-8 rounded-lg bg-bg-muted text-text-muted hover:text-red-500 transition-all flex items-center justify-center"
+                                    title="Delete">
                                     <i class="pi pi-trash"></i>
                                 </button>
                             </div>
@@ -111,7 +159,337 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Pagination -->
+        <app-pagination [currentPageValue]="currentPage()" [pageSizeValue]="pageSize()" [totalItemsValue]="totalItems()"
+            (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+        </app-pagination>
     </div>
 </div>
 
-<!-- Add/Edit Modal (Simplified for now using prompt) -->
+<!-- Add/Edit Modal -->
+@if (modalMode()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+    (click)="closeModal()">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+        (click)="$event.stopPropagation()">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                {{ modalMode() === 'create' ? 'Add New Branch' : 'Edit Branch' }}
+            </h2>
+            <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <i class="pi pi-times text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Modal Body -->
+        <form [formGroup]="branchForm" (ngSubmit)="onSubmit()" class="p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Left Column: Form Fields -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Branch Name <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" formControlName="name"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-main focus:border-transparent dark:bg-gray-700 dark:text-white"
+                            placeholder="Enter branch name">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Address <span class="text-red-500">*</span>
+                        </label>
+                        <textarea formControlName="address" rows="2"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-main focus:border-transparent dark:bg-gray-700 dark:text-white"
+                            placeholder="Enter full address"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                City <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" formControlName="city"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-main focus:border-transparent dark:bg-gray-700 dark:text-white"
+                                placeholder="City">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                State <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" formControlName="state"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-main focus:border-transparent dark:bg-gray-700 dark:text-white"
+                                placeholder="State">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                ZIP Code <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" formControlName="zipCode"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-main focus:border-transparent dark:bg-gray-700 dark:text-white"
+                                placeholder="ZIP Code">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Phone <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" formControlName="phone"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-main focus:border-transparent dark:bg-gray-700 dark:text-white"
+                                placeholder="Phone number">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Latitude
+                            </label>
+                            <input type="text" formControlName="latitude" readonly
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-600 dark:text-gray-300"
+                                placeholder="Click on map">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Longitude
+                            </label>
+                            <input type="text" formControlName="longitude" readonly
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-600 dark:text-gray-300"
+                                placeholder="Click on map">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Map -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Branch Location <span class="text-gray-400 font-normal">(Click on map to set)</span>
+                    </label>
+                    <div class="h-[400px] border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+                        <app-leaflet-map [defaultLocation]="getCurrentLocation()" [showCoordinates]="false"
+                            (locationChange)="onLocationChange($event)">
+                        </app-leaflet-map>
+                    </div>
+                    <p class="text-xs text-gray-500">
+                        <i class="pi pi-info-circle mr-1"></i>
+                        Drag the marker or click anywhere on the map to set the branch location
+                    </p>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <button type="button" (click)="closeModal()"
+                    class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" [disabled]="isSubmitting() || branchForm.invalid"
+                    class="px-6 py-2 bg-brand-main hover:bg-brand-dark text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                    <i *ngIf="isSubmitting()" class="pi pi-spin pi-spinner"></i>
+                    {{ modalMode() === 'create' ? 'Create Branch' : 'Save Changes' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+}
+
+<!-- Detail Modal -->
+<app-detail-modal [isOpen]="isDetailModalOpen()" [title]="(selectedBranch()?.name || '') + ' - Details'"
+    (close)="closeDetailModal()">
+
+    <div *ngIf="selectedBranch()" class="space-y-6">
+        <!-- Branch Info -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-3">
+                <h4 class="font-semibold text-text-primary flex items-center gap-2">
+                    <i class="pi pi-building text-brand-main"></i>
+                    Branch Information
+                </h4>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-text-muted">Address:</span>
+                        <span class="text-text-primary text-right">{{ selectedBranch()?.address }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-text-muted">City:</span>
+                        <span class="text-text-primary">{{ selectedBranch()?.city }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-text-muted">State:</span>
+                        <span class="text-text-primary">{{ selectedBranch()?.state }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-text-muted">ZIP Code:</span>
+                        <span class="text-text-primary">{{ selectedBranch()?.zipCode }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-text-muted">Phone:</span>
+                        <span class="text-text-primary">{{ selectedBranch()?.phone }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <h4 class="font-semibold text-text-primary flex items-center gap-2">
+                    <i class="pi pi-map-marker text-brand-main"></i>
+                    Location
+                </h4>
+                <div *ngIf="hasCoordinates(selectedBranch()!)"
+                    class="h-48 rounded-lg overflow-hidden border border-border-default">
+                    <app-leaflet-map
+                        [defaultLocation]="{ latitude: +(selectedBranch()?.latitude || 0), longitude: +(selectedBranch()?.longitude || 0) }"
+                        [showCoordinates]="false" [readonly]="true">
+                    </app-leaflet-map>
+                </div>
+                <div *ngIf="!hasCoordinates(selectedBranch()!)"
+                    class="h-48 rounded-lg border border-border-default flex items-center justify-center bg-bg-muted">
+                    <span class="text-text-muted">No coordinates available</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Staff Statistics -->
+        <div class="grid grid-cols-3 gap-4">
+            <div class="card p-4 text-center">
+                <p class="text-2xl font-bold text-text-primary">{{ staffStats().total }}</p>
+                <p class="text-xs text-text-muted uppercase">Total Staff</p>
+            </div>
+            <div class="card p-4 text-center">
+                <p class="text-2xl font-bold text-blue-600">{{ staffStats().bmCount }}</p>
+                <p class="text-xs text-text-muted uppercase">Branch Managers</p>
+            </div>
+            <div class="card p-4 text-center">
+                <p class="text-2xl font-bold text-green-600">{{ staffStats().marketingCount }}</p>
+                <p class="text-xs text-text-muted uppercase">Marketing</p>
+            </div>
+        </div>
+
+        <!-- Staff Filter -->
+        <div class="flex items-center justify-between">
+            <h4 class="font-semibold text-text-primary flex items-center gap-2">
+                <i class="pi pi-users text-brand-main"></i>
+                Staff Members
+            </h4>
+            <div class="flex gap-2">
+                <button (click)="setStaffFilter('ALL')" [class.bg-brand-main]="staffFilterRole() === 'ALL'"
+                    [class.text-white]="staffFilterRole() === 'ALL'"
+                    class="px-3 py-1 text-sm rounded-lg border border-border-default hover:bg-bg-muted transition-colors">
+                    All
+                </button>
+                <button (click)="setStaffFilter('BRANCH_MANAGER')"
+                    [class.bg-brand-main]="staffFilterRole() === 'BRANCH_MANAGER'"
+                    [class.text-white]="staffFilterRole() === 'BRANCH_MANAGER'"
+                    class="px-3 py-1 text-sm rounded-lg border border-border-default hover:bg-bg-muted transition-colors">
+                    Managers
+                </button>
+                <button (click)="setStaffFilter('MARKETING')" [class.bg-brand-main]="staffFilterRole() === 'MARKETING'"
+                    [class.text-white]="staffFilterRole() === 'MARKETING'"
+                    class="px-3 py-1 text-sm rounded-lg border border-border-default hover:bg-bg-muted transition-colors">
+                    Marketing
+                </button>
+                <button (click)="openAssignModal(selectedBranch()!)"
+                    class="px-3 py-1 text-sm rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors flex items-center gap-1">
+                    <i class="pi pi-plus"></i>
+                    Assign Staff
+                </button>
+            </div>
+        </div>
+
+        <!-- Staff List -->
+        <div class="border border-border-default rounded-lg overflow-hidden">
+            <div *ngIf="loadingStaff()" class="p-8 text-center">
+                <i class="pi pi-spin pi-spinner text-brand-main"></i>
+                <p class="text-text-muted mt-2">Loading staff...</p>
+            </div>
+
+            <div *ngIf="!loadingStaff() && filteredBranchStaff().length === 0" class="p-8 text-center text-text-muted">
+                <i class="pi pi-users text-3xl mb-2"></i>
+                <p>No staff members found</p>
+            </div>
+
+            <div *ngIf="!loadingStaff() && filteredBranchStaff().length > 0" class="divide-y divide-border-muted">
+                <div *ngFor="let staff of filteredBranchStaff()"
+                    class="p-4 flex items-center justify-between hover:bg-bg-muted/50">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-full bg-brand-soft text-brand-main flex items-center justify-center font-bold">
+                            {{ getInitials(staff.fullName) }}
+                        </div>
+                        <div>
+                            <p class="font-medium text-text-primary">{{ staff.fullName }}</p>
+                            <p class="text-sm text-text-muted">{{ staff.email }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="flex gap-1">
+                            <span *ngFor="let role of staff.roles"
+                                class="px-2 py-0.5 text-xs rounded-full bg-bg-muted text-text-secondary">
+                                {{ getRoleDisplayName(role) }}
+                            </span>
+                        </div>
+                        <button (click)="removeStaff(staff.id)"
+                            class="w-8 h-8 rounded-lg bg-red-100 text-red-500 hover:bg-red-200 transition-colors flex items-center justify-center"
+                            title="Remove from branch">
+                            <i class="pi pi-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</app-detail-modal>
+
+<!-- Assign Staff Modal -->
+<app-detail-modal [isOpen]="isAssignModalOpen()" title="Assign Staff to Branch" (close)="closeAssignModal()">
+
+    <div class="space-y-4">
+        <div>
+            <label class="form-label">Select User</label>
+            <div *ngIf="loadingUsers()" class="text-text-muted">
+                <i class="pi pi-spin pi-spinner mr-2"></i>Loading users...
+            </div>
+            <select *ngIf="!loadingUsers()" [ngModel]="selectedUserId()" (ngModelChange)="selectedUserId.set($event)"
+                class="form-select">
+                <option value="">Select a user</option>
+                <option *ngFor="let user of availableUsers()" [value]="user.id">
+                    {{ user.fullName }} ({{ user.email }})
+                </option>
+            </select>
+        </div>
+
+        <div>
+            <label class="form-label">Assign Role</label>
+            <div class="flex gap-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="staffRole" [checked]="selectedStaffRole() === 'MARKETING'"
+                        (change)="selectedStaffRole.set('MARKETING')" class="text-brand-main">
+                    <span>Marketing Staff</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="staffRole" [checked]="selectedStaffRole() === 'BRANCH_MANAGER'"
+                        (change)="selectedStaffRole.set('BRANCH_MANAGER')" class="text-brand-main">
+                    <span>Branch Manager</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4">
+            <button (click)="closeAssignModal()" class="btn-secondary">Cancel</button>
+            <button (click)="onAssignStaff()" [disabled]="!selectedUserId()" class="btn-primary">
+                Assign Staff
+            </button>
+        </div>
+    </div>
+</app-detail-modal>
+
+<!-- Delete Confirmation Modal -->
+<app-confirmation-modal [isOpen]="isDeleteModalOpen()" title="Delete Branch"
+    [message]="'Are you sure you want to delete ' + (branchToDelete()?.name || '') + '? This action cannot be undone.'"
+    confirmLabel="Delete" confirmBtnClass="bg-red-500 hover:bg-red-600" (confirm)="onDeleteConfirmed()"
+    (close)="isDeleteModalOpen.set(false)">
+</app-confirmation-modal>

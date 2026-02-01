@@ -5,11 +5,18 @@ import { Router } from '@angular/router';
 import { LoanFacade } from '../../../core/facades/loan.facade';
 import { LoanService } from '../../../core/services/loan.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { DocumentService } from '../../../core/services/document.service';
+import { DocumentUploadService } from '../../../core/services/document-upload.service';
 import { ProductFacade } from '../../products/facades/product.facade';
 import { LoanRequestBuilder } from '../../../core/patterns/loan-request.builder';
 import { LoanEventBus } from '../../../core/patterns/loan-event-bus.service';
 
+/**
+ * Loan Application Component
+ * 
+ * Refactored to use DocumentUploadService and DocumentUploadComponent
+ * for document upload functionality, eliminating code duplication
+ * with MarketingLoanApplicationComponent.
+ */
 @Component({
     selector: 'app-loan-application',
     standalone: true,
@@ -19,28 +26,28 @@ import { LoanEventBus } from '../../../core/patterns/loan-event-bus.service';
 })
 export class LoanApplicationComponent implements OnInit {
     private fb = inject(FormBuilder);
-    // private loanFacade = inject(LoanFacade); // Using Service directly might be easier if Facade is incomplete, but Facade has applyLoan/submitLoan. I'll stick to Facade for consistency if possible, or extend Facade. OR used Service for missing methods.
-    // Facade didn't have cancel. I'll use LoanService for cancel or validly use Facade updates.
-    // Let's inject LoanService for cancel to avoid editing Facade excessively if not needed, or better, edit Facade.
-    // I'll edit Facade in a previous step? No, I skipped editing Facade. I'll inject LoanService directly for cancel.
-    private loanService = inject(LoanService); // Inject Service for cancel
+    private loanService = inject(LoanService);
     private loanFacade = inject(LoanFacade);
     private productFacade = inject(ProductFacade);
     private eventBus = inject(LoanEventBus);
     private router = inject(Router);
     private toast = inject(ToastService);
-    private documentService = inject(DocumentService);
-
+    private documentUploadService = inject(DocumentUploadService);
 
     products = this.productFacade.products;
     loading = this.loanFacade.loading;
     submittedLoanId = signal<string | null>(null);
 
-    // Document Upload States
-    ktpStatus = signal<'pending' | 'uploading' | 'done'>('pending');
-    kkStatus = signal<'pending' | 'uploading' | 'done'>('pending');
-    npwpStatus = signal<'pending' | 'uploading' | 'done'>('pending');
+    // Document types for upload
+    readonly documentTypes = ['KTP', 'KK', 'NPWP'] as const;
 
+    // Expose document upload status signals for template
+    ktpStatus = this.documentUploadService.ktpStatus;
+    kkStatus = this.documentUploadService.kkStatus;
+    npwpStatus = this.documentUploadService.npwpStatus;
+
+    // Computed property from service
+    allDocumentsUploaded = this.documentUploadService.allDocumentsUploaded;
 
     // 2️⃣ Product Selector UI - Sort order: Basic, Standard, Premium
     // 2️⃣ Product Selector UI - Sort by Min Amount (Basic -> Standard -> Premium)
@@ -64,10 +71,6 @@ export class LoanApplicationComponent implements OnInit {
                 this.onProductChange(productCode);
             }
         });
-
-        // Listen to form value changes to trigger validation toasts if needed,
-        // but typically per UX rules, we show specific errors on submit or change.
-        // I will rely on onApply for validation toasts as per "Example: this.toast.error".
 
         // Also listen to product control changes directly for non-signal based updates if needed
         this.applyForm.controls.product.valueChanges.subscribe(code => {
@@ -154,6 +157,10 @@ export class LoanApplicationComponent implements OnInit {
         });
     }
 
+    /**
+     * Legacy method for direct file selection (kept for backward compatibility)
+     * Now delegates to DocumentUploadService
+     */
     onFileSelected(event: Event, type: 'KTP' | 'KK' | 'NPWP') {
         const input = event.target as HTMLInputElement;
         if (!input.files?.length) return;
@@ -161,34 +168,11 @@ export class LoanApplicationComponent implements OnInit {
         const loanId = this.submittedLoanId();
         if (!loanId) return;
 
-        // Update status
-        if (type === 'KTP') this.ktpStatus.set('uploading');
-        if (type === 'KK') this.kkStatus.set('uploading');
-        if (type === 'NPWP') this.npwpStatus.set('uploading');
-
-        this.documentService.uploadDocument(loanId, file, type).subscribe({
-            next: () => {
-                this.toast.show(`${type} uploaded successfully`, 'success');
-                if (type === 'KTP') this.ktpStatus.set('done');
-                if (type === 'KK') this.kkStatus.set('done');
-                if (type === 'NPWP') this.npwpStatus.set('done');
-            },
-            error: (err) => {
-                console.error(err);
-                this.toast.show(`Failed to upload ${type}`, 'error');
-                if (type === 'KTP') this.ktpStatus.set('pending');
-                if (type === 'KK') this.kkStatus.set('pending');
-                if (type === 'NPWP') this.npwpStatus.set('pending');
-            }
-        });
-    }
-
-    get allDocumentsUploaded() {
-        return this.ktpStatus() === 'done' && this.kkStatus() === 'done' && this.npwpStatus() === 'done';
+        this.documentUploadService.uploadDocument(loanId, file, type);
     }
 
     onSubmitFinal() {
-        if (!this.allDocumentsUploaded) {
+        if (!this.allDocumentsUploaded()) {
             this.toast.show('Please upload all required documents (KTP, KK, NPWP)', 'error');
             return;
         }
@@ -200,10 +184,9 @@ export class LoanApplicationComponent implements OnInit {
             next: () => {
                 this.eventBus.emitLoanApplied(id);
                 this.toast.show('Loan application submitted successfully!', 'success');
-                // Redirect to list or dashboard? Prompt doesn't specify Customer List route, mostly just "Apply".
-                // Assuming customer can see list.
-                // For now stay or refresh.
+                // Reset state
                 this.submittedLoanId.set(null);
+                this.documentUploadService.resetStatuses();
                 this.applyForm.reset({ loanAmount: 5000000, tenor: 12 });
             },
             error: (err) => console.error(err)
@@ -221,6 +204,7 @@ export class LoanApplicationComponent implements OnInit {
             next: () => {
                 this.toast.show('Application cancelled.', 'info');
                 this.submittedLoanId.set(null);
+                this.documentUploadService.resetStatuses();
                 this.loading.set(false);
             },
             error: (err) => {

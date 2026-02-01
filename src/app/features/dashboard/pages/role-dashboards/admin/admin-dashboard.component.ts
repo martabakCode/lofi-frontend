@@ -165,13 +165,13 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
           this.pendingDisbursementAmount.set(totalAmount);
 
           // 2. Product Stats
-          const products = data.products || [];
+          const products = data.products?.items || [];
           this.totalProducts.set(products.length);
-          this.activeProducts.set(products.filter(p => p.isActive).length);
-          this.inactiveProducts.set(products.filter(p => !p.isActive).length);
+          this.activeProducts.set(products.filter((p: any) => p.isActive).length);
+          this.inactiveProducts.set(products.filter((p: any) => !p.isActive).length);
 
           // 3. User Stats
-          const users = data.users || [];
+          const users = data.users?.items || [];
           // Assuming status exists on User, defaulting to 'Active' if checked elsewhere
           // Based on user-list.component.ts: status can be checked.
           // User interface in rbac.models.ts might have status.

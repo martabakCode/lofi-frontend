@@ -11,20 +11,13 @@
             </div>
         </div>
         <div class="flex items-center gap-3">
-            <div class="relative group">
-                <i
-                    class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-brand-main transition-colors"></i>
-                <input type="text" placeholder="Search users..." (input)="onSearch($event)"
-                    class="form-input pl-10 w-64 bg-bg-surface hover:bg-bg-muted transition-all rounded-lg border-border-default focus:border-brand-main focus:ring-1 focus:ring-brand-main" />
-            </div>
-
             <button class="btn-secondary px-3" (click)="exportUsers()" title="Export" [disabled]="isExporting()">
                 <i class="pi pi-download" [class.pi-spin]="isExporting()"></i>
             </button>
 
-            <button class="btn-primary" (click)="openInviteModal()">
-                <i class="pi pi-user-plus mr-2"></i> Invite Staff
-            </button>
+            <a routerLink="/users/new" class="btn-primary">
+                <i class="pi pi-user-plus mr-2"></i> Add User
+            </a>
             <button class="btn-secondary px-3" (click)="loadData()" title="Refresh" [disabled]="loading()">
                 <i class="pi pi-refresh" [class.pi-spin]="loading()"></i>
             </button>
@@ -56,8 +49,52 @@
                 <i class="pi pi-users"></i>
             </div>
             <div class="stat-content">
-                <span class="stat-value">{{ users().length }}</span>
+                <span class="stat-value">{{ totalItems() }}</span>
                 <span class="stat-label">Total Users</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="card p-4">
+        <div class="flex flex-col lg:flex-row gap-4">
+            <div class="relative flex-1">
+                <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"></i>
+                <input type="text" placeholder="Search users..." (input)="onSearch($event)"
+                    class="form-input pl-10 w-full" [value]="searchQuery()" />
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <!-- Role Filter -->
+                <select [ngModel]="selectedRoleFilter()"
+                    (ngModelChange)="selectedRoleFilter.set($event); onFilterChange()" class="form-select w-40">
+                    <option value="">All Roles</option>
+                    <option *ngFor="let role of roles()" [value]="role.id">
+                        {{ getRoleDisplayName(role) }}
+                    </option>
+                </select>
+
+                <!-- Branch Filter -->
+                <select [ngModel]="selectedBranchFilter()"
+                    (ngModelChange)="selectedBranchFilter.set($event); onFilterChange()" class="form-select w-40">
+                    <option value="">All Branches</option>
+                    <option *ngFor="let branch of branches()" [value]="branch.id">
+                        {{ branch.name }}
+                    </option>
+                </select>
+
+                <!-- Status Filter -->
+                <select [ngModel]="selectedStatusFilter()"
+                    (ngModelChange)="selectedStatusFilter.set($event); onFilterChange()" class="form-select w-32">
+                    <option value="">All Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+
+                <!-- Clear Filters -->
+                <button *ngIf="hasActiveFilters()" (click)="clearFilters()" class="btn-secondary px-3 text-sm">
+                    <i class="pi pi-times mr-1"></i> Clear
+                </button>
             </div>
         </div>
     </div>
@@ -75,9 +112,18 @@
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>User</th>
-                        <th>Username</th>
-                        <th>Email</th>
+                        <app-sortable-header field="fullName" [sortField]="sortField()"
+                            [sortDirection]="sortDirection()" (sort)="onSort($event)">
+                            User
+                        </app-sortable-header>
+                        <app-sortable-header field="username" [sortField]="sortField()"
+                            [sortDirection]="sortDirection()" (sort)="onSort($event)">
+                            Username
+                        </app-sortable-header>
+                        <app-sortable-header field="email" [sortField]="sortField()" [sortDirection]="sortDirection()"
+                            (sort)="onSort($event)">
+                            Email
+                        </app-sortable-header>
                         <th>Role</th>
                         <th>Branch</th>
                         <th>Status</th>
@@ -101,13 +147,14 @@
                             <div class="empty-state">
                                 <i class="pi pi-users"></i>
                                 <span>No users found</span>
-                                <p>Invite your team members to get started</p>
+                                <p *ngIf="hasActiveFilters()">Try adjusting your filters</p>
+                                <p *ngIf="!hasActiveFilters()">Add your first user to get started</p>
                             </div>
                         </td>
                     </tr>
 
                     <!-- Data Rows -->
-                    <tr *ngFor="let user of filteredUsers()" class="data-row">
+                    <tr *ngFor="let user of users()" class="data-row">
                         <td>
                             <div class="user-info">
                                 <div class="user-avatar" [class]="getRoleColor(user.roles[0])">
@@ -142,22 +189,122 @@
                             </span>
                         </td>
                         <td class="actions-cell">
-                            <button class="btn-action view" title="View Details">
+                            <button class="btn-action view" (click)="openDetailModal(user)" title="View Details">
                                 <i class="pi pi-eye"></i>
                             </button>
-                            <button class="btn-action edit" title="Edit User">
+                            <a [routerLink]="['/users', user.id, 'edit']" class="btn-action edit" title="Edit User">
                                 <i class="pi pi-pencil"></i>
-                            </button>
-                            <button class="btn-action roles" title="Manage Roles">
+                            </a>
+                            <button class="btn-action roles" (click)="openRoleModal(user)" title="Manage Roles">
                                 <i class="pi pi-shield"></i>
                             </button>
-                            <button class="btn-action reset" title="Reset Password">
-                                <i class="pi pi-key"></i>
+                            <button class="btn-action delete" (click)="confirmDelete(user)" title="Delete User">
+                                <i class="pi pi-trash"></i>
                             </button>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
+
+        <!-- Pagination -->
+        <app-pagination [currentPageValue]="currentPage()" [pageSizeValue]="pageSize()" [totalItemsValue]="totalItems()"
+            (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+        </app-pagination>
     </div>
 </div>
+
+<!-- User Detail Modal -->
+<app-detail-modal [isOpen]="isDetailModalOpen()" [title]="(selectedUser()?.fullName || '') + ' - User Details'"
+    (close)="closeDetailModal()">
+
+    <div *ngIf="selectedUser()" class="space-y-6">
+        <!-- User Header -->
+        <div class="flex items-center gap-4 pb-4 border-b border-border-default">
+            <div
+                class="w-16 h-16 rounded-full bg-brand-soft text-brand-main flex items-center justify-center text-2xl font-bold">
+                {{ getInitials(selectedUser()!.fullName) }}
+            </div>
+            <div>
+                <h3 class="text-xl font-bold text-text-primary">{{ selectedUser()!.fullName }}</h3>
+                <p class="text-text-muted">{{ selectedUser()!.email }}</p>
+            </div>
+        </div>
+
+        <!-- User Info Grid -->
+        <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1">
+                <label class="text-xs text-text-muted uppercase">Username</label>
+                <p class="font-medium text-text-primary">{{ selectedUser()!.username }}</p>
+            </div>
+            <div class="space-y-1">
+                <label class="text-xs text-text-muted uppercase">Phone</label>
+                <p class="font-medium text-text-primary">{{ selectedUser()!.phone || '-' }}</p>
+            </div>
+            <div class="space-y-1">
+                <label class="text-xs text-text-muted uppercase">Status</label>
+                <span class="status-badge" [class.active]="getUserStatus(selectedUser()!) === 'Active'"
+                    [class.inactive]="getUserStatus(selectedUser()!) === 'Inactive'">
+                    {{ getUserStatus(selectedUser()!) }}
+                </span>
+            </div>
+            <div class="space-y-1">
+                <label class="text-xs text-text-muted uppercase">Branch</label>
+                <p class="font-medium text-text-primary">{{ selectedUser()!.branch?.name || '-' }}</p>
+            </div>
+        </div>
+
+        <!-- Roles Section -->
+        <div class="space-y-2">
+            <label class="text-xs text-text-muted uppercase">Assigned Roles</label>
+            <div class="flex flex-wrap gap-2">
+                <span *ngFor="let role of selectedUser()!.roles" class="px-3 py-1 rounded-full text-sm font-medium"
+                    [class]="getRoleBadgeClass(role)">
+                    {{ getRoleDisplayName(role) }}
+                </span>
+                <span *ngIf="!selectedUser()!.roles?.length" class="text-text-muted italic">
+                    No roles assigned
+                </span>
+            </div>
+        </div>
+    </div>
+</app-detail-modal>
+
+<!-- Role Management Modal -->
+<app-detail-modal [isOpen]="isRoleModalOpen()" title="Manage User Roles" (close)="closeRoleModal()">
+
+    <div *ngIf="selectedUser()" class="space-y-4">
+        <p class="text-text-secondary">
+            Manage roles for <strong class="text-text-primary">{{ selectedUser()!.fullName }}</strong>
+        </p>
+
+        <div class="border border-border-default rounded-lg overflow-hidden">
+            <div class="max-h-64 overflow-y-auto">
+                <div *ngFor="let role of roles()"
+                    class="flex items-center gap-3 p-3 hover:bg-bg-muted/50 border-b border-border-muted last:border-b-0">
+                    <input type="checkbox" [checked]="hasRole(role.id)" (change)="toggleRole(role.id)"
+                        class="w-4 h-4 text-brand-main rounded border-border-default focus:ring-brand-main">
+                    <div class="flex-1">
+                        <p class="font-medium text-text-primary">{{ getRoleDisplayName(role) }}</p>
+                        <p class="text-sm text-text-muted">{{ role.description || 'No description' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4">
+            <button (click)="closeRoleModal()" class="btn-secondary">Cancel</button>
+            <button (click)="saveRoles()" [disabled]="isSavingRoles()" class="btn-primary flex items-center gap-2">
+                <i *ngIf="isSavingRoles()" class="pi pi-spin pi-spinner"></i>
+                Save Roles
+            </button>
+        </div>
+    </div>
+</app-detail-modal>
+
+<!-- Delete Confirmation Modal -->
+<app-confirmation-modal [isOpen]="isDeleteModalOpen()" title="Delete User"
+    [message]="'Are you sure you want to delete ' + (userToDelete()?.fullName || '') + '? This action cannot be undone.'"
+    confirmLabel="Delete" confirmBtnClass="bg-red-500 hover:bg-red-600" (confirm)="onDeleteConfirmed()"
+    (close)="isDeleteModalOpen.set(false)">
+</app-confirmation-modal>

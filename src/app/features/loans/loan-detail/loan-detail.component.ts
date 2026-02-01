@@ -7,6 +7,7 @@ import { DocumentService } from '../../../core/services/document.service';
 import { LoanActionsComponent } from '../components/loan-actions/loan-actions.component';
 import { ToastService } from '../../../core/services/toast.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { LeafletMapComponent } from '../../../shared/components/leaflet-map/leaflet-map.component';
 
 // Adapter to match Loan interface for actions (Facade returns UI model, Service returns Backend DTO)
 // We'll use the BackendDTO for Detail View as it has more fields (timestamps).
@@ -15,145 +16,9 @@ import { AuthService } from '../../../core/services/auth.service';
 @Component({
     selector: 'app-loan-detail',
     standalone: true,
-    imports: [CommonModule, RouterModule, LoanActionsComponent],
-    template: `
-    <div class="container mx-auto px-4 py-8 max-w-5xl">
-      <!-- Breadcrumb -->
-      <nav class="mb-6 text-sm text-gray-500">
-        <a routerLink="/loans" class="hover:text-primary-600">Loans</a>
-        <span class="mx-2">/</span>
-        <span class="text-gray-900">{{ loan()?.id || '...' }}</span>
-      </nav>
-
-      <!-- Loading -->
-      <div *ngIf="loading()" class="flex justify-center py-12">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-
-      <!-- Error / Not Found -->
-      <div *ngIf="error()" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
-        {{ error() }}
-        <button (click)="loadLoan()" class="underline ml-2">Retry</button>
-      </div>
-
-      <div *ngIf="!loading() && loan(); let l" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        <!-- LEFT COL: STATUS & TIMELINE -->
-        <div class="lg:col-span-1 space-y-6">
-          <!-- Status Card -->
-          <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-            <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wide mb-2">Current Status</h3>
-            <div class="flex items-center justify-between">
-              <span [class]="getStatusBadgeClass(l.loanStatus)" class="px-3 py-1 text-sm font-bold rounded-full">
-                {{ l.loanStatus }}
-              </span>
-              <span class="text-xs text-gray-400">
-                {{ l.updatedAt | date:'medium' }}
-              </span>
-            </div>
-            
-            <div class="mt-6">
-                <!-- Status Timeline (Approximated from timestamps) -->
-                <div class="relative border-l-2 border-gray-200 dark:border-gray-700 ml-3 space-y-6">
-                    <div class="mb-6 ml-6">
-                        <span class="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -left-3 ring-8 ring-white dark:ring-gray-800">
-                             <i class="fas fa-file-alt text-blue-600 text-xs"></i>
-                        </span>
-                        <h3 class="font-medium text-gray-900 dark:text-white">Applied</h3>
-                        <p class="text-sm text-gray-500">{{ (l.submittedAt | date:'medium') || 'Pending' }}</p>
-                    </div>
-                     <div class="mb-6 ml-6" *ngIf="l.approvedAt">
-                        <span class="absolute flex items-center justify-center w-6 h-6 bg-green-100 rounded-full -left-3 ring-8 ring-white dark:ring-gray-800">
-                             <i class="fas fa-check text-green-600 text-xs"></i>
-                        </span>
-                        <h3 class="font-medium text-gray-900 dark:text-white">Approved</h3>
-                        <p class="text-sm text-gray-500">{{ l.approvedAt | date:'medium' }}</p>
-                    </div>
-                     <div class="mb-6 ml-6" *ngIf="l.disbursedAt">
-                        <span class="absolute flex items-center justify-center w-6 h-6 bg-purple-100 rounded-full -left-3 ring-8 ring-white dark:ring-gray-800">
-                             <i class="fas fa-money-bill text-purple-600 text-xs"></i>
-                        </span>
-                        <h3 class="font-medium text-gray-900 dark:text-white">Disbursed</h3>
-                        <p class="text-sm text-gray-500">{{ l.disbursedAt | date:'medium' }}</p>
-                    </div>
-                     <div class="mb-6 ml-6" *ngIf="l.rejectedAt">
-                        <span class="absolute flex items-center justify-center w-6 h-6 bg-red-100 rounded-full -left-3 ring-8 ring-white dark:ring-gray-800">
-                             <i class="fas fa-times text-red-600 text-xs"></i>
-                        </span>
-                        <h3 class="font-medium text-gray-900 dark:text-white">Rejected</h3>
-                        <p class="text-sm text-gray-500">{{ l.rejectedAt | date:'medium' }}</p>
-                    </div>
-                </div>
-            </div>
-          </div>
-
-          <!-- Actions -->
-          <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-             <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wide mb-4">Actions</h3>
-             <app-loan-actions 
-                [loan]="processedLoan(l)" 
-                [loading]="actionLoading()"
-                (action)="handleAction($event, l.id)">
-             </app-loan-actions>
-          </div>
-        </div>
-
-        <!-- RIGHT COL: DETAILS -->
-        <div class="lg:col-span-2 space-y-6">
-             <!-- Summary -->
-             <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Loan Details</h2>
-                <div class="grid grid-cols-2 gap-6">
-                    <div>
-                        <p class="text-sm text-gray-500">Applicant</p>
-                        <p class="font-medium">{{ l.customerName }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Product</p>
-                        <p class="font-medium">{{ l.product.productName }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Amount</p>
-                        <p class="font-medium text-lg">{{ l.loanAmount | currency:'IDR':'symbol':'1.0-0' }}</p>
-                    </div>
-                     <div>
-                        <p class="text-sm text-gray-500">Tenure</p>
-                        <p class="font-medium">{{ l.tenor }} Months</p>
-                    </div>
-                </div>
-             </div>
-
-             <!-- Documents -->
-             <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Documents</h2>
-                
-                <div *ngIf="!l.documents || l.documents.length === 0" class="text-sm text-gray-500 italic">
-                    No documents uploaded.
-                    <span *ngIf="l.loanStatus === 'DRAFT'" class="not-italic text-primary-600 cursor-pointer hover:underline" routerLink="/loans/apply">Edit in Application</span>
-                </div>
-
-                <div class="space-y-3">
-                    <div *ngFor="let doc of l.documents" class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
-                                <i class="fas" [class.fa-file-alt]="doc.documentType === 'NPWP'" [class.fa-id-card]="doc.documentType === 'KTP'" [class.fa-users]="doc.documentType === 'KK'"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-gray-900">{{ formatDocType(doc.documentType) }}</p>
-                                <p class="text-xs text-gray-500">{{ doc.fileName }}</p>
-                            </div>
-                        </div>
-                        <button (click)="viewDocument(doc.id)" class="text-primary-600 hover:text-primary-800 p-2" title="View Document">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-             </div>
-        </div>
-
-      </div>
-    </div>
-  `
+    imports: [CommonModule, RouterModule, LoanActionsComponent, LeafletMapComponent],
+    templateUrl: './loan-detail.component.html',
+    styleUrls: ['./loan-detail.component.css']
 })
 export class LoanDetailComponent implements OnInit {
     private route = inject(ActivatedRoute);
@@ -280,8 +145,8 @@ export class LoanDetailComponent implements OnInit {
 
     viewDocument(id: string) {
         this.documentService.getDownloadUrl(id).subscribe({
-            next: (url) => {
-                window.open(url, '_blank');
+            next: (data) => {
+                window.open(data.downloadUrl, '_blank');
             },
             error: (err) => this.toast.show('Failed to open document', 'error')
         });
@@ -289,5 +154,12 @@ export class LoanDetailComponent implements OnInit {
 
     formatDocType(type: string): string {
         return type.replace('_', ' ');
+    }
+
+    viewLocationOnMap(loan: BackendLoanResponse) {
+        if (loan.latitude && loan.longitude) {
+            const url = `https://www.openstreetmap.org/?mlat=${loan.latitude}&mlon=${loan.longitude}#map=15/${loan.latitude}/${loan.longitude}`;
+            window.open(url, '_blank');
+        }
     }
 }

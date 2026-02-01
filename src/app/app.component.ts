@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ToastComponent } from './shared/components/toast/toast.component';
+import { NotificationService } from './core/services/notification.service';
 
 @Component({
   selector: 'app-root',
@@ -11,4 +12,10 @@ import { ToastComponent } from './shared/components/toast/toast.component';
     <app-toast></app-toast>
   `
 })
-export class AppComponent { }
+export class AppComponent implements OnInit {
+  private notificationService = inject(NotificationService);
+
+  ngOnInit() {
+    this.notificationService.requestPermission();
+  }
+}

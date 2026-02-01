@@ -19,6 +19,14 @@ export interface ProductResponse {
     isActive: boolean;
 }
 
+export interface AIAnalysis {
+    confidence: number;
+    summary: string;
+    riskFlags: string[];
+    reviewNotes: string[];
+    limitations: string[];
+}
+
 export interface BackendLoanResponse {
     id: string;
     customerId: string; // Added based on assumed backend response, check if needed
@@ -35,6 +43,10 @@ export interface BackendLoanResponse {
     createdAt?: string;
     updatedAt?: string;
     documents?: DocumentResponse[];
+    disbursementReference?: string;
+    aiAnalysis?: AIAnalysis;
+    longitude?: number;
+    latitude?: number;
 }
 
 export interface DocumentResponse {
@@ -49,6 +61,36 @@ export interface LoanRequest {
     productId: string;
     loanAmount: number;
     tenor: number;
+}
+
+export interface MarketingLoanApplicationRequest {
+    fullName: string;
+    email: string;
+    username: string;
+    phoneNumber: string;
+    branchId: string;
+    incomeSource: string;
+    incomeType: string;
+    monthlyIncome: number;
+    age: number;
+    nik: string;
+    dateOfBirth: string;
+    placeOfBirth: string;
+    city: string;
+    address: string;
+    province: string;
+    district: string;
+    subDistrict: string;
+    postalCode: string;
+    gender: string;
+    maritalStatus: string;
+    education: string;
+    occupation: string;
+    productId: string;
+    loanAmount: number;
+    tenor: number;
+    longitude?: number;
+    latitude?: number;
 }
 
 // UI Model (matches current component usage)
@@ -106,6 +148,12 @@ export class LoanService {
 
     applyLoan(request: LoanRequest): Observable<BackendLoanResponse> {
         return this.http.post<ApiResponse<BackendLoanResponse>>(`${this.baseUrl}`, request).pipe(
+            map(res => res.data)
+        );
+    }
+
+    applyLoanOnBehalf(request: MarketingLoanApplicationRequest): Observable<BackendLoanResponse> {
+        return this.http.post<ApiResponse<BackendLoanResponse>>(`${this.baseUrl}/marketing/apply-on-behalf`, request).pipe(
             map(res => res.data)
         );
     }

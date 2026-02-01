@@ -10,6 +10,11 @@ export interface PresignUploadResponse {
     documentId: string;
 }
 
+export interface DownloadUrlResponse {
+    downloadUrl: string;
+    fileName: string;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -52,9 +57,9 @@ export class DocumentService {
         return this.uploadDocument(null, file, 'PROFILE_PICTURE');
     }
 
-    getDownloadUrl(documentId: string): Observable<string> {
-        return this.http.get<ApiResponse<{ downloadUrl: string }>>(`${this.apiUrl}/${documentId}/download`).pipe(
-            map(res => res.data.downloadUrl)
+    getDownloadUrl(documentId: string): Observable<DownloadUrlResponse> {
+        return this.http.get<ApiResponse<DownloadUrlResponse>>(`${this.apiUrl}/${documentId}/download`).pipe(
+            map(res => res.data)
         );
     }
 }

@@ -11,6 +11,17 @@
     --primary-900: #823f0c;
     --primary-950: #461e04;
 
+    --accent-100: #cafff9;
+    --accent-200: #9cfff8;
+    --accent-300: #57fff5;
+    --accent-400: #0cfffd;
+    --accent-500: #00e3ea;
+    --accent-600: #00b5c4;
+    --accent-700: #008d9b;
+    --accent-800: #0b727f;
+    --accent-900: #0e5e6b;
+    --accent-950: #023f4a;
+
     /* Surface/Neutral colors */
     --surface-0: #ffffff;
     --surface-50: #f8fafc;
@@ -40,6 +51,7 @@
     --brand-main: var(--primary-500);
     --brand-hover: var(--primary-600);
     --brand-soft: var(--primary-100);
+    --brand-accent: var(--accent-500);
 
     /* Status (With 10% opacity as per hex format #rrggbbaa) */
     --success-bg: #22c55e1a;

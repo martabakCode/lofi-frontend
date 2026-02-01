@@ -1,5 +1,5 @@
 import { Directive, Input, TemplateRef, ViewContainerRef, inject, effect } from '@angular/core';
-import { AuthService } from '../../features/auth/services/auth.service';
+import { AuthService } from '../services/auth.service';
 
 @Directive({
   selector: '[appHasPermission]',
@@ -28,7 +28,7 @@ export class HasPermissionDirective {
 
   private updateView() {
     const hasPerm = this.authService.hasPermission(this.permission);
-    
+
     if (hasPerm && !this.isVisible) {
       this.viewContainer.createEmbeddedView(this.templateRef);
       this.isVisible = true;

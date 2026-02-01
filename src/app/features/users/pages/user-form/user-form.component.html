@@ -1,0 +1,133 @@
+<div class="space-y-6 max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center gap-4">
+        <button [routerLink]="['/users']"
+            class="w-10 h-10 rounded-lg bg-bg-muted text-text-secondary hover:text-text-primary flex items-center justify-center transition-colors">
+            <i class="pi pi-arrow-left"></i>
+        </button>
+        <div>
+            <h1 class="text-2xl font-bold text-text-primary m-0">
+                {{ isEditMode() ? 'Edit User' : 'Add New User' }}
+            </h1>
+            <p class="text-text-secondary m-0">
+                {{ isEditMode() ? 'Update user information and assignments' : 'Create a new user account' }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="card">
+        <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="p-6 space-y-6">
+
+            <!-- Personal Information -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
+                    <i class="pi pi-user text-brand-main"></i>
+                    Personal Information
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="form-label">Full Name <span class="text-red-500">*</span></label>
+                        <input type="text" formControlName="fullName" class="form-input" placeholder="Enter full name"
+                            [class.border-red-500]="userForm.get('fullName')?.invalid && userForm.get('fullName')?.touched">
+                        <p *ngIf="userForm.get('fullName')?.invalid && userForm.get('fullName')?.touched"
+                            class="form-error">
+                            Full name is required
+                        </p>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Username <span class="text-red-500">*</span></label>
+                        <input type="text" formControlName="username" class="form-input" placeholder="Enter username"
+                            [class.border-red-500]="userForm.get('username')?.invalid && userForm.get('username')?.touched">
+                        <p *ngIf="userForm.get('username')?.invalid && userForm.get('username')?.touched"
+                            class="form-error">
+                            Username is required
+                        </p>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Email <span class="text-red-500">*</span></label>
+                        <input type="email" formControlName="email" class="form-input" placeholder="Enter email address"
+                            [class.border-red-500]="userForm.get('email')?.invalid && userForm.get('email')?.touched">
+                        <p *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched" class="form-error">
+                            Valid email is required
+                        </p>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Phone</label>
+                        <input type="tel" formControlName="phone" class="form-input" placeholder="Enter phone number">
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-border-default">
+
+            <!-- Account Settings -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
+                    <i class="pi pi-cog text-brand-main"></i>
+                    Account Settings
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="form-label">Status</label>
+                        <select formControlName="status" class="form-select">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Branch Assignment</label>
+                        <select formControlName="branchId" class="form-select">
+                            <option value="">No Branch</option>
+                            <option *ngFor="let branch of branches()" [value]="branch.id">
+                                {{ branch.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="form-label">Roles</label>
+                    <div class="border border-border-default rounded-lg p-4 space-y-2 max-h-48 overflow-y-auto">
+                        <label *ngFor="let role of roles()"
+                            class="flex items-center gap-3 p-2 hover:bg-bg-muted/50 rounded cursor-pointer">
+                            <input type="checkbox" [checked]="isRoleSelected(role.id)" (change)="toggleRole(role.id)"
+                                class="w-4 h-4 text-brand-main rounded border-border-default focus:ring-brand-main">
+                            <div>
+                                <p class="font-medium text-text-primary">{{ getRoleDisplayName(role) }}</p>
+                                <p class="text-sm text-text-muted">{{ role.description || 'No description' }}</p>
+                            </div>
+                        </label>
+                        <p *ngIf="roles().length === 0" class="text-text-muted text-center py-4">
+                            No roles available
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div *ngIf="error()" class="error-alert">
+                <i class="pi pi-exclamation-triangle"></i>
+                <span>{{ error() }}</span>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex justify-end gap-3 pt-4 border-t border-border-default">
+                <button type="button" [routerLink]="['/users']" class="btn-secondary">
+                    Cancel
+                </button>
+                <button type="submit" [disabled]="isSubmitting() || userForm.invalid"
+                    class="btn-primary flex items-center gap-2">
+                    <i *ngIf="isSubmitting()" class="pi pi-spin pi-spinner"></i>
+                    {{ isEditMode() ? 'Update User' : 'Create User' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

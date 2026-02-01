@@ -15,7 +15,7 @@ export const LOAN_ROUTES: Routes = [
     },
     {
         path: 'apply',
-        loadComponent: () => import('./loan-application/loan-application.component').then(m => m.LoanApplicationComponent)
+        loadComponent: () => import('./marketing-loan-application/marketing-loan-application.component').then(m => m.MarketingLoanApplicationComponent)
     },
     {
         path: ':id',

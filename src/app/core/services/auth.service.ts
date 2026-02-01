@@ -103,5 +103,13 @@ export class AuthService {
     changePassword(payload: any): Observable<ApiResponse<Object>> {
         return this.http.post<ApiResponse<Object>>(`${this.baseUrl}/change-password`, payload);
     }
+
+    /**
+     * Get the current authentication token
+     * Used by JWT interceptor
+     */
+    getToken(): string | null {
+        return this.tokenStorage.getToken();
+    }
 }
 

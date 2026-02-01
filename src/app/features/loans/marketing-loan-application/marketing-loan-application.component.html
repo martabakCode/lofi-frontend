@@ -1,0 +1,333 @@
+<div class="max-w-4xl mx-auto py-8 px-4">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Marketing Loan Application</h1>
+        <p class="text-gray-500">Apply on behalf of a customer</p>
+    </div>
+
+    <!-- Initialization Form -->
+    <div *ngIf="!submittedLoanId()" class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+        <form [formGroup]="applyForm" (ngSubmit)="onApply()" class="space-y-8">
+
+            <!-- Section: Personal Info -->
+            <div>
+                <h3 class="text-lg font-semibold text-text-primary border-b border-border-muted pb-2 mb-4">Personal
+                    Information</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Full Name</label>
+                        <input type="text" formControlName="fullName"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Email</label>
+                        <input type="email" formControlName="email"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Phone Number</label>
+                        <input type="tel" formControlName="phoneNumber"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">NIK (16 digits)</label>
+                        <input type="text" formControlName="nik" maxlength="16"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Place of Birth</label>
+                        <input type="text" formControlName="placeOfBirth"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Date of Birth</label>
+                        <input type="date" formControlName="dateOfBirth"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Gender</label>
+                        <select formControlName="gender"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                            <option value="MALE">Male</option>
+                            <option value="FEMALE">Female</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Marital Status</label>
+                        <select formControlName="maritalStatus"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                            <option value="SINGLE">Single</option>
+                            <option value="MARRIED">Married</option>
+                            <option value="DIVORCED">Divorced</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: Employment & Financial -->
+            <div>
+                <h3 class="text-lg font-semibold text-text-primary border-b border-border-muted pb-2 mb-4">Employment &
+                    Financial</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Occupation</label>
+                        <input type="text" formControlName="occupation"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Education</label>
+                        <input type="text" formControlName="education"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Income Source</label>
+                        <input type="text" formControlName="incomeSource"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Income Type</label>
+                        <select formControlName="incomeType"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                            <option value="SALARY">Salary</option>
+                            <option value="BUSINESS">Business</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Monthly Income</label>
+                        <input type="number" formControlName="monthlyIncome"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: Address -->
+            <div>
+                <h3 class="text-lg font-semibold text-text-primary border-b border-border-muted pb-2 mb-4">Address</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-text-secondary">Street Address</label>
+                        <textarea formControlName="address" rows="2"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">City</label>
+                        <input type="text" formControlName="city"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Province</label>
+                        <input type="text" formControlName="province"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">District (Kecamatan)</label>
+                        <input type="text" formControlName="district"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Sub-District (Kelurahan)</label>
+                        <input type="text" formControlName="subDistrict"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Postal Code</label>
+                        <input type="text" formControlName="postalCode"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: Loan Details -->
+            <div>
+                <h3 class="text-lg font-semibold text-text-primary border-b border-border-muted pb-2 mb-4">Loan Details
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Product</label>
+                        <select formControlName="productId"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                            <option value="" disabled>Select Product</option>
+                            <option *ngFor="let p of filteredProducts()" [value]="p.id">{{ p.name }}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Loan Amount</label>
+                        <input type="number" formControlName="loanAmount"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Tenor (Months)</label>
+                        <input type="number" formControlName="tenor"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: Location -->
+            <div>
+                <div class="flex items-center justify-between border-b border-border-muted pb-2 mb-4">
+                    <h3 class="text-lg font-semibold text-text-primary">Application Location</h3>
+                    <div class="flex gap-2">
+                        <button type="button" (click)="toggleLocationMap()"
+                            class="text-sm text-brand-main hover:bg-brand-soft px-3 py-1 rounded-lg transition-colors flex items-center gap-1">
+                            <i class="pi pi-map-marker"></i>
+                            {{ showLocationMap() ? 'Hide Map' : 'Set Location' }}
+                        </button>
+                        <button type="button" (click)="locateApplicant()"
+                            class="text-sm text-green-600 hover:bg-green-50 px-3 py-1 rounded-lg transition-colors flex items-center gap-1">
+                            <i class="pi pi-compass"></i> Auto Locate
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Coordinates Display -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Latitude</label>
+                        <input type="text" [value]="applyForm.get('latitude')?.value | number:'1.6-6'" readonly
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm bg-gray-100 border p-2 text-gray-600"
+                            placeholder="Not captured">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Longitude</label>
+                        <input type="text" [value]="applyForm.get('longitude')?.value | number:'1.6-6'" readonly
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm bg-gray-100 border p-2 text-gray-600"
+                            placeholder="Not captured">
+                    </div>
+                </div>
+
+                <!-- Map -->
+                @if (showLocationMap()) {
+                <div class="h-[300px] rounded-xl overflow-hidden border border-border-default animate-in fade-in">
+                    <app-leaflet-map [defaultLocation]="getCurrentLocation()" [showCoordinates]="false"
+                        (locationChange)="onLocationChange($event)">
+                    </app-leaflet-map>
+                </div>
+                <p class="text-xs text-text-muted mt-2">
+                    <i class="pi pi-info-circle mr-1"></i>
+                    Click on the map or drag the marker to set the application location
+                </p>
+                }
+
+                @if (!hasLocation()) {
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-2">
+                    <p class="text-sm text-yellow-700 flex items-center gap-2">
+                        <i class="pi pi-exclamation-triangle"></i>
+                        Location not captured. Click "Auto Locate" or "Set Location" to add coordinates.
+                    </p>
+                </div>
+                }
+            </div>
+
+            <div class="pt-4 flex justify-end">
+                <button type="submit" [disabled]="loading()"
+                    class="bg-brand-main hover:bg-brand-hover text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-brand-main/20 transition-all active:scale-95 flex items-center">
+                    <span *ngIf="loading()" class="mr-2"><i class="pi pi-spin pi-spinner"></i></span>
+                    Submit Application
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Upload Documents -->
+    <div *ngIf="submittedLoanId()"
+        class="bg-white rounded-xl shadow-lg p-6 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4">
+        <div class="text-center">
+            <div
+                class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="pi pi-check text-2xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-text-primary">Application Initialized</h2>
+            <p class="text-text-secondary">ID: {{ submittedLoanId() }}</p>
+            <p class="mt-2 text-sm">Please upload the required documents to complete the process.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- KTP -->
+            <div class="border rounded-lg p-4 flex flex-col items-center justify-between bg-gray-50">
+                <div class="text-center mb-4">
+                    <i class="pi pi-id-card text-3xl text-brand-accent mb-2"></i>
+                    <h4 class="font-bold">KTP</h4>
+                </div>
+                <div *ngIf="ktpStatus() === 'done'" class="text-green-600 font-bold"><i class="pi pi-check-circle"></i>
+                    Uploaded</div>
+                <div *ngIf="ktpStatus() === 'uploading'" class="text-brand-main"><i class="pi pi-spin pi-spinner"></i>
+                    Uploading...</div>
+                <div *ngIf="ktpStatus() === 'pending'">
+                    <input type="file" id="ktp" (change)="onFileSelected($event, 'KTP')" class="hidden"
+                        accept="image/*,.pdf">
+                    <label for="ktp"
+                        class="cursor-pointer bg-white border border-border-default px-4 py-2 rounded-xl hover:bg-surface-100 text-sm transition-colors text-brand-main font-bold">Select
+                        File</label>
+                </div>
+            </div>
+
+            <!-- KK -->
+            <div class="border rounded-lg p-4 flex flex-col items-center justify-between bg-gray-50">
+                <div class="text-center mb-4">
+                    <i class="pi pi-users text-3xl text-brand-accent mb-2"></i>
+                    <h4 class="font-bold">KK</h4>
+                </div>
+                <div *ngIf="kkStatus() === 'done'" class="text-green-600 font-bold"><i class="pi pi-check-circle"></i>
+                    Uploaded</div>
+                <div *ngIf="kkStatus() === 'uploading'" class="text-brand-main"><i class="pi pi-spin pi-spinner"></i>
+                    Uploading...</div>
+                <div *ngIf="kkStatus() === 'pending'">
+                    <input type="file" id="kk" (change)="onFileSelected($event, 'KK')" class="hidden"
+                        accept="image/*,.pdf">
+                    <label for="kk"
+                        class="cursor-pointer bg-white border border-border-default px-4 py-2 rounded-xl hover:bg-surface-100 text-sm transition-colors text-brand-main font-bold">Select
+                        File</label>
+                </div>
+            </div>
+
+            <!-- NPWP -->
+            <div class="border rounded-lg p-4 flex flex-col items-center justify-between bg-gray-50">
+                <div class="text-center mb-4">
+                    <i class="pi pi-briefcase text-3xl text-brand-accent mb-2"></i>
+                    <h4 class="font-bold">NPWP</h4>
+                </div>
+                <div *ngIf="npwpStatus() === 'done'" class="text-green-600 font-bold"><i class="pi pi-check-circle"></i>
+                    Uploaded</div>
+                <div *ngIf="npwpStatus() === 'uploading'" class="text-brand-main"><i class="pi pi-spin pi-spinner"></i>
+                    Uploading...</div>
+                <div *ngIf="npwpStatus() === 'pending'">
+                    <input type="file" id="npwp" (change)="onFileSelected($event, 'NPWP')" class="hidden"
+                        accept="image/*,.pdf">
+                    <label for="npwp"
+                        class="cursor-pointer bg-white border border-border-default px-4 py-2 rounded-xl hover:bg-surface-100 text-sm transition-colors text-brand-main font-bold">Select
+                        File</label>
+                </div>
+            </div>
+
+            <!-- SLIP GAJI -->
+            <div class="border rounded-lg p-4 flex flex-col items-center justify-between bg-gray-50">
+                <div class="text-center mb-4">
+                    <i class="pi pi-money-bill text-3xl text-brand-accent mb-2"></i>
+                    <h4 class="font-bold">Slip Gaji</h4>
+                </div>
+                <div *ngIf="slipGajiStatus() === 'done'" class="text-green-600 font-bold"><i
+                        class="pi pi-check-circle"></i> Uploaded</div>
+                <div *ngIf="slipGajiStatus() === 'uploading'" class="text-brand-main"><i
+                        class="pi pi-spin pi-spinner"></i> Uploading...</div>
+                <div *ngIf="slipGajiStatus() === 'pending'">
+                    <input type="file" id="slip" (change)="onFileSelected($event, 'SLIP_GAJI')" class="hidden"
+                        accept="image/*,.pdf">
+                    <label for="slip"
+                        class="cursor-pointer bg-white border border-border-default px-4 py-2 rounded-xl hover:bg-surface-100 text-sm transition-colors text-brand-main font-bold">Select
+                        File</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end pt-6">
+            <button (click)="finish()"
+                class="bg-brand-main hover:bg-brand-hover text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-brand-main/20 transition-all active:scale-95">
+                Finish & View Details
+            </button>
+        </div>
+    </div>
+</div>

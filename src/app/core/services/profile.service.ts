@@ -35,6 +35,8 @@ export interface UserBiodata {
     maritalStatus?: string;
     education?: string;
     occupation?: string;
+    longitude?: number;
+    latitude?: number;
 }
 
 @Injectable({

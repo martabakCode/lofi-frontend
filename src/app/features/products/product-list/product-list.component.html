@@ -11,20 +11,13 @@
             </div>
         </div>
         <div class="flex items-center gap-3">
-            <div class="relative group">
-                <i
-                    class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-brand-main transition-colors"></i>
-                <input type="text" placeholder="Search products..." (input)="onSearch($event)"
-                    class="form-input pl-10 w-64 bg-bg-surface hover:bg-bg-muted transition-all rounded-lg border-border-default focus:border-brand-main focus:ring-1 focus:ring-brand-main" />
-            </div>
-
             <button class="btn-secondary px-3" (click)="exportProducts()" title="Export" [disabled]="isExporting()">
                 <i class="pi pi-download" [class.pi-spin]="isExporting()"></i>
             </button>
 
-            <button class="btn-primary">
+            <a routerLink="/products/new" class="btn-primary">
                 <i class="pi pi-plus mr-2"></i> New Product
-            </button>
+            </a>
             <button class="btn-secondary px-3" (click)="loadProducts()" title="Refresh" [disabled]="loading()">
                 <i class="pi pi-refresh" [class.pi-spin]="loading()"></i>
             </button>
@@ -62,6 +55,32 @@
         </div>
     </div>
 
+    <!-- Search and Filters -->
+    <div class="card p-4">
+        <div class="flex flex-col lg:flex-row gap-4">
+            <div class="relative flex-1">
+                <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"></i>
+                <input type="text" placeholder="Search products..." (input)="onSearch($event)"
+                    class="form-input pl-10 w-full" [value]="searchQuery()" />
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <!-- Status Filter -->
+                <select [ngModel]="selectedStatusFilter()"
+                    (ngModelChange)="selectedStatusFilter.set($event); onFilterChange()" class="form-select w-40">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+
+                <!-- Clear Filters -->
+                <button *ngIf="hasActiveFilters()" (click)="clearFilters()" class="btn-secondary px-3 text-sm">
+                    <i class="pi pi-times mr-1"></i> Clear
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Error Message -->
     <div *ngIf="error()" class="error-alert">
         <i class="pi pi-exclamation-triangle"></i>
@@ -75,10 +94,19 @@
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Product</th>
-                        <th>Loan Amount Range</th>
+                        <app-sortable-header field="name" [sortField]="sortField()" [sortDirection]="sortDirection()"
+                            (sort)="onSort($event)">
+                            Product
+                        </app-sortable-header>
+                        <app-sortable-header field="minAmount" [sortField]="sortField()"
+                            [sortDirection]="sortDirection()" (sort)="onSort($event)">
+                            Loan Amount Range
+                        </app-sortable-header>
                         <th>Tenure Range</th>
-                        <th>Interest Rate</th>
+                        <app-sortable-header field="interestRate" [sortField]="sortField()"
+                            [sortDirection]="sortDirection()" (sort)="onSort($event)">
+                            Interest Rate
+                        </app-sortable-header>
                         <th>Admin Fee</th>
                         <th>Status</th>
                         <th class="text-center">Actions</th>
@@ -96,12 +124,13 @@
                     </tr>
 
                     <!-- Empty State -->
-                    <tr *ngIf="!loading() && products().length === 0 && !error()">
+                    <tr *ngIf="!loading() && filteredProducts().length === 0 && !error()">
                         <td colspan="7" class="empty-cell">
                             <div class="empty-state">
                                 <i class="pi pi-inbox"></i>
                                 <span>No products found</span>
-                                <p>Create your first product to get started</p>
+                                <p *ngIf="hasActiveFilters()">Try adjusting your filters</p>
+                                <p *ngIf="!hasActiveFilters()">Create your first product to get started</p>
                             </div>
                         </td>
                     </tr>
@@ -140,17 +169,19 @@
                             </span>
                         </td>
                         <td class="actions-cell">
-                            <button class="btn-action view" title="View Details">
+                            <button class="btn-action view" (click)="openDetailModal(product)" title="View Details">
                                 <i class="pi pi-eye"></i>
                             </button>
-                            <button class="btn-action edit" title="Edit Product">
+                            <a [routerLink]="['/products', product.id, 'edit']" class="btn-action edit"
+                                title="Edit Product">
                                 <i class="pi pi-pencil"></i>
-                            </button>
-                            <button class="btn-action toggle" [title]="product.isActive ? 'Deactivate' : 'Activate'">
+                            </a>
+                            <button class="btn-action toggle" (click)="toggleStatus(product)"
+                                [title]="product.isActive ? 'Deactivate' : 'Activate'">
                                 <i [class.pi-eye-slash]="product.isActive" [class.pi-eye]="!product.isActive"
                                     class="pi"></i>
                             </button>
-                            <button class="btn-action delete" title="Delete Product">
+                            <button class="btn-action delete" (click)="confirmDelete(product)" title="Delete Product">
                                 <i class="pi pi-trash"></i>
                             </button>
                         </td>
@@ -158,5 +189,68 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Pagination -->
+        <app-pagination [currentPageValue]="currentPage()" [pageSizeValue]="pageSize()" [totalItemsValue]="totalItems()"
+            (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+        </app-pagination>
     </div>
 </div>
+
+<!-- Product Detail Modal -->
+<app-detail-modal [isOpen]="isDetailModalOpen()" [title]="(selectedProduct()?.name || '') + ' - Product Details'"
+    (close)="closeDetailModal()">
+
+    <div *ngIf="selectedProduct()" class="space-y-6">
+        <!-- Product Header -->
+        <div class="flex items-center gap-4 pb-4 border-b border-border-default">
+            <div
+                class="w-16 h-16 rounded-xl bg-brand-soft text-brand-main flex items-center justify-center text-2xl font-bold">
+                {{ selectedProduct()!.name.charAt(0) }}
+            </div>
+            <div>
+                <h3 class="text-xl font-bold text-text-primary">{{ selectedProduct()!.name }}</h3>
+                <p class="text-text-muted">{{ selectedProduct()!.code }}</p>
+            </div>
+            <span class="ml-auto status-badge" [class.active]="selectedProduct()!.isActive"
+                [class.inactive]="!selectedProduct()!.isActive">
+                {{ selectedProduct()!.isActive ? 'Active' : 'Inactive' }}
+            </span>
+        </div>
+
+        <!-- Product Info Grid -->
+        <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1">
+                <label class="text-xs text-text-muted uppercase">Interest Rate</label>
+                <p class="font-medium text-text-primary text-lg">{{ selectedProduct()!.interestRateLabel }}</p>
+            </div>
+            <div class="space-y-1">
+                <label class="text-xs text-text-muted uppercase">Admin Fee</label>
+                <p class="font-medium text-text-primary text-lg">
+                    {{ selectedProduct()!.adminFee | currency:'IDR':'symbol-narrow':'1.0-0' }}
+                </p>
+            </div>
+            <div class="space-y-1">
+                <label class="text-xs text-text-muted uppercase">Loan Amount Range</label>
+                <p class="font-medium text-text-primary">{{ selectedProduct()!.amountRangeLabel }}</p>
+            </div>
+            <div class="space-y-1">
+                <label class="text-xs text-text-muted uppercase">Tenor Range</label>
+                <p class="font-medium text-text-primary">{{ selectedProduct()!.tenorLabel }}</p>
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div *ngIf="selectedProduct()!.description" class="space-y-1">
+            <label class="text-xs text-text-muted uppercase">Description</label>
+            <p class="text-text-secondary">{{ selectedProduct()!.description }}</p>
+        </div>
+    </div>
+</app-detail-modal>
+
+<!-- Delete Confirmation Modal -->
+<app-confirmation-modal [isOpen]="isDeleteModalOpen()" title="Delete Product"
+    [message]="'Are you sure you want to delete ' + (productToDelete()?.name || '') + '? This action cannot be undone.'"
+    confirmLabel="Delete" confirmBtnClass="bg-red-500 hover:bg-red-600" (confirm)="onDeleteConfirmed()"
+    (close)="isDeleteModalOpen.set(false)">
+</app-confirmation-modal>

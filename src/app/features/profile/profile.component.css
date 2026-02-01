@@ -1,0 +1,8 @@
+:host {
+    display: block;
+    padding-bottom: 2rem;
+}
+
+input[readonly] {
+    cursor: default;
+}

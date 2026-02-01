@@ -1,0 +1,204 @@
+<div class="max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <!-- Profile Header Card -->
+    <div
+        class="relative overflow-hidden bg-gradient-to-r from-primary-600 to-accent-500 rounded-3xl p-8 md:p-12 text-white shadow-2xl shadow-brand-main/20">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full -ml-10 -mb-10 blur-2xl"></div>
+
+        <div class="relative flex flex-col md:flex-row items-center gap-8">
+            <!-- Profile Picture -->
+            <div class="relative group">
+                <div
+                    class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white/30 overflow-hidden bg-white/20 backdrop-blur-md shadow-inner flex items-center justify-center">
+                    @if (profile()?.profilePictureUrl) {
+                    <img [src]="profile()?.profilePictureUrl" class="w-full h-full object-cover" alt="Profile">
+                    } @else {
+                    <span class="text-5xl font-bold uppercase">{{ user()?.username?.charAt(0) }}</span>
+                    }
+
+                    <!-- Upload Overlay -->
+                    <label
+                        class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                        <i class="pi pi-camera text-2xl mb-1"></i>
+                        <span class="text-xs font-bold uppercase tracking-wider">Change</span>
+                        <input type="file" (change)="onPhotoSelected($event)" class="hidden" accept="image/*">
+                    </label>
+                </div>
+                @if (isUploadingPhoto()) {
+                <div class="absolute inset-0 bg-black/20 rounded-full flex items-center justify-center">
+                    <i class="pi pi-spin pi-spinner text-3xl"></i>
+                </div>
+                }
+            </div>
+
+            <div class="text-center md:text-left space-y-2">
+                <h1 class="text-4xl font-black tracking-tight">{{ profile()?.fullName || user()?.username }}</h1>
+                <p class="text-brand-soft text-lg">{{ user()?.email }}</p>
+                <div class="flex flex-wrap justify-center md:justify-start gap-2 pt-2">
+                    @for (role of user()?.roles; track role) {
+                    <span
+                        class="px-3 py-1 bg-white/20 backdrop-blur-md border border-white/10 rounded-full text-xs font-bold uppercase tracking-widest leading-none">
+                        {{ role.replace('ROLE_', '') }}
+                    </span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-[30%_70%] gap-8 items-start">
+        <!-- Sidebar Stats -->
+        <div class="space-y-6 sticky top-6">
+            <div class="bg-bg-surface border border-border-default rounded-3xl p-6 shadow-sm">
+                <h3 class="text-sm font-bold text-text-muted uppercase tracking-widest mb-4">Account Stats</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 bg-bg-muted rounded-2xl">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 bg-brand-soft text-brand-main rounded-xl flex items-center justify-center">
+                                <i class="pi pi-check"></i>
+                            </div>
+                            <span class="text-sm font-medium">Loans Approved</span>
+                        </div>
+                        <span class="font-bold">0</span>
+                    </div>
+                    <!-- Add more stats here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Form -->
+        <div class="space-y-8">
+            <div class="bg-bg-surface border border-border-default rounded-3xl p-8 shadow-sm">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-2xl font-bold text-text-primary">Biodata Information</h2>
+                    <button type="button" (click)="isEditing.set(!isEditing())"
+                        class="min-h-[44px] px-4 py-2 text-accent-700 hover:bg-accent-soft rounded-xl transition-colors font-bold flex items-center justify-center gap-2">
+                        <i [class]="isEditing() ? 'pi pi-times' : 'pi pi-user-edit'"></i>
+                        {{ isEditing() ? 'Cancel Edit' : 'Edit Profile' }}
+                    </button>
+                </div>
+
+                <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-text-muted uppercase tracking-wider ml-1">Full
+                                Name</label>
+                            <input formControlName="fullName" [readonly]="!isEditing()"
+                                [class.bg-bg-muted]="!isEditing()"
+                                class="w-full px-4 py-3 bg-bg-surface border border-border-default rounded-xl focus:border-brand-main focus:ring-1 focus:ring-brand-main outline-none transition-all">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-text-muted uppercase tracking-wider ml-1">Phone
+                                Number</label>
+                            <input formControlName="phoneNumber" [readonly]="!isEditing()"
+                                [class.bg-bg-muted]="!isEditing()"
+                                class="w-full px-4 py-3 bg-bg-surface border border-border-default rounded-xl focus:border-brand-main focus:ring-1 focus:ring-brand-main outline-none transition-all">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-text-muted uppercase tracking-wider ml-1">NIK (Identity
+                                Number)</label>
+                            <input formControlName="nik" [readonly]="!isEditing()" [class.bg-bg-muted]="!isEditing()"
+                                class="w-full px-4 py-3 bg-bg-surface border border-border-default rounded-xl focus:border-brand-main focus:ring-1 focus:ring-brand-main outline-none transition-all">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-text-muted uppercase tracking-wider ml-1">Income
+                                Source</label>
+                            <input formControlName="incomeSource" [readonly]="!isEditing()"
+                                [class.bg-bg-muted]="!isEditing()"
+                                class="w-full px-4 py-3 bg-bg-surface border border-border-default rounded-xl focus:border-brand-main focus:ring-1 focus:ring-brand-main outline-none transition-all">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-text-muted uppercase tracking-wider ml-1">Monthly
+                                Income</label>
+                            <input type="number" formControlName="monthlyIncome" [readonly]="!isEditing()"
+                                [class.bg-bg-muted]="!isEditing()"
+                                class="w-full px-4 py-3 bg-bg-surface border border-border-default rounded-xl focus:border-brand-main focus:ring-1 focus:ring-brand-main outline-none transition-all">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-text-muted uppercase tracking-wider ml-1">City</label>
+                            <input formControlName="city" [readonly]="!isEditing()" [class.bg-bg-muted]="!isEditing()"
+                                class="w-full px-4 py-3 bg-bg-surface border border-border-default rounded-xl focus:border-brand-main focus:ring-1 focus:ring-brand-main outline-none transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Location Section -->
+                    <div class="mt-8 pt-6 border-t border-border-default">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-text-primary">Location</h3>
+                                <p class="text-sm text-text-muted">Your current location coordinates</p>
+                            </div>
+                            <div class="flex gap-2">
+                                @if (hasLocation()) {
+                                <button type="button" (click)="viewOnMap()"
+                                    class="px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-1">
+                                    <i class="pi pi-map"></i> View on Map
+                                </button>
+                                }
+                                @if (isEditing()) {
+                                <button type="button" (click)="toggleLocationMap()"
+                                    class="px-3 py-2 text-sm text-brand-main hover:bg-brand-soft rounded-lg transition-colors flex items-center gap-1">
+                                    <i class="pi pi-map-marker"></i>
+                                    {{ showLocationMap() ? 'Hide Map' : 'Set Location' }}
+                                </button>
+                                <button type="button" (click)="locateMe()"
+                                    class="px-3 py-2 text-sm text-green-600 hover:bg-green-50 rounded-lg transition-colors flex items-center gap-1">
+                                    <i class="pi pi-compass"></i> Locate Me
+                                </button>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Coordinates Display -->
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div class="space-y-1.5">
+                                <label
+                                    class="text-xs font-bold text-text-muted uppercase tracking-wider ml-1">Latitude</label>
+                                <input type="text" [value]="profileForm.get('latitude')?.value | number:'1.6-6'"
+                                    readonly
+                                    class="w-full px-4 py-3 bg-bg-muted border border-border-default rounded-xl text-text-muted"
+                                    placeholder="Not set">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label
+                                    class="text-xs font-bold text-text-muted uppercase tracking-wider ml-1">Longitude</label>
+                                <input type="text" [value]="profileForm.get('longitude')?.value | number:'1.6-6'"
+                                    readonly
+                                    class="w-full px-4 py-3 bg-bg-muted border border-border-default rounded-xl text-text-muted"
+                                    placeholder="Not set">
+                            </div>
+                        </div>
+
+                        <!-- Map -->
+                        @if (showLocationMap() && isEditing()) {
+                        <div
+                            class="h-[300px] rounded-xl overflow-hidden border border-border-default animate-in fade-in">
+                            <app-leaflet-map [defaultLocation]="getCurrentLocation()" [showCoordinates]="false"
+                                (locationChange)="onLocationChange($event)">
+                            </app-leaflet-map>
+                        </div>
+                        <p class="text-xs text-text-muted mt-2">
+                            <i class="pi pi-info-circle mr-1"></i>
+                            Click on the map or drag the marker to set your location
+                        </p>
+                        }
+                    </div>
+
+                    @if (isEditing()) {
+                    <div class="pt-4 animate-in slide-in-from-top-2">
+                        <button type="submit" [disabled]="profileForm.invalid || isLoading()"
+                            class="w-full py-4 bg-brand-main hover:bg-brand-dark text-white font-bold rounded-2xl shadow-xl shadow-brand-main/20 transition-all flex items-center justify-center gap-2">
+                            @if (isLoading()) {
+                            <i class="pi pi-spin pi-spinner text-xl"></i>
+                            } @else {
+                            <i class="pi pi-save"></i> Save Changes
+                            }
+                        </button>
+                    </div>
+                    }
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

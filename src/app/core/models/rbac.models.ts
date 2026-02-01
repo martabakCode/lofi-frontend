@@ -30,6 +30,8 @@ export interface Branch {
   state: string;
   zipCode: string;
   phone: string;
+  longitude?: string;
+  latitude?: string;
 }
 
 export interface User {

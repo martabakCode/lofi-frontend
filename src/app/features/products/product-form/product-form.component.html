@@ -1,0 +1,211 @@
+<div class="space-y-6 max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center gap-4">
+        <button [routerLink]="['/products']"
+            class="w-10 h-10 rounded-lg bg-bg-muted text-text-secondary hover:text-text-primary flex items-center justify-center transition-colors">
+            <i class="pi pi-arrow-left"></i>
+        </button>
+        <div>
+            <h1 class="text-2xl font-bold text-text-primary m-0">
+                {{ isEditMode() ? 'Edit Product' : 'Add New Product' }}
+            </h1>
+            <p class="text-text-secondary m-0">
+                {{ isEditMode() ? 'Update product details and settings' : 'Create a new loan product' }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="card">
+        <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="p-6 space-y-6">
+
+            <!-- Basic Information -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
+                    <i class="pi pi-info-circle text-brand-main"></i>
+                    Basic Information
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="form-label">Product Code <span class="text-red-500">*</span></label>
+                        <input type="text" formControlName="productCode" class="form-input" placeholder="e.g., PROD-001"
+                            [class.border-red-500]="productForm.get('productCode')?.invalid && productForm.get('productCode')?.touched">
+                        <p *ngIf="productForm.get('productCode')?.invalid && productForm.get('productCode')?.touched"
+                            class="form-error">
+                            Product code is required
+                        </p>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Product Name <span class="text-red-500">*</span></label>
+                        <input type="text" formControlName="productName" class="form-input"
+                            placeholder="Enter product name"
+                            [class.border-red-500]="productForm.get('productName')?.invalid && productForm.get('productName')?.touched">
+                        <p *ngIf="productForm.get('productName')?.invalid && productForm.get('productName')?.touched"
+                            class="form-error">
+                            Product name is required
+                        </p>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="form-label">Description</label>
+                    <textarea formControlName="description" rows="3" class="form-textarea"
+                        placeholder="Enter product description"></textarea>
+                </div>
+            </div>
+
+            <hr class="border-border-default">
+
+            <!-- Loan Amount Settings -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
+                    <i class="pi pi-money-bill text-brand-main"></i>
+                    Loan Amount Settings
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="form-label">Minimum Amount <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">Rp</span>
+                            <input type="number" formControlName="minLoanAmount" class="form-input pl-12"
+                                placeholder="0" min="0"
+                                [class.border-red-500]="productForm.get('minLoanAmount')?.invalid && productForm.get('minLoanAmount')?.touched">
+                        </div>
+                        <p *ngIf="productForm.get('minLoanAmount')?.invalid && productForm.get('minLoanAmount')?.touched"
+                            class="form-error">
+                            Minimum amount is required
+                        </p>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Maximum Amount <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">Rp</span>
+                            <input type="number" formControlName="maxLoanAmount" class="form-input pl-12"
+                                placeholder="0" min="0"
+                                [class.border-red-500]="productForm.get('maxLoanAmount')?.invalid && productForm.get('maxLoanAmount')?.touched">
+                        </div>
+                        <p *ngIf="productForm.get('maxLoanAmount')?.invalid && productForm.get('maxLoanAmount')?.touched"
+                            class="form-error">
+                            Maximum amount is required
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-border-default">
+
+            <!-- Tenor Settings -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
+                    <i class="pi pi-calendar text-brand-main"></i>
+                    Tenor Settings
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="form-label">Minimum Tenor (months) <span class="text-red-500">*</span></label>
+                        <input type="number" formControlName="minTenor" class="form-input" placeholder="0" min="1"
+                            [class.border-red-500]="productForm.get('minTenor')?.invalid && productForm.get('minTenor')?.touched">
+                        <p *ngIf="productForm.get('minTenor')?.invalid && productForm.get('minTenor')?.touched"
+                            class="form-error">
+                            Minimum tenor is required
+                        </p>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Maximum Tenor (months) <span class="text-red-500">*</span></label>
+                        <input type="number" formControlName="maxTenor" class="form-input" placeholder="0" min="1"
+                            [class.border-red-500]="productForm.get('maxTenor')?.invalid && productForm.get('maxTenor')?.touched">
+                        <p *ngIf="productForm.get('maxTenor')?.invalid && productForm.get('maxTenor')?.touched"
+                            class="form-error">
+                            Maximum tenor is required
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-border-default">
+
+            <!-- Interest & Fees -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
+                    <i class="pi pi-percentage text-brand-main"></i>
+                    Interest & Fees
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="form-label">Interest Rate (%) <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <input type="number" formControlName="interestRate" class="form-input pr-10"
+                                placeholder="0.00" min="0" step="0.01"
+                                [class.border-red-500]="productForm.get('interestRate')?.invalid && productForm.get('interestRate')?.touched">
+                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted">%</span>
+                        </div>
+                        <p *ngIf="productForm.get('interestRate')?.invalid && productForm.get('interestRate')?.touched"
+                            class="form-error">
+                            Interest rate is required
+                        </p>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Admin Fee <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">Rp</span>
+                            <input type="number" formControlName="adminFee" class="form-input pl-12" placeholder="0"
+                                min="0"
+                                [class.border-red-500]="productForm.get('adminFee')?.invalid && productForm.get('adminFee')?.touched">
+                        </div>
+                        <p *ngIf="productForm.get('adminFee')?.invalid && productForm.get('adminFee')?.touched"
+                            class="form-error">
+                            Admin fee is required
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-border-default">
+
+            <!-- Status -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
+                    <i class="pi pi-check-circle text-brand-main"></i>
+                    Product Status
+                </h3>
+
+                <div class="flex items-center gap-4">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" formControlName="isActive" [value]="true" class="text-brand-main">
+                        <span>Active</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" formControlName="isActive" [value]="false" class="text-brand-main">
+                        <span>Inactive</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div *ngIf="error()" class="error-alert">
+                <i class="pi pi-exclamation-triangle"></i>
+                <span>{{ error() }}</span>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex justify-end gap-3 pt-4 border-t border-border-default">
+                <button type="button" [routerLink]="['/products']" class="btn-secondary">
+                    Cancel
+                </button>
+                <button type="submit" [disabled]="isSubmitting() || productForm.invalid"
+                    class="btn-primary flex items-center gap-2">
+                    <i *ngIf="isSubmitting()" class="pi pi-spin pi-spinner"></i>
+                    {{ isEditMode() ? 'Update Product' : 'Create Product' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -34,7 +34,7 @@ export class ProductFacade {
         this.productService.getProducts()
             .pipe(
                 finalize(() => this.loadingSignal.set(false)),
-                map(res => ProductAdapter.toViewList(res))
+                map(res => ProductAdapter.toViewList(res.items))
             )
             .subscribe({
                 next: (products) => this.productsSignal.set(products),
