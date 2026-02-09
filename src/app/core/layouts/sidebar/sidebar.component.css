@@ -1,4 +1,4 @@
-/* Sidebar Premium Design */
+/* Sidebar Premium Design - Apple HIG with Dark Theme Support */
 :host {
     display: block;
     height: 100%;
@@ -6,52 +6,88 @@
 
 .sidebar {
     background: var(--bg-surface);
+    /* Uses theme CSS variable for background */
     border-right: 1px solid var(--border-default);
     display: flex;
     flex-direction: column;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    height: 100vh;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .logo-container {
     padding: 1.5rem;
-    border-bottom: 1px solid var(--border-muted);
+    height: 64px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--border-default);
+    gap: 0.75rem;
 }
 
+/* Logo styles with dark theme support */
+.logo-container .logo-text {
+    color: var(--text-primary);
+    transition: color 0.2s ease;
+}
+
+/* Menu Section */
 .menu-section {
-    padding: 1rem;
+    padding: 1rem 0.75rem;
     flex: 1;
     overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-default) transparent;
+}
+
+/* Custom scrollbar for webkit browsers */
+.menu-section::-webkit-scrollbar {
+    width: 4px;
+}
+
+.menu-section::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.menu-section::-webkit-scrollbar-thumb {
+    background-color: var(--border-default);
+    border-radius: 4px;
 }
 
 .menu-label {
     padding: 0 1rem;
-    margin-bottom: 0.75rem;
-    font-size: 0.7rem;
-    font-weight: 700;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--text-muted);
+    transition: color 0.2s ease;
 }
 
 /* Menu item base styles */
 .menu-item {
     display: flex;
     align-items: center;
-    gap: 0.875rem;
-    padding: 0.75rem 1rem;
-    margin-bottom: 0.25rem;
-    font-size: 0.9rem;
+    gap: 0.75rem;
+    padding: 0.625rem 1rem;
+    margin-bottom: 0.125rem;
+    font-size: 0.9375rem;
+    /* ~15px */
     font-weight: 500;
     color: var(--text-secondary);
-    border-radius: 12px;
+    border-radius: 8px;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
+    position: relative;
+    border-left: 3px solid transparent;
 }
 
 .menu-item i {
-    font-size: 1.1rem;
-    transition: transform 0.2s ease;
-    color: currentColor;
+    font-size: 1.125rem;
+    color: var(--text-muted);
+    transition: color 0.2s ease;
+    width: 20px;
+    text-align: center;
 }
 
 .menu-item:hover {
@@ -60,58 +96,116 @@
 }
 
 .menu-item:hover i {
-    transform: translateX(2px);
+    color: var(--text-primary);
 }
 
-/* Active link styles */
-/* Active link styles */
+/* Active link styles - synchronized with theme */
 .active-link {
-    background: linear-gradient(90deg, var(--brand-soft) 0%, transparent 100%) !important;
-    color: var(--brand-main) !important;
+    background: var(--brand-soft);
+    color: var(--brand-main);
     font-weight: 600;
-    position: relative;
-    border-right: 3px solid transparent;
-    /* Balance the left border if needed, or remove */
+    border-left: 3px solid var(--brand-main);
 }
 
 .active-link i {
-    color: var(--brand-accent) !important;
-    transform: scale(1.1);
+    color: var(--brand-main);
 }
 
-.active-link::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 15%;
-    bottom: 15%;
-    width: 4px;
-    background: var(--brand-accent);
-    border-radius: 0 4px 4px 0;
-    box-shadow: 0 0 12px var(--brand-accent);
+/* Badge Style */
+.nav-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 4px;
+    background-color: var(--error-text);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 9999px;
+    margin-left: auto;
 }
 
 .logout-container {
     padding: 1rem;
-    border-top: 1px solid var(--border-muted);
+    border-top: 1px solid var(--border-default);
+    background: var(--bg-surface);
 }
 
 .btn-logout {
     width: 100%;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.75rem;
     padding: 0.75rem 1rem;
     background: transparent;
     border: none;
-    border-radius: 12px;
-    color: #ef4444;
-    font-weight: 600;
-    font-size: 0.9rem;
+    border-radius: 8px;
+    color: var(--error-text);
+    font-weight: 500;
+    font-size: 0.9375rem;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .btn-logout:hover {
-    background: rgba(239, 68, 68, 0.1);
+    background: var(--error-bg);
+}
+
+.btn-logout i {
+    font-size: 1rem;
+}
+
+/* Collapsed state adjustments */
+.collapsed .menu-item {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.collapsed .menu-item span,
+.collapsed .menu-label,
+.collapsed .logo-text,
+.collapsed .nav-badge {
+    display: none;
+}
+
+.collapsed .logo-container {
+    justify-content: center;
+    padding: 0;
+}
+
+/* Desktop collapse toggle button with dark theme */
+.sidebar .collapse-btn {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+}
+
+.sidebar .collapse-btn:hover {
+    background: var(--bg-muted);
+    color: var(--text-primary);
+}
+
+/* Dark theme specific adjustments */
+.dark .menu-item:hover {
+    background: var(--bg-muted);
+}
+
+.dark .btn-logout:hover {
+    background: rgba(248, 113, 113, 0.1);
+}
+
+/* Smooth transitions for theme switching */
+.sidebar,
+.logo-container,
+.menu-section,
+.menu-item,
+.menu-label,
+.logout-container,
+.btn-logout {
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }

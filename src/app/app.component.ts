@@ -12,10 +12,5 @@ import { NotificationService } from './core/services/notification.service';
     <app-toast></app-toast>
   `
 })
-export class AppComponent implements OnInit {
-  private notificationService = inject(NotificationService);
-
-  ngOnInit() {
-    this.notificationService.requestPermission();
-  }
+export class AppComponent {
 }

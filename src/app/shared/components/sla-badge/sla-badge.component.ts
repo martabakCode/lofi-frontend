@@ -12,19 +12,19 @@ import { Subject, takeUntil } from 'rxjs';
     <div class="flex items-center gap-2 group relative cursor-help">
       <div [ngClass]="{
             'inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium transition-all duration-300': true,
-            'bg-green-500/10 text-green-600 border border-green-500/20': sla().status === 'SAFE',
-            'bg-amber-500/10 text-amber-600 border border-amber-500/20': sla().status === 'WARNING',
-            'bg-red-500/10 text-red-600 border border-red-500/20 animate-pulse': sla().status === 'CRITICAL',
-            'bg-surface-900 text-white border border-surface-700 dark:text-surface-100': sla().status === 'EXPIRED'
+            'bg-green-500/10 text-green-600 border border-green-500/20 dark:text-green-400': sla().status === 'SAFE',
+            'bg-amber-500/10 text-amber-600 border border-amber-500/20 dark:text-amber-400': sla().status === 'WARNING',
+            'bg-red-500/10 text-red-600 border border-red-500/20 animate-pulse dark:text-red-400': sla().status === 'CRITICAL',
+            'bg-slate-900 text-white border border-slate-700 dark:bg-slate-700 dark:border-slate-600': sla().status === 'EXPIRED'
         }">
         <i class="pi pi-clock mr-1.5" [class.pi-spin]="sla().status === 'CRITICAL'"></i>
         <span class="font-mono font-bold">{{ timeDisplay() }}</span>
       </div>
       
       <!-- Tooltip -->
-      <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-32 p-2 bg-surface-900 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity invisible group-hover:visible z-10 shadow-xl dark:text-surface-100">
+      <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-32 p-2 bg-slate-900 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity invisible group-hover:visible z-10 shadow-xl dark:bg-slate-800">
         <span class="text-xs font-semibold">SLA Status: {{ sla().status }}</span>
-        <div class="w-full bg-surface-600/20 h-1 rounded-full mt-1">
+        <div class="w-full bg-slate-600/20 h-1 rounded-full mt-1">
           <div [className]="'h-full rounded-full transition-all duration-500 ' + progressColor()" 
                [style.width.%]="progress()"></div>
         </div>
@@ -49,7 +49,7 @@ export class SlaBadgeComponent implements OnInit {
 
   timeDisplay = signal<string>('00:00:00');
   progress = signal<number>(100);
-  progressColor = signal<string>('bg-green-500 dark:bg-green-500');
+  progressColor = signal<string>('bg-green-500');
 
   ngOnInit() {
     this.slaService.getSlaStatus(this.startTime, this.targetHours)
@@ -65,7 +65,7 @@ export class SlaBadgeComponent implements OnInit {
           case 'SAFE': this.progressColor.set('bg-green-500'); break;
           case 'WARNING': this.progressColor.set('bg-amber-500'); break;
           case 'CRITICAL': this.progressColor.set('bg-red-500'); break;
-          case 'EXPIRED': this.progressColor.set('bg-surface-400'); break;
+          case 'EXPIRED': this.progressColor.set('bg-slate-400'); break;
         }
       });
   }
@@ -75,3 +75,4 @@ export class SlaBadgeComponent implements OnInit {
     this.destroy$.complete();
   }
 }
+

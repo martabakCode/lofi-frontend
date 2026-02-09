@@ -1,36 +1,43 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { LoanFacade } from '../../../core/facades/loan.facade';
-import { LoanService, BackendLoanResponse } from '../../../core/services/loan.service';
-import { DocumentService } from '../../../core/services/document.service';
-import { LoanActionsComponent } from '../components/loan-actions/loan-actions.component';
+import { LoanVM } from '../models/loan.models';
 import { ToastService } from '../../../core/services/toast.service';
+import { DocumentService } from '../../../core/services/document.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { LeafletMapComponent } from '../../../shared/components/leaflet-map/leaflet-map.component';
-
-// Adapter to match Loan interface for actions (Facade returns UI model, Service returns Backend DTO)
-// We'll use the BackendDTO for Detail View as it has more fields (timestamps).
-// We might need to map it to Loan Interface for LoanActionsComponent.
+import { PageHeaderComponent } from '../../../shared/components/page/page-header.component';
+import { CardComponent } from '../../../shared/components/card/card.component';
+import { StatusBadgeComponent } from '../../../shared/components/status/status-badge.component';
+import { LoanActionsComponent } from '../components/loan-actions/loan-actions.component';
 
 @Component({
     selector: 'app-loan-detail',
     standalone: true,
-    imports: [CommonModule, RouterModule, LoanActionsComponent, LeafletMapComponent],
+    imports: [
+        CommonModule,
+        RouterModule,
+        PageHeaderComponent,
+        CardComponent,
+        StatusBadgeComponent,
+        LoanActionsComponent
+    ],
     templateUrl: './loan-detail.component.html',
     styleUrls: ['./loan-detail.component.css']
 })
 export class LoanDetailComponent implements OnInit {
+    private loanFacade = inject(LoanFacade);
+    private toastService = inject(ToastService);
     private route = inject(ActivatedRoute);
-    private loanService = inject(LoanService);
-    private documentService = inject(DocumentService);
-    private toast = inject(ToastService);
     private router = inject(Router);
+    private documentService = inject(DocumentService);
+    private authService = inject(AuthService);
 
-    loan = signal<BackendLoanResponse | null>(null);
+    // State
+    loan = signal<LoanVM | null>(null);
     loading = signal(false);
-    actionLoading = signal(false);
     error = signal<string | null>(null);
+    actionLoading = signal(false);
 
     ngOnInit() {
         this.route.paramMap.subscribe(params => {
@@ -41,125 +48,105 @@ export class LoanDetailComponent implements OnInit {
         });
     }
 
-    loadLoan(id?: string) {
-        const loanId = id || this.loan()?.id;
-        if (!loanId) return;
-
+    loadLoan(id: string) {
         this.loading.set(true);
         this.error.set(null);
 
-        this.loanService.getLoanById(loanId).subscribe({
-            next: (data) => {
-                this.loan.set(data);
+        this.loanFacade.getLoan(id).subscribe({
+            next: (loan) => {
+                this.loan.set(loan);
                 this.loading.set(false);
             },
             error: (err) => {
+                this.error.set(err.message || 'Failed to load loan details');
                 this.loading.set(false);
-                this.error.set(err.error?.message || 'Failed to load loan details');
-                // if 404
-                if (err.status === 404) {
-                    this.toast.show('Loan not found', 'error');
-                    this.router.navigate(['/loans']);
-                }
+                this.toastService.show('Failed to load loan details', 'error');
             }
         });
     }
 
-    handleAction(e: { type: string, payload?: any }, id: string) {
+    goBack() {
+        this.router.navigate(['/dashboard/loans']);
+    }
+
+    handleAction(event: { type: string; payload?: any }) {
+        const loan = this.loan();
+        if (!loan) return;
+
+        const loanId = loan.id;
         this.actionLoading.set(true);
 
-        // SOURCE OF TRUTH: Refetch after action
         const refresh = () => {
             this.actionLoading.set(false);
-            this.loadLoan(id);
+            this.loadLoan(loanId);
         };
 
         const onError = (err: any) => {
             this.actionLoading.set(false);
             if (err.status === 409) {
-                this.toast.show('Status has changed. Reloading...', 'warning');
-                this.loadLoan(id);
+                this.toastService.show('Status has changed. Reloading...', 'warning');
+                this.loadLoan(loanId);
             } else {
-                this.toast.show(err.error?.message || 'Action failed', 'error');
+                this.toastService.show(err.error?.message || 'Action failed', 'error');
             }
         };
 
-        switch (e.type) {
+        switch (event.type) {
             case 'SUBMIT':
-                this.loanService.submitLoan(id).subscribe({ next: () => { this.toast.show('Submitted!', 'success'); refresh(); }, error: onError });
+                this.loanFacade.submitLoan(loanId).subscribe({ next: refresh, error: onError });
                 break;
             case 'REVIEW':
-                // Prompt for notes? For now simple default. Or add modal.
-                const notes = prompt("Review Notes (Optional):") || "Reviewed by Marketing";
-                this.loanService.reviewLoan(id, notes).subscribe({ next: () => { this.toast.show('Reviewed!', 'success'); refresh(); }, error: onError });
+                const notes = event.payload?.notes || 'Reviewed';
+                this.loanFacade.reviewLoan(loanId, notes).subscribe({ next: refresh, error: onError });
                 break;
             case 'APPROVE':
-                if (confirm("Are you sure you want to APPROVE this loan?")) {
-                    this.loanService.approveLoan(id, "Approved").subscribe({ next: () => { this.toast.show('Approved!', 'success'); refresh(); }, error: onError });
-                } else { this.actionLoading.set(false); }
+                this.loanFacade.approveLoan(loanId, 'Approved').subscribe({ next: refresh, error: onError });
                 break;
             case 'REJECT':
-                const reason = prompt("Enter Rejection Reason:") || "Rejected by Manager";
-                this.loanService.rejectLoan(id, reason).subscribe({ next: () => { this.toast.show('Rejected!', 'info'); refresh(); }, error: onError });
+                const reason = event.payload?.reason || 'Rejected';
+                this.loanFacade.rejectLoan(loanId, reason).subscribe({ next: refresh, error: onError });
                 break;
             case 'DISBURSE':
-                // Needs date/ref
-                const ref = prompt("Enter Disbursement Reference:") || "REF-" + Date.now();
-                this.loanService.disburseLoan(id, new Date().toISOString().split('T')[0], ref).subscribe({ next: () => { this.toast.show('Disbursed!', 'success'); refresh(); }, error: onError });
+                const ref = event.payload?.reference || 'REF-' + Date.now();
+                const date = event.payload?.date || new Date().toISOString().split('T')[0];
+                this.loanFacade.disburseLoan(loanId, date, ref).subscribe({ next: refresh, error: onError });
                 break;
             case 'COMPLETE':
-                this.loanService.completeLoan(id).subscribe({ next: () => { this.toast.show('Completed!', 'success'); refresh(); }, error: onError });
+                this.loanFacade.completeLoan(loanId).subscribe({ next: refresh, error: onError });
                 break;
             case 'CANCEL':
-                if (confirm("Cancel this loan?")) {
-                    this.loanService.cancelLoan(id).subscribe({ next: () => { this.toast.show('Cancelled', 'info'); refresh(); }, error: onError });
-                } else { this.actionLoading.set(false); }
+                this.loanFacade.cancelLoan(loanId).subscribe({ next: refresh, error: onError });
                 break;
             default:
                 this.actionLoading.set(false);
         }
     }
 
-    getStatusBadgeClass(status: string) {
-        switch (status) {
-            case 'DRAFT': return 'bg-gray-100 text-gray-800';
-            case 'SUBMITTED': return 'bg-yellow-100 text-yellow-800';
-            case 'REVIEWED': return 'bg-blue-100 text-blue-800';
-            case 'APPROVED': return 'bg-green-100 text-green-800';
-            case 'REJECTED': return 'bg-red-100 text-red-800';
-            case 'DISBURSED': return 'bg-purple-100 text-purple-800';
-            case 'COMPLETED': return 'bg-indigo-100 text-indigo-800';
-            case 'CANCELLED': return 'bg-red-100 text-red-800';
-            default: return 'bg-gray-100 text-gray-800';
-        }
-    }
-
-    processedLoan(l: BackendLoanResponse): any {
-        return {
-            id: l.id,
-            status: l.loanStatus,
-            amount: l.loanAmount,
-            // ... other fields if needed by actions
-        };
-    }
-
     viewDocument(id: string) {
         this.documentService.getDownloadUrl(id).subscribe({
-            next: (data) => {
-                window.open(data.downloadUrl, '_blank');
-            },
-            error: (err) => this.toast.show('Failed to open document', 'error')
+            next: (data) => window.open(data.downloadUrl, '_blank'),
+            error: () => this.toastService.show('Failed to open document', 'error')
         });
     }
 
     formatDocType(type: string): string {
-        return type.replace('_', ' ');
+        return type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     }
 
-    viewLocationOnMap(loan: BackendLoanResponse) {
-        if (loan.latitude && loan.longitude) {
+    viewLocationOnMap() {
+        const loan = this.loan();
+        if (loan?.latitude && loan?.longitude) {
             const url = `https://www.openstreetmap.org/?mlat=${loan.latitude}&mlon=${loan.longitude}#map=15/${loan.latitude}/${loan.longitude}`;
             window.open(url, '_blank');
         }
+    }
+
+    processedLoan(): any {
+        const loan = this.loan();
+        return loan ? {
+            id: loan.id,
+            status: loan.status,
+            amount: loan.amount
+        } : null;
     }
 }

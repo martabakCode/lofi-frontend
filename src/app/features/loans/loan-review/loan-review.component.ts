@@ -1,33 +1,53 @@
 import { Component, inject, OnInit, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { LoanFacade } from '../../../core/facades/loan.facade';
+import { AuthService } from '../../../core/services/auth.service';
 import { ReportService } from '../../../core/services/report.service';
 import { SlaBadgeComponent } from '../../../shared/components/sla-badge/sla-badge.component';
 import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
+import { LoanWorkflowModalComponent, LoanDetailInfo, LoanWorkflowStep } from '../../../shared/components/loan-workflow-modal/loan-workflow-modal.component';
 import { LoanStatus } from '../../../core/models/loan.models';
+import { LoanVM } from '../models/loan.models';
 import { LoanEventBus } from '../../../core/patterns/loan-event-bus.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { LoanService } from '../../../core/services/loan.service';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-loan-review',
   standalone: true,
-  imports: [CommonModule, RouterModule, SlaBadgeComponent, ConfirmationModalComponent],
+  imports: [CommonModule, RouterModule, SlaBadgeComponent, ConfirmationModalComponent, LoanWorkflowModalComponent],
   templateUrl: './loan-review.component.html',
   styleUrls: ['./loan-review.component.css']
 })
 export class LoanReviewComponent implements OnInit, OnDestroy {
   private loanFacade = inject(LoanFacade);
+  private loanService = inject(LoanService);
+  private authService = inject(AuthService);
   private reportService = inject(ReportService);
   private eventBus = inject(LoanEventBus);
   private toast = inject(ToastService);
+  private router = inject(Router);
   private destroy$ = new Subject<void>();
 
-  loans = signal<any[]>([]);
+  loans = signal<LoanVM[]>([]);
   loading = this.loanFacade.loading;
   error = signal<string | null>(null);
   totalRecords = signal<number>(0);
+
+  // Workflow Modal State
+  workflowModal = signal<{
+    isOpen: boolean;
+    loanDetail: LoanDetailInfo | null;
+    workflowSteps: LoanWorkflowStep[];
+    availableActions: string[];
+  }>({
+    isOpen: false,
+    loanDetail: null,
+    workflowSteps: [],
+    availableActions: ['REVIEW', 'APPROVE']
+  });
 
   // Modal State
   modal = signal({
@@ -66,15 +86,14 @@ export class LoanReviewComponent implements OnInit, OnDestroy {
 
   loadLoans() {
     const params: any = {
-      // status field might be handled by backend default or facade, checking getLatestLoans signature
-      // Facade calls service which takes params.
-      // Based on loan-approval component, we might want to filter by SUBMITTED here if this is review queue?
-      // Step 27 says "New loan applications will appear here for your review".
-      // TS matches loanFacade.getLatestLoans().
-      // I'll keep default but allow search.
       page: 0,
       size: 10
     };
+    const user = this.authService.currentUser();
+    if (user?.branchId) {
+      params.branchId = user.branchId;
+    }
+    params.status = 'SUBMITTED';
 
     if (this.searchQuery()) {
       params.search = this.searchQuery();
@@ -95,6 +114,12 @@ export class LoanReviewComponent implements OnInit, OnDestroy {
   exportLoans() {
     this.isExporting.set(true);
     const params: any = { size: 1000 };
+    const user = this.authService.currentUser();
+    if (user?.branchId) {
+      params.branchId = user.branchId;
+    }
+    params.status = 'SUBMITTED';
+
     if (this.searchQuery()) {
       params.search = this.searchQuery();
     }
@@ -205,7 +230,7 @@ export class LoanReviewComponent implements OnInit, OnDestroy {
       requireNotes: true,
       placeholder: 'Mandatory rejection reason...',
       action: (notes: string) => {
-        this.loanFacade.rollbackLoan(loanId, 'REJECTED: ' + notes).subscribe({
+        this.loanFacade.rejectLoan(loanId, notes).subscribe({
           next: () => {
             this.eventBus.emitLoanUpdated();
             this.toast.show('Application rejected', 'info');
@@ -302,5 +327,98 @@ export class LoanReviewComponent implements OnInit, OnDestroy {
       },
       error: (err) => console.error('Failed to export SLA report', err)
     });
+  }
+
+  // ========== Workflow Modal Methods ==========
+
+  onViewWorkflowDetails(loan: any): void {
+    this.loanService.getLoanDetailForWorkflow(loan.id).subscribe({
+      next: (detail) => {
+        const loanDetail: LoanDetailInfo = {
+          id: detail.id,
+          customerName: detail.customerName,
+          productName: detail.product?.productName || 'Unknown',
+          amount: detail.loanAmount,
+          tenor: detail.tenor,
+          interestRate: detail.product?.interestRate,
+          adminFee: detail.product?.adminFee,
+          status: detail.loanStatus,
+          currentStage: detail.currentStage,
+          disbursementReference: detail.disbursementReference,
+          submittedAt: detail.submittedAt,
+          approvedAt: detail.approvedAt,
+          disbursedAt: detail.disbursedAt,
+          appliedDate: detail.submittedAt || detail.createdAt
+        };
+
+        const workflowSteps = this.buildWorkflowSteps(detail);
+
+        this.workflowModal.set({
+          isOpen: true,
+          loanDetail,
+          workflowSteps,
+          availableActions: this.getAvailableActions(detail.loanStatus)
+        });
+      },
+      error: (err) => {
+        this.toast.show('Failed to load loan details', 'error');
+      }
+    });
+  }
+
+  private buildWorkflowSteps(detail: any): LoanWorkflowStep[] {
+    return [
+      {
+        step: 'SUBMITTED',
+        status: detail.submittedAt ? 'completed' : 'pending',
+        timestamp: detail.submittedAt,
+        userName: 'Customer'
+      },
+      {
+        step: 'REVIEW',
+        status: detail.reviewedAt ? 'completed' : (detail.submittedAt ? 'current' : 'pending'),
+        timestamp: detail.reviewedAt
+      },
+      {
+        step: 'APPROVAL',
+        status: detail.approvedAt ? 'completed' : (detail.reviewedAt ? 'current' : 'pending'),
+        timestamp: detail.approvedAt
+      },
+      {
+        step: 'DISBURSE',
+        status: detail.disbursedAt ? 'completed' : (detail.approvedAt ? 'current' : 'pending'),
+        timestamp: detail.disbursedAt
+      }
+    ];
+  }
+
+  private getAvailableActions(status: string): string[] {
+    const actions: string[] = [];
+    if (status === 'SUBMITTED') {
+      actions.push('REVIEW');
+      actions.push('APPROVE');
+    }
+    return actions;
+  }
+
+  onWorkflowAction(event: { type: string; notes?: string }): void {
+    const loanId = this.workflowModal().loanDetail?.id;
+    if (!loanId) return;
+
+    if (event.type === 'REVIEW') {
+      this.workflowModal.set({ ...this.workflowModal(), isOpen: false });
+      this.onReview(loanId);
+    } else if (event.type === 'APPROVE') {
+      this.workflowModal.set({ ...this.workflowModal(), isOpen: false });
+      this.onApprove(loanId);
+    }
+  }
+
+  onWorkflowClose(): void {
+    this.workflowModal.set({ ...this.workflowModal(), isOpen: false });
+  }
+
+  onViewFullPage(loanId: string): void {
+    this.router.navigate(['/dashboard/loans', loanId]);
   }
 }

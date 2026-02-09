@@ -12,6 +12,8 @@ import { PaginationComponent } from '../../../shared/components/pagination/pagin
 import { SortableHeaderComponent, SortConfig } from '../../../shared/components/sortable-header/sortable-header.component';
 import { DetailModalComponent } from '../../../shared/components/detail-modal/detail-modal.component';
 import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
+import { EmptyStateComponent } from '../../../shared/components/apple-hig/empty-state/empty-state.component';
+import { SkeletonLoaderComponent } from '../../../shared/components/apple-hig/skeleton-loader/skeleton-loader.component';
 
 @Component({
   selector: 'app-user-list',
@@ -23,7 +25,9 @@ import { ConfirmationModalComponent } from '../../../shared/components/confirmat
     PaginationComponent,
     SortableHeaderComponent,
     DetailModalComponent,
-    ConfirmationModalComponent
+    ConfirmationModalComponent,
+    EmptyStateComponent,
+    SkeletonLoaderComponent
   ],
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.css']

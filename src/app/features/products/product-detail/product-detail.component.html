@@ -1,0 +1,109 @@
+<div class="space-y-6 max-w-5xl mx-auto">
+    <!-- Header -->
+    <app-page-header title="Product Details" subtitle="View product information and settings" [showBackButton]="true"
+        (back)="goBack()">
+
+        <div actions class="flex gap-3">
+            <button (click)="editProduct()" class="btn-primary flex items-center gap-2">
+                <i class="pi pi-pencil"></i> Edit
+            </button>
+        </div>
+    </app-page-header>
+
+    <!-- Loading State -->
+    <div *ngIf="loading()" class="p-12 flex flex-col items-center justify-center text-gray-500">
+        <i class="pi pi-spin pi-spinner text-3xl mb-4 text-brand-main"></i>
+        <p>Loading product details...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error() && !loading()"
+        class="bg-red-50 border border-red-200 rounded-xl p-6 flex flex-col items-center text-center">
+        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4 text-red-600">
+            <i class="pi pi-exclamation-triangle text-xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-1">Error Loading Product</h3>
+        <p class="text-gray-600 mb-4">{{ error() }}</p>
+        <button (click)="goBack()" class="btn-secondary">Go Back</button>
+    </div>
+
+    <!-- Main Content -->
+    <ng-container *ngIf="product() && !loading()">
+        <!-- Product Identity Card -->
+        <app-card>
+            <div class="flex flex-col md:flex-row items-center gap-6">
+                <!-- Icon -->
+                <div
+                    class="w-20 h-20 rounded-2xl bg-brand-soft text-brand-main flex items-center justify-center shadow-inner shrink-0">
+                    <span class="text-3xl font-bold">{{ product()!.name.charAt(0) }}</span>
+                </div>
+
+                <!-- Info -->
+                <div class="flex-1 text-center md:text-left">
+                    <h2 class="text-2xl font-bold text-gray-900">{{ product()!.name }}</h2>
+                    <p class="text-gray-500 font-mono text-sm mt-1">{{ product()!.code }}</p>
+                </div>
+
+                <!-- Status -->
+                <div class="shrink-0">
+                    <app-status-badge [status]="product()!.isActive ? 'ACTIVE' : 'INACTIVE'"
+                        [label]="product()!.isActive ? 'Active' : 'Inactive'" size="lg">
+                    </app-status-badge>
+                </div>
+            </div>
+        </app-card>
+
+        <!-- Details Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Loan Amount -->
+            <app-card title="Loan Amount Range" icon="pi-money-bill">
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
+                        <span class="text-gray-500">Minimum</span>
+                        <span class="font-semibold text-gray-900">Rp {{ product()!.minAmount | number:'1.0-0' }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
+                        <span class="text-gray-500">Maximum</span>
+                        <span class="font-semibold text-gray-900">Rp {{ product()!.maxAmount | number:'1.0-0' }}</span>
+                    </div>
+                </div>
+            </app-card>
+
+            <!-- Tenor -->
+            <app-card title="Tenor Range" icon="pi-calendar">
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
+                        <span class="text-gray-500">Minimum</span>
+                        <span class="font-semibold text-gray-900">{{ product()!.minTenor }} months</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
+                        <span class="text-gray-500">Maximum</span>
+                        <span class="font-semibold text-gray-900">{{ product()!.maxTenor }} months</span>
+                    </div>
+                </div>
+            </app-card>
+
+            <!-- Interest & Fees -->
+            <app-card title="Interest & Fees" icon="pi-percentage">
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
+                        <span class="text-gray-500">Interest Rate</span>
+                        <span class="font-semibold text-gray-900">{{ product()!.interestRate }}% p.a.</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
+                        <span class="text-gray-500">Admin Fee</span>
+                        <span class="font-semibold text-gray-900">{{ product()!.adminFee |
+                            currency:'IDR':'symbol-narrow':'1.0-0' }}</span>
+                    </div>
+                </div>
+            </app-card>
+
+            <!-- Description -->
+            <app-card title="Description" icon="pi-info-circle">
+                <p class="text-gray-600 leading-relaxed">
+                    {{ product()!.description || 'No description available for this product.' }}
+                </p>
+            </app-card>
+        </div>
+    </ng-container>
+</div>

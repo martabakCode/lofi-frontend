@@ -1,0 +1,37 @@
+<div *ngIf="isOpen" class="modal-overlay" (click)="onClose()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header flex justify-between items-center">
+            <h3 class="modal-title">{{ config.title }}</h3>
+            <button class="btn-ghost p-2" (click)="onClose()">
+                <i class="pi pi-times"></i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <p class="modal-message mb-4">{{ config.message }}</p>
+
+            <div *ngIf="showComment" class="mt-4">
+                <label class="form-label">
+                    Comment
+                    <span *ngIf="!commentRequired" class="text-xs text-text-muted font-normal">(Optional)</span>
+                    <span *ngIf="commentRequired" class="text-xs text-error-text font-normal">*</span>
+                </label>
+                <textarea class="form-textarea w-full" rows="3" [(ngModel)]="comment"
+                    placeholder="Add a comment..."></textarea>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-text" (click)="onClose()">
+                {{ config.cancelLabel || 'Cancel' }}
+            </button>
+            <button [class]="config.type === 'destructive' ? 'btn-destructive' : 'btn-primary'"
+                [disabled]="commentRequired && !comment.trim()" (click)="onConfirm()">
+                {{ config.confirmLabel }}
+            </button>
+        </div>
+    </div>
+</div>

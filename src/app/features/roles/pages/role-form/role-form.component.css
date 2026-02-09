@@ -1,0 +1,96 @@
+:host {
+    display: block;
+}
+
+.card {
+    background-color: var(--bg-card);
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-default);
+}
+
+.form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-default);
+    border-radius: 0.5rem;
+    background-color: transparent;
+    color: var(--text-primary);
+    transition: all 0.2s;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--brand-main);
+    box-shadow: 0 0 0 2px var(--brand-soft);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-error {
+    font-size: 0.75rem;
+    color: var(--error-text);
+    margin-top: 0.25rem;
+}
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background-color: var(--bg-muted);
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: var(--border-default);
+}
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background-color: var(--brand-main);
+    color: white;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: var(--brand-dark);
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.error-alert {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background-color: var(--error-bg);
+    color: var(--error-text);
+    border-radius: 0.5rem;
+    border: 1px solid var(--error-border);
+}
+
+.bg-bg-muted {
+    background-color: var(--bg-muted);
+}

@@ -1,0 +1,101 @@
+<div class="space-y-6 max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center gap-4">
+        <button (click)="goBack()"
+            class="w-10 h-10 rounded-lg bg-bg-muted text-text-secondary hover:text-text-primary flex items-center justify-center transition-colors">
+            <i class="pi pi-arrow-left"></i>
+        </button>
+        <div>
+            <h1 class="text-2xl font-bold text-text-primary m-0">
+                {{ isEditMode() ? 'Edit Role' : 'Add New Role' }}
+            </h1>
+            <p class="text-text-secondary m-0">
+                {{ isEditMode() ? 'Update role details and permissions' : 'Create a new role with permissions' }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="card">
+        <form [formGroup]="roleForm" (ngSubmit)="onSubmit()" class="p-6 space-y-6">
+
+            <!-- Basic Information -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
+                    <i class="pi pi-info-circle text-brand-main"></i>
+                    Basic Information
+                </h3>
+
+                <div>
+                    <label class="form-label">Role Name <span class="text-red-500">*</span></label>
+                    <input type="text" formControlName="name" class="form-input" placeholder="e.g., ROLE_ADMIN"
+                        [class.border-red-500]="roleForm.get('name')?.invalid && roleForm.get('name')?.touched"
+                        [readonly]="isEditMode()" [class.bg-bg-muted]="isEditMode()">
+                    <p *ngIf="roleForm.get('name')?.invalid && roleForm.get('name')?.touched" class="form-error">
+                        Role name is required
+                    </p>
+                    <p *ngIf="isEditMode()" class="text-sm text-text-muted mt-1">
+                        <i class="pi pi-info-circle mr-1"></i>
+                        Role name cannot be changed after creation
+                    </p>
+                </div>
+
+                <div>
+                    <label class="form-label">Description</label>
+                    <textarea formControlName="description" rows="2" class="form-textarea"
+                        placeholder="Enter role description"></textarea>
+                </div>
+            </div>
+
+            <hr class="border-border-default">
+
+            <!-- Permissions -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
+                        <i class="pi pi-shield text-brand-main"></i>
+                        Permissions
+                    </h3>
+                    <span class="text-sm text-text-muted">
+                        {{ selectedPermissions().length }} selected
+                    </span>
+                </div>
+
+                <div class="border border-border-default rounded-lg p-4 h-64 overflow-y-auto space-y-2">
+                    <label *ngFor="let perm of allPermissions()"
+                        class="flex items-center gap-3 p-2 hover:bg-bg-muted/50 rounded cursor-pointer transition-colors">
+                        <input type="checkbox" [checked]="hasPermission(perm)" (change)="togglePermission(perm)"
+                            class="w-4 h-4 text-brand-main rounded border-border-default focus:ring-brand-main">
+                        <div>
+                            <p class="font-medium text-text-primary">{{ perm.name || perm }}</p>
+                            <p class="text-sm text-text-muted">{{ perm.description || 'No description' }}</p>
+                        </div>
+                    </label>
+
+                    <div *ngIf="allPermissions().length === 0" class="text-center py-8 text-text-muted">
+                        <i class="pi pi-shield text-3xl mb-2"></i>
+                        <p>No permissions available</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div *ngIf="error()" class="error-alert">
+                <i class="pi pi-exclamation-triangle"></i>
+                <span>{{ error() }}</span>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex justify-end gap-3 pt-4 border-t border-border-default">
+                <button type="button" (click)="goBack()" class="btn-secondary">
+                    Cancel
+                </button>
+                <button type="submit" [disabled]="isSubmitting() || roleForm.invalid"
+                    class="btn-primary flex items-center gap-2">
+                    <i *ngIf="isSubmitting()" class="pi pi-spin pi-spinner"></i>
+                    {{ isEditMode() ? 'Update Role' : 'Create Role' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

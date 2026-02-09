@@ -1,0 +1,219 @@
+<!-- Loan Workflow Modal -->
+<div *ngIf="isOpenValue()" class="modal-overlay" (click)="close()">
+    <!-- Modal Content -->
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-brand-soft text-brand-main rounded-xl flex items-center justify-center">
+                        <i class="pi pi-file-edit text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-text-primary">Loan Workflow</h2>
+                        <p class="text-sm text-text-muted">#{{ loanDetail?.id || 'N/A' }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="btn-secondary px-3" (click)="viewFullPage()" title="View Full Page">
+                        <i class="pi pi-external-link"></i>
+                    </button>
+                    <button class="text-text-muted hover:text-text-primary transition-colors p-2" (click)="close()">
+                        <i class="pi pi-times text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <!-- Loan Details Section -->
+            <div class="section">
+                <h3 class="section-title">Loan Details</h3>
+                <div class="loan-details-grid">
+                    <!-- Customer Info -->
+                    <div class="detail-card">
+                        <div class="detail-header">
+                            <i class="pi pi-user text-brand-main"></i>
+                            <span class="detail-label">Customer Information</span>
+                        </div>
+                        <div class="detail-content">
+                            <div class="detail-row">
+                                <span class="detail-key">Name</span>
+                                <span class="detail-value">{{ loanDetail?.customerName || '-' }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Phone</span>
+                                <span class="detail-value">{{ loanDetail?.customerPhone || '-' }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Email</span>
+                                <span class="detail-value">{{ loanDetail?.customerEmail || '-' }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loan Info -->
+                    <div class="detail-card">
+                        <div class="detail-header">
+                            <i class="pi pi-money-bill text-brand-main"></i>
+                            <span class="detail-label">Loan Information</span>
+                        </div>
+                        <div class="detail-content">
+                            <div class="detail-row">
+                                <span class="detail-key">Product</span>
+                                <span class="detail-value">{{ loanDetail?.productName || '-' }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Amount</span>
+                                <span class="detail-value font-semibold text-brand-main">
+                                    {{ loanDetail ? formatCurrency(loanDetail.amount) : '-' }}
+                                </span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Tenure</span>
+                                <span class="detail-value">{{ loanDetail?.tenor || 0 }} months</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Interest Rate</span>
+                                <span class="detail-value">{{ loanDetail?.interestRate || 0 }}%</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Admin Fee</span>
+                                <span class="detail-value">
+                                    {{ loanDetail ? formatCurrency(loanDetail.adminFee || 0) : '-' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bank Info -->
+                    <div class="detail-card" *ngIf="loanDetail?.bankName">
+                        <div class="detail-header">
+                            <i class="pi pi-building text-brand-main"></i>
+                            <span class="detail-label">Bank Information</span>
+                        </div>
+                        <div class="detail-content">
+                            <div class="detail-row">
+                                <span class="detail-key">Bank Name</span>
+                                <span class="detail-value">{{ loanDetail?.bankName || '-' }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Branch</span>
+                                <span class="detail-value">{{ loanDetail?.bankBranch || '-' }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Account Number</span>
+                                <span class="detail-value font-mono">{{ loanDetail?.accountNumber || '-' }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Account Holder</span>
+                                <span class="detail-value">{{ loanDetail?.accountHolderName || '-' }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Disbursement Info -->
+                    <div class="detail-card" *ngIf="loanDetail?.disbursementReference">
+                        <div class="detail-header">
+                            <i class="pi pi-wallet text-brand-main"></i>
+                            <span class="detail-label">Disbursement Info</span>
+                        </div>
+                        <div class="detail-content">
+                            <div class="detail-row">
+                                <span class="detail-key">Reference</span>
+                                <span class="detail-value font-mono">{{ loanDetail?.disbursementReference }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Disbursed At</span>
+                                <span class="detail-value">{{ formatDate(loanDetail?.disbursedAt) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step Tracker -->
+            <div class="section">
+                <h3 class="section-title">Workflow Status</h3>
+                <div class="step-tracker">
+                    <ng-container *ngFor="let step of steps; let last = last; let i = index">
+                        <div class="step-item" [class.current]="getStepStatus(step.key) === 'current'"
+                            [class.completed]="getStepStatus(step.key) === 'completed'"
+                            [class.pending]="getStepStatus(step.key) === 'pending'">
+                            <!-- Step Icon -->
+                            <div class="step-icon-wrapper">
+                                <div class="step-icon">
+                                    <i [class]="step.icon"></i>
+                                </div>
+                                <div class="step-connector" *ngIf="!last"></div>
+                            </div>
+                            <!-- Step Info -->
+                            <div class="step-info">
+                                <span class="step-label">{{ step.label }}</span>
+                                <ng-container *ngIf="getStepInfo(step.key) as stepInfo">
+                                    <span class="step-timestamp" *ngIf="stepInfo.timestamp">
+                                        {{ formatDate(stepInfo.timestamp) }}
+                                    </span>
+                                    <span class="step-user" *ngIf="stepInfo.userName">
+                                        by {{ stepInfo.userName }}
+                                    </span>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+
+            <!-- Activity Timeline -->
+            <div class="section">
+                <h3 class="section-title">Activity Timeline</h3>
+                <app-activity-timeline [items]="getTimelineItems()"></app-activity-timeline>
+            </div>
+
+            <!-- Action Section -->
+            <div class="section action-section" *ngIf="availableActions.length > 0">
+                <!-- Action Input -->
+                <div class="action-input-wrapper" *ngIf="activeAction()">
+                    <label class="action-label">
+                        {{ getActionLabel(activeAction()!) }}
+                        <span class="required">*</span>
+                    </label>
+                    <textarea class="action-textarea" [(ngModel)]="actionNotes"
+                        [placeholder]="'Enter ' + getActionLabel(activeAction()!).toLowerCase() + ' notes...'"
+                        rows="3"></textarea>
+                    <div class="action-buttons">
+                        <button class="btn-secondary" (click)="cancelAction()">Cancel</button>
+                        <button class="btn-primary" (click)="executeAction()"
+                            [disabled]="!actionNotes.trim() && isActionRequired()">
+                            {{ getActionLabel(activeAction()!) }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Available Actions -->
+                <div class="available-actions" *ngIf="!activeAction()">
+                    <button *ngIf="canPerformAction('REVIEW')" class="btn-secondary" (click)="startAction('REVIEW')">
+                        <i class="pi pi-search"></i>
+                        Review Loan
+                    </button>
+                    <button *ngIf="canPerformAction('APPROVE')" class="btn-primary bg-amber-600 hover:bg-amber-700"
+                        (click)="startAction('APPROVE')">
+                        <i class="pi pi-check-circle"></i>
+                        Approve Loan
+                    </button>
+                    <button *ngIf="canPerformAction('DISBURSE')" class="btn-primary bg-green-600 hover:bg-green-700"
+                        (click)="startAction('DISBURSE')">
+                        <i class="pi pi-wallet"></i>
+                        Disburse Loan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-secondary" (click)="close()">Close</button>
+        </div>
+    </div>
+</div>

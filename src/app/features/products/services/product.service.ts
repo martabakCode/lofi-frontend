@@ -19,7 +19,7 @@ export class ProductService {
     private buildParams(params: PaginationParams): HttpParams {
         let httpParams = new HttpParams();
         if (params.page !== undefined) {
-            httpParams = httpParams.set('page', params.page.toString());
+            httpParams = httpParams.set('page', (params.page - 1).toString());
         }
         if (params.pageSize !== undefined) {
             httpParams = httpParams.set('size', params.pageSize.toString());

@@ -23,13 +23,19 @@ export class DocumentService {
     private apiUrl = `${environment.apiUrl}/documents`;
 
     presignUpload(loanId: string | null, fileName: string, documentType: string, contentType: string): Observable<PresignUploadResponse> {
-        return this.http.post<ApiResponse<PresignUploadResponse>>(`${this.apiUrl}/presign-upload`, {
+        const payload = {
             loanId,
             fileName,
             documentType,
             contentType
-        }).pipe(
-            map(res => res.data)
+        };
+        console.log('[DocumentService] presignUpload request:', payload);
+        console.log('[DocumentService] API URL:', `${this.apiUrl}/presign-upload`);
+        return this.http.post<ApiResponse<PresignUploadResponse>>(`${this.apiUrl}/presign-upload`, payload).pipe(
+            map(res => {
+                console.log('[DocumentService] presignUpload response:', res);
+                return res.data;
+            })
         );
     }
 

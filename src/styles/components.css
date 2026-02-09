@@ -1,4 +1,6 @@
-/* Financial / Enterprise UI Components */
+@reference "./tailwind.css";
+
+/* Financial / Enterprise UI Components - Apple HIG */
 
 /* Scrollbar */
 ::-webkit-scrollbar {
@@ -46,35 +48,102 @@ p {
 
 /* Buttons */
 .btn-primary {
-    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold text-white transition-all duration-200 bg-brand-main hover:bg-brand-hover disabled:bg-surface-200 disabled:cursor-not-allowed shadow-sm;
+    @apply inline-flex items-center justify-center px-4 py-2.5 rounded-lg font-semibold text-white transition-all duration-200 bg-brand-main hover:bg-brand-hover disabled:bg-gray-300 disabled:cursor-not-allowed shadow-apple-sm min-h-[44px];
+}
+
+.btn-primary:focus-visible {
+    @apply ring-2 ring-brand-main ring-offset-2 outline-none;
 }
 
 .btn-secondary {
-    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold transition-all duration-200 border border-border-default text-text-primary hover:bg-bg-muted disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center px-4 py-2.5 rounded-lg font-semibold transition-all duration-200 border border-border-default text-text-primary hover:bg-bg-muted disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px];
+}
+
+.btn-secondary:focus-visible {
+    @apply ring-2 ring-brand-main ring-offset-2 outline-none;
 }
 
 .btn-ghost {
-    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold transition-all duration-200 text-text-secondary hover:bg-bg-muted hover:text-text-primary;
+    @apply inline-flex items-center justify-center px-4 py-2.5 rounded-lg font-semibold transition-all duration-200 text-text-secondary hover:bg-bg-muted hover:text-text-primary min-h-[44px];
+}
+
+.btn-ghost:focus-visible {
+    @apply ring-2 ring-brand-main ring-offset-2 outline-none;
+}
+
+.btn-text {
+    @apply inline-flex items-center justify-center px-4 py-2.5 rounded-lg font-semibold text-text-secondary hover:text-text-primary hover:bg-bg-muted transition-all duration-200 min-h-[44px];
+}
+
+.btn-text:focus-visible {
+    @apply ring-2 ring-brand-main ring-offset-2 outline-none;
+}
+
+.btn-destructive {
+    @apply inline-flex items-center justify-center px-4 py-2.5 rounded-lg font-semibold text-white bg-error-text hover:bg-red-700 transition-all duration-200 shadow-apple-sm min-h-[44px];
+}
+
+.btn-destructive:focus-visible {
+    @apply ring-2 ring-error-text ring-offset-2 outline-none;
+}
+
+.btn-logout {
+    @apply inline-flex items-center justify-center px-4 py-2.5 rounded-lg font-semibold text-text-secondary hover:text-text-primary hover:bg-bg-muted transition-all duration-200 min-h-[44px];
+}
+
+.btn-logout:focus-visible {
+    @apply ring-2 ring-brand-main ring-offset-2 outline-none;
 }
 
 /* Form & Input */
 .form-input,
 .form-select,
 .form-textarea {
-    @apply w-full px-4 py-2 rounded-lg bg-bg-surface border border-border-default text-text-primary transition-all duration-200 focus:ring-2 focus:ring-brand-main focus:border-brand-main outline-none disabled:bg-bg-muted disabled:cursor-not-allowed placeholder:text-text-muted;
+    @apply w-full px-4 py-2.5 rounded-lg bg-bg-surface border border-border-default text-text-primary transition-all duration-200 focus:ring-2 focus:ring-brand-main focus:border-brand-main outline-none disabled:bg-bg-muted disabled:cursor-not-allowed placeholder:text-text-muted min-h-[44px];
+}
+
+.form-input:focus-visible,
+.form-select:focus-visible,
+.form-textarea:focus-visible {
+    @apply ring-2 ring-brand-main ring-offset-2 outline-none;
+}
+
+.form-input.error,
+.form-select.error,
+.form-textarea.error {
+    @apply border-error-text focus:ring-error-text focus:border-error-text;
 }
 
 .form-label {
     @apply block text-sm font-medium text-text-secondary mb-1.5;
 }
 
+.form-label .required {
+    @apply text-error-text;
+}
+
 .form-error {
-    @apply text-sm text-red-500 mt-1;
+    @apply text-sm text-error-text mt-1;
+}
+
+.form-helper {
+    @apply text-xs text-text-muted mt-1;
 }
 
 /* Card & Table */
 .card {
     @apply bg-bg-surface border border-border-default rounded-xl shadow-sm overflow-hidden;
+}
+
+/* Duplicate card definition for Tailwind v4 compatibility */
+@layer components {
+    .card {
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-default);
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        overflow: hidden;
+    }
 }
 
 .card-header {
@@ -102,11 +171,11 @@ tbody td {
 }
 
 tbody tr:hover {
-    @apply bg-surface-100/50;
+    background-color: rgba(241, 245, 249, 0.5);
 }
 
 .dark tbody tr:hover {
-    @apply bg-surface-100/20;
+    background-color: rgba(30, 41, 59, 0.2);
 }
 
 /* Status & Badge */
@@ -116,21 +185,21 @@ tbody tr:hover {
 
 .badge-success {
     background-color: var(--success-bg);
-    @apply text-green-600;
+    @apply text-success-text;
 }
 
 .badge-warning {
     background-color: var(--warning-bg);
-    @apply text-amber-600;
+    @apply text-warning-text;
 }
 
 .badge-error {
     background-color: var(--error-bg);
-    @apply text-red-600;
+    @apply text-error-text;
 }
 
 .badge-info {
-    @apply bg-brand-soft text-brand-main;
+    @apply bg-info-bg text-info-text;
 }
 
 /* Modal / Overlay */
@@ -140,4 +209,662 @@ tbody tr:hover {
 
 .modal-content {
     @apply bg-bg-surface border border-border-default rounded-2xl shadow-2xl w-full max-w-lg transform transition-all duration-300;
+}
+
+.modal-header {
+    @apply px-6 py-4 border-b border-border-default bg-bg-muted/50;
+}
+
+.modal-body {
+    @apply p-6;
+}
+
+.modal-footer {
+    @apply px-6 py-4 border-t border-border-default flex justify-end gap-3;
+}
+
+.modal-icon {
+    @apply w-12 h-12 rounded-full flex items-center justify-center mb-4;
+}
+
+.modal-icon.approve {
+    @apply bg-success-bg;
+}
+
+.modal-icon.approve i {
+    @apply text-success-text text-xl;
+}
+
+.modal-icon.reject {
+    @apply bg-error-bg;
+}
+
+.modal-icon.reject i {
+    @apply text-error-text text-xl;
+}
+
+.modal-icon.revision {
+    @apply bg-warning-bg;
+}
+
+.modal-icon.revision i {
+    @apply text-warning-text text-xl;
+}
+
+.modal-title {
+    @apply text-lg font-semibold text-text-primary mb-2;
+}
+
+.modal-message {
+    @apply text-text-secondary text-sm;
+}
+
+/* Table Card - Consistent styling for management modules */
+.table-card {
+    @apply bg-bg-surface border border-border-default rounded-xl shadow-sm overflow-hidden;
+}
+
+.table-card>.table-container {
+    @apply border-0 rounded-none shadow-none;
+}
+
+/* Stats Grid - Consistent stats display */
+.stats-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+.stat-card {
+    @apply bg-bg-surface border border-border-default rounded-xl shadow-sm p-6 flex items-center gap-4;
+}
+
+.stat-icon {
+    @apply w-12 h-12 rounded-xl flex items-center justify-center text-xl;
+}
+
+.stat-icon.active {
+    @apply bg-green-100 text-green-600;
+}
+
+.stat-icon.inactive {
+    @apply bg-red-100 text-red-600;
+}
+
+.stat-icon.total {
+    @apply bg-brand-soft text-brand-main;
+}
+
+.stat-content {
+    @apply flex flex-col;
+}
+
+.stat-value {
+    @apply text-2xl font-bold text-text-primary;
+}
+
+.stat-label {
+    @apply text-sm text-text-muted;
+}
+
+/* Data Table - Consistent table styling */
+.data-table {
+    @apply w-full border-collapse text-left text-sm;
+}
+
+.data-table thead th {
+    @apply px-4 py-3 bg-bg-muted font-semibold text-text-secondary border-b border-border-default;
+}
+
+.data-table tbody td {
+    @apply px-4 py-4 border-b border-border-muted text-text-primary;
+}
+
+.data-table tbody tr:hover {
+    @apply bg-bg-muted/50;
+}
+
+.data-table .data-row {
+    @apply transition-colors;
+}
+
+/* Loading and Empty States */
+.loading-cell {
+    @apply py-20 text-center;
+}
+
+.loading-spinner {
+    @apply flex flex-col items-center gap-3 text-text-muted;
+}
+
+.loading-spinner i {
+    @apply text-3xl text-brand-main;
+}
+
+.empty-cell {
+    @apply py-20 text-center;
+}
+
+.empty-state {
+    @apply flex flex-col items-center gap-3 text-text-muted;
+}
+
+.empty-state i {
+    @apply text-4xl text-text-muted/50;
+}
+
+.empty-state span {
+    @apply text-lg font-medium;
+}
+
+.empty-state p {
+    @apply text-sm;
+}
+
+/* Action Buttons in Tables */
+.actions-cell {
+    @apply text-center;
+}
+
+.btn-action {
+    @apply w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200;
+}
+
+.btn-action.view {
+    @apply bg-bg-muted text-text-muted hover:text-blue-500;
+}
+
+.btn-action.edit {
+    @apply bg-bg-muted text-text-muted hover:text-brand-main;
+}
+
+.btn-action.delete {
+    @apply bg-bg-muted text-text-muted hover:text-red-500;
+}
+
+.btn-action.toggle {
+    @apply bg-bg-muted text-text-muted hover:text-green-500;
+}
+
+.btn-action.roles {
+    @apply bg-bg-muted text-text-muted hover:text-purple-500;
+}
+
+/* Status Badge */
+.status-badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium;
+}
+
+.status-badge.active {
+    @apply bg-green-100 text-green-700;
+}
+
+.status-badge.inactive {
+    @apply bg-red-100 text-red-700;
+}
+
+/* Error Alert */
+.error-alert {
+    @apply flex items-center gap-3 p-4 bg-error-bg text-error-text rounded-lg border border-error-border;
+}
+
+.error-alert i {
+    @apply text-lg;
+}
+
+.error-alert .btn-link {
+    @apply ml-auto text-sm font-medium underline hover:no-underline;
+}
+
+/* Alert Styles */
+.alert {
+    @apply flex items-start gap-3 p-4 rounded-lg border;
+}
+
+.alert-success {
+    @apply bg-success-bg text-success-text border-success-border;
+}
+
+.alert-warning {
+    @apply bg-warning-bg text-warning-text border-warning-border;
+}
+
+.alert-error {
+    @apply bg-error-bg text-error-text border-error-border;
+}
+
+.alert-info {
+    @apply bg-info-bg text-info-text border-info-border;
+}
+
+.alert i {
+    @apply text-lg flex-shrink-0 mt-0.5;
+}
+
+.alert-success i {
+    @apply text-success-text;
+}
+
+.alert-warning i {
+    @apply text-warning-text;
+}
+
+.alert-error i {
+    @apply text-error-text;
+}
+
+.alert-info i {
+    @apply text-info-text;
+}
+
+/* User Info in Tables */
+.user-info {
+    @apply flex items-center gap-3;
+}
+
+.user-avatar {
+    @apply w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white;
+}
+
+.user-name {
+    @apply font-medium text-text-primary;
+}
+
+.username {
+    @apply text-sm text-text-secondary font-mono;
+}
+
+.email {
+    @apply text-sm text-text-secondary;
+}
+
+/* Role Tags */
+.role-tags {
+    @apply flex flex-wrap gap-1;
+}
+
+.role-badge {
+    @apply px-2 py-0.5 rounded-full text-xs font-medium;
+}
+
+/* Role Badge Colors */
+.role-badge.admin {
+    @apply bg-purple-100 text-purple-700;
+}
+
+.role-badge.superadmin {
+    @apply bg-red-100 text-red-700;
+}
+
+.role-badge.marketing {
+    @apply bg-green-100 text-green-700;
+}
+
+.role-badge.manager {
+    @apply bg-blue-100 text-blue-700;
+}
+
+.role-badge.backoffice {
+    @apply bg-orange-100 text-orange-700;
+}
+
+.role-badge.customer {
+    @apply bg-gray-100 text-gray-700;
+}
+
+.role-badge.default {
+    @apply bg-gray-100 text-gray-700;
+}
+
+/* Product Info */
+.product-info {
+    @apply flex flex-col;
+}
+
+.product-name {
+    @apply font-medium text-text-primary;
+}
+
+.product-code {
+    @apply text-xs text-text-muted font-mono;
+}
+
+.range-info,
+.tenure-info {
+    @apply text-sm text-text-secondary;
+}
+
+.interest-rate {
+    @apply text-sm font-medium text-text-primary;
+}
+
+.admin-fee {
+    @apply text-sm text-text-secondary;
+}
+
+.branch-name {
+    @apply text-sm text-text-secondary;
+}
+
+.no-branch {
+    @apply text-sm text-text-muted italic;
+}
+
+/* Accessibility Styles */
+.focus-visible {
+    @apply outline-none ring-2 ring-brand-main ring-offset-2;
+}
+
+.sr-only {
+    @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
+}
+
+/* Dark Mode Overrides */
+/* Using semantic tokens and explicit dark colors for consistency */
+
+.dark .card {
+    background-color: var(--bg-surface);
+    border-color: var(--border-default);
+}
+
+.dark .card-header {
+    background-color: var(--bg-muted);
+    border-color: var(--border-default);
+}
+
+.dark .form-input,
+.dark .form-select,
+.dark .form-textarea {
+    background-color: var(--bg-surface);
+    border-color: var(--border-default);
+    color: var(--text-primary);
+}
+
+.dark .form-input:focus,
+.dark .form-select:focus,
+.dark .form-textarea:focus {
+    @apply ring-brand-main border-brand-main;
+}
+
+.dark .table-container {
+    background-color: var(--bg-surface);
+    border-color: var(--border-default);
+}
+
+.dark table thead th {
+    background-color: var(--bg-muted);
+    border-color: var(--border-default);
+    color: var(--text-secondary);
+}
+
+.dark table tbody td {
+    border-color: var(--border-muted);
+    color: var(--text-primary);
+}
+
+.dark table tbody tr:hover {
+    background-color: var(--bg-muted);
+}
+
+.dark .modal-content {
+    background-color: var(--bg-surface);
+    border-color: var(--border-default);
+}
+
+.dark .modal-header {
+    background-color: var(--bg-muted);
+    border-color: var(--border-default);
+}
+
+.dark .modal-footer {
+    border-color: var(--border-default);
+}
+
+.dark .badge-success {
+    background-color: var(--success-bg);
+    color: var(--success-text);
+}
+
+.dark .badge-warning {
+    background-color: var(--warning-bg);
+    color: var(--warning-text);
+}
+
+.dark .badge-error {
+    background-color: var(--error-bg);
+    color: var(--error-text);
+}
+
+.dark .badge-info {
+    background-color: var(--info-bg);
+    color: var(--info-text);
+}
+
+.dark .status-badge.active {
+    @apply bg-green-900/40 text-green-400;
+}
+
+.dark .status-badge.inactive {
+    @apply bg-red-900/40 text-red-400;
+}
+
+.dark .alert-success {
+    background-color: var(--success-bg);
+    color: var(--success-text);
+    border-color: var(--success-border);
+}
+
+.dark .alert-warning {
+    background-color: var(--warning-bg);
+    color: var(--warning-text);
+    border-color: var(--warning-border);
+}
+
+.dark .alert-error {
+    background-color: var(--error-bg);
+    color: var(--error-text);
+    border-color: var(--error-border);
+}
+
+.dark .alert-info {
+    background-color: var(--info-bg);
+    color: var(--info-text);
+    border-color: var(--info-border);
+}
+
+.dark .stat-card {
+    background-color: var(--bg-surface);
+    border-color: var(--border-default);
+}
+
+.dark .stat-icon.active {
+    @apply bg-green-900/40 text-green-400;
+}
+
+.dark .stat-icon.inactive {
+    @apply bg-red-900/40 text-red-400;
+}
+
+.dark .stat-icon.total {
+    @apply bg-blue-900/40 text-blue-400;
+}
+
+.dark .btn-action {
+    background-color: var(--bg-muted);
+    color: var(--text-muted);
+}
+
+.dark .btn-action.view:hover {
+    @apply text-blue-400;
+}
+
+.dark .btn-action.edit:hover {
+    color: var(--brand-main);
+}
+
+.dark .btn-action.delete:hover {
+    @apply text-red-400;
+}
+
+.dark .btn-action.toggle:hover {
+    @apply text-green-400;
+}
+
+.dark .btn-action.roles:hover {
+    @apply text-purple-400;
+}
+
+.dark .role-badge.admin {
+    @apply bg-purple-900/40 text-purple-400;
+}
+
+.dark .role-badge.superadmin {
+    @apply bg-red-900/40 text-red-400;
+}
+
+.dark .role-badge.marketing {
+    @apply bg-green-900/40 text-green-400;
+}
+
+.dark .role-badge.manager {
+    @apply bg-blue-900/40 text-blue-400;
+}
+
+.dark .role-badge.backoffice {
+    @apply bg-orange-900/40 text-orange-400;
+}
+
+.dark .role-badge.customer {
+    @apply bg-gray-700/50 text-gray-400;
+}
+
+.dark .role-badge.default {
+    @apply bg-gray-700/50 text-gray-400;
+}
+
+/* Dark mode table card */
+.dark .table-card {
+    background-color: var(--bg-surface);
+    border-color: var(--border-default);
+}
+
+/* Dark mode data table */
+.dark .data-table thead th {
+    background-color: var(--bg-muted);
+    border-color: var(--border-default);
+    color: var(--text-secondary);
+}
+
+.dark .data-table tbody td {
+    border-color: var(--border-muted);
+    color: var(--text-primary);
+}
+
+.dark .data-table tbody tr:hover {
+    background-color: var(--bg-muted);
+}
+
+/* Dark mode button states */
+.dark .btn-primary {
+    @apply shadow-none;
+}
+
+.dark .btn-primary:disabled {
+    @apply bg-gray-700 text-gray-500;
+}
+
+.dark .btn-secondary {
+    background-color: transparent;
+    border-color: var(--border-default);
+    color: var(--text-primary);
+}
+
+.dark .btn-secondary:hover {
+    background-color: var(--bg-muted);
+}
+
+.dark .btn-destructive {
+    @apply shadow-none;
+}
+
+/* Dark mode focus rings */
+.dark .btn-primary:focus-visible,
+.dark .btn-secondary:focus-visible,
+.dark .btn-ghost:focus-visible,
+.dark .btn-text:focus-visible,
+.dark .btn-destructive:focus-visible,
+.dark .btn-logout:focus-visible {
+    @apply ring-offset-slate-900;
+}
+
+.dark .form-input:focus-visible,
+.dark .form-select:focus-visible,
+.dark .form-textarea:focus-visible {
+    @apply ring-offset-slate-900;
+}
+
+/* Responsive Table Styles */
+.table-container {
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: var(--bg-muted);
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: var(--border-default);
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* Mobile-friendly action buttons */
+@media (max-width: 640px) {
+    .btn-action {
+        @apply w-9 h-9;
+    }
+
+    .data-table thead th,
+    .data-table tbody td {
+        @apply px-2 py-3;
+    }
+
+    .user-info {
+        @apply gap-2;
+    }
+
+    .user-avatar {
+        @apply w-8 h-8 text-xs;
+    }
+
+    .stat-card {
+        @apply p-4;
+    }
+
+    .stat-icon {
+        @apply w-10 h-10 text-lg;
+    }
+
+    .stat-value {
+        @apply text-xl;
+    }
+}
+
+/* Pagination responsive styles */
+@media (max-width: 640px) {
+    .pagination-btn {
+        @apply w-8 h-8 text-xs;
+    }
+}
+
+/* Card header responsive */
+.card-header {
+    @apply px-4 py-3 sm:px-6 sm:py-4;
 }

@@ -53,32 +53,134 @@
     --brand-soft: var(--primary-100);
     --brand-accent: var(--accent-500);
 
-    /* Status (With 10% opacity as per hex format #rrggbbaa) */
-    --success-bg: #22c55e1a;
-    --warning-bg: #f59e0b1a;
-    --error-bg: #ef44441a;
+    /* Status Colors */
+    /* Success */
+    --success-bg: #dcfce7;
+    --success-text: #16a34a;
+    --success-border: #86efac;
+
+    /* Warning */
+    --warning-bg: #fef3c7;
+    --warning-text: #d97706;
+    --warning-border: #fcd34d;
+
+    /* Error */
+    --error-bg: #fee2e2;
+    --error-text: #dc2626;
+    --error-border: #fca5a5;
+
+    /* Info */
+    --info-bg: #dbeafe;
+    --info-text: #2563eb;
+    --info-border: #93c5fd;
 }
 
 /* Dark mode overrides */
 .dark {
-    /* Surface mapping for dark mode */
-    --surface-0: #1e293b;
-    /* Card background */
-    --surface-50: #0f172a;
-    /* Page background */
-    --surface-100: #334155;
-    /* Muted background */
-    --surface-200: #475569;
-    /* Default border */
-    --surface-300: #64748b;
-    --surface-400: #94a3b8;
-    --surface-500: #94a3b8;
-    /* Muted text */
-    --surface-600: #cbd5e1;
-    /* Secondary text */
-    --surface-700: #e2e8f0;
-    --surface-800: #f1f5f9;
-    --surface-900: #f8fafc;
-    /* Primary text */
-    --surface-950: #ffffff;
+    /* 
+     * Surface scale remains UNCHANGED in dark mode.
+     * Only semantic mappings change to use dark-appropriate values.
+     * This prevents confusion when using surface-XXX directly.
+     */
+
+    /* Semantic Mapping for Dark Mode */
+    --bg-page: #020617;
+    /* slate-950 - darkest background */
+    --bg-surface: #0f172a;
+    /* slate-900 - card/component backgrounds */
+    --bg-muted: #1e293b;
+    /* slate-800 - muted/hover states */
+
+    --text-primary: #f8fafc;
+    /* slate-50 - primary text */
+    --text-secondary: #cbd5e1;
+    /* slate-300 - secondary text */
+    --text-muted: #94a3b8;
+    /* slate-400 - muted text */
+
+    --border-default: #334155;
+    /* slate-700 - default borders */
+    --border-muted: #1e293b;
+    /* slate-800 - subtle borders */
+
+    /* Brand colors stay the same but ensure contrast */
+    --brand-main: #ff9d0a;
+    --brand-hover: #ffb632;
+    --brand-soft: rgba(255, 157, 10, 0.15);
+
+    /* Dark Mode Status Colors (Softened for dark backgrounds) */
+    --success-bg: rgba(20, 83, 45, 0.5);
+    /* green-900/50 */
+    --success-text: #4ade80;
+    /* green-400 */
+    --success-border: #166534;
+    /* green-800 */
+
+    --warning-bg: rgba(113, 63, 18, 0.5);
+    /* amber-900/50 */
+    --warning-text: #fbbf24;
+    /* amber-400 */
+    --warning-border: #854d0e;
+    /* amber-800 */
+
+    --error-bg: rgba(127, 29, 29, 0.5);
+    /* red-900/50 */
+    --error-text: #f87171;
+    /* red-400 */
+    --error-border: #991b1b;
+    /* red-800 */
+
+    --info-bg: rgba(30, 58, 138, 0.5);
+    /* blue-900/50 */
+    --info-text: #60a5fa;
+    /* blue-400 */
+    --info-border: #1e40af;
+    /* blue-800 */
+}
+
+/* Dark mode select dropdown styling */
+.dark select option {
+    background-color: var(--surface-0);
+    color: var(--surface-900);
+}
+
+.dark select {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+}
+
+.dark select optgroup,
+.dark select option {
+    background-color: var(--surface-0);
+    color: var(--surface-900);
+}
+
+/* Sidebar specific dark theme styles */
+.sidebar {
+    --sidebar-bg: var(--bg-surface);
+    --sidebar-border: var(--border-default);
+    --sidebar-text: var(--text-secondary);
+    --sidebar-text-muted: var(--text-muted);
+    --sidebar-hover: var(--bg-muted);
+    --sidebar-active: var(--brand-soft);
+}
+
+.dark .sidebar {
+    --sidebar-bg: #0f172a;
+    --sidebar-border: #334155;
+    --sidebar-text: #cbd5e1;
+    --sidebar-text-muted: #64748b;
+    --sidebar-hover: #1e293b;
+    --sidebar-active: rgba(255, 157, 10, 0.15);
+}
+
+/* Topbar specific dark theme styles */
+.topbar {
+    --topbar-bg: rgba(255, 255, 255, 0.8);
+    --topbar-border: var(--border-default);
+}
+
+.dark .topbar {
+    --topbar-bg: rgba(15, 23, 42, 0.8);
+    --topbar-border: #334155;
 }

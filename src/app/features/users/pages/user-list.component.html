@@ -15,7 +15,7 @@
                 <i class="pi pi-download" [class.pi-spin]="isExporting()"></i>
             </button>
 
-            <a routerLink="/users/new" class="btn-primary">
+            <a routerLink="/dashboard/users/new" class="btn-primary">
                 <i class="pi pi-user-plus mr-2"></i> Add User
             </a>
             <button class="btn-secondary px-3" (click)="loadData()" title="Refresh" [disabled]="loading()">
@@ -106,50 +106,51 @@
         <button class="btn-link" (click)="loadUsers()">Try Again</button>
     </div>
 
-    <!-- Table Card -->
     <div class="table-card">
-        <div class="table-container">
-            <table class="data-table">
+        <div class="card-header flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-3">
+            <h3 class="text-lg font-semibold m-0">All Users</h3>
+            <span class="text-sm text-text-muted">{{ totalItems() }} users found</span>
+        </div>
+        <div class="table-container overflow-x-auto">
+            <table class="data-table min-w-[900px]">
                 <thead>
                     <tr>
                         <app-sortable-header field="fullName" [sortField]="sortField()"
-                            [sortDirection]="sortDirection()" (sort)="onSort($event)">
+                            [sortDirection]="sortDirection()" (sort)="onSort($event)" class="min-w-[180px]">
                             User
                         </app-sortable-header>
                         <app-sortable-header field="username" [sortField]="sortField()"
-                            [sortDirection]="sortDirection()" (sort)="onSort($event)">
+                            [sortDirection]="sortDirection()" (sort)="onSort($event)" class="min-w-[120px]">
                             Username
                         </app-sortable-header>
                         <app-sortable-header field="email" [sortField]="sortField()" [sortDirection]="sortDirection()"
-                            (sort)="onSort($event)">
+                            (sort)="onSort($event)" class="min-w-[180px]">
                             Email
                         </app-sortable-header>
-                        <th>Role</th>
-                        <th>Branch</th>
-                        <th>Status</th>
-                        <th class="text-center">Actions</th>
+                        <th class="min-w-[100px]">Role</th>
+                        <th class="min-w-[120px]">Branch</th>
+                        <th class="min-w-[90px]">Status</th>
+                        <th class="text-center min-w-[140px]">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <!-- Loading State -->
+                    <!-- Loading State -->
                     <tr *ngIf="loading()">
-                        <td colspan="7" class="loading-cell">
-                            <div class="loading-spinner">
-                                <i class="pi pi-spin pi-spinner"></i>
-                                <span>Loading users...</span>
-                            </div>
+                        <td colspan="7">
+                            <app-skeleton-loader type="table" [rows]="5"></app-skeleton-loader>
                         </td>
                     </tr>
 
                     <!-- Empty State -->
+                    <!-- Empty State -->
                     <tr *ngIf="!loading() && users().length === 0 && !error()">
-                        <td colspan="7" class="empty-cell">
-                            <div class="empty-state">
-                                <i class="pi pi-users"></i>
-                                <span>No users found</span>
-                                <p *ngIf="hasActiveFilters()">Try adjusting your filters</p>
-                                <p *ngIf="!hasActiveFilters()">Add your first user to get started</p>
-                            </div>
+                        <td colspan="7">
+                            <app-empty-state [title]="hasActiveFilters() ? 'No users found' : 'No users yet'"
+                                [message]="hasActiveFilters() ? 'Try adjusting your filters' : 'Add your first user to get started'"
+                                [actionText]="!hasActiveFilters() ? 'Add User' : undefined"
+                                (actionClick)="!hasActiveFilters() ? exportUsers() : null">
+                            </app-empty-state>
                         </td>
                     </tr>
 
@@ -157,7 +158,7 @@
                     <tr *ngFor="let user of users()" class="data-row">
                         <td>
                             <div class="user-info">
-                                <div class="user-avatar" [class]="getRoleColor(user.roles[0])">
+                                <div class="user-avatar" [class]="'bg-brand-soft text-brand-main'">
                                     {{ getInitials(user.fullName) }}
                                 </div>
                                 <span class="user-name">{{ user.fullName }}</span>
@@ -171,7 +172,8 @@
                         </td>
                         <td>
                             <div class="role-tags">
-                                <span *ngFor="let role of user.roles" class="role-badge" [class]="getRoleColor(role)">
+                                <span *ngFor="let role of user.roles" class="role-badge" [class]="getRoleColor(role)"
+                                    [ngClass]="getRoleColor(role)">
                                     {{ getRoleDisplayName(role) }}
                                 </span>
                             </div>
@@ -189,18 +191,24 @@
                             </span>
                         </td>
                         <td class="actions-cell">
-                            <button class="btn-action view" (click)="openDetailModal(user)" title="View Details">
-                                <i class="pi pi-eye"></i>
-                            </button>
-                            <a [routerLink]="['/users', user.id, 'edit']" class="btn-action edit" title="Edit User">
-                                <i class="pi pi-pencil"></i>
-                            </a>
-                            <button class="btn-action roles" (click)="openRoleModal(user)" title="Manage Roles">
-                                <i class="pi pi-shield"></i>
-                            </button>
-                            <button class="btn-action delete" (click)="confirmDelete(user)" title="Delete User">
-                                <i class="pi pi-trash"></i>
-                            </button>
+                            <div class="flex items-center justify-center gap-1">
+                                <button class="btn-action view" (click)="openDetailModal(user)" title="View Details"
+                                    aria-label="View user details">
+                                    <i class="pi pi-eye"></i>
+                                </button>
+                                <a [routerLink]="['/dashboard/users', user.id, 'edit']" class="btn-action edit"
+                                    title="Edit User" aria-label="Edit user">
+                                    <i class="pi pi-pencil"></i>
+                                </a>
+                                <button class="btn-action roles" (click)="openRoleModal(user)" title="Manage Roles"
+                                    aria-label="Manage user roles">
+                                    <i class="pi pi-shield"></i>
+                                </button>
+                                <button class="btn-action delete" (click)="confirmDelete(user)" title="Delete User"
+                                    aria-label="Delete user">
+                                    <i class="pi pi-trash"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -208,7 +216,7 @@
         </div>
 
         <!-- Pagination -->
-        <app-pagination [currentPageValue]="currentPage()" [pageSizeValue]="pageSize()" [totalItemsValue]="totalItems()"
+        <app-pagination [page]="currentPage()" [pageSize]="pageSize()" [total]="totalItems()"
             (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
         </app-pagination>
     </div>
@@ -262,7 +270,7 @@
                     [class]="getRoleBadgeClass(role)">
                     {{ getRoleDisplayName(role) }}
                 </span>
-                <span *ngIf="!selectedUser()!.roles?.length" class="text-text-muted italic">
+                <span *ngIf="!selectedUser()!.roles.length" class="text-text-muted italic">
                     No roles assigned
                 </span>
             </div>

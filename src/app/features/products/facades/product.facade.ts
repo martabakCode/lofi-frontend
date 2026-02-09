@@ -97,4 +97,18 @@ export class ProductFacade {
             })
         );
     }
+
+    toggleProductStatus(id: string, isActive: boolean) {
+        this.loadingSignal.set(true);
+        return this.productService.updateProduct(id, { isActive }).pipe(
+            tap({
+                next: () => this.toastService.show(`Product ${isActive ? 'activated' : 'deactivated'} successfully`, 'success'),
+                error: () => this.toastService.show('Failed to update product status', 'error')
+            }),
+            finalize(() => {
+                this.loadingSignal.set(false);
+                this.loadProducts(); // Refresh list
+            })
+        );
+    }
 }

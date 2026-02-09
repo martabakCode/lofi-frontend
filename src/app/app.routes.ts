@@ -59,6 +59,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent)
       },
       {
+        path: 'notifications',
+        loadChildren: () => import('./features/notifications/notifications.routes').then(m => m.NOTIFICATION_ROUTES)
+      },
+      {
         path: 'settings/password',
         loadComponent: () => import('./features/profile/change-password.component').then(m => m.ChangePasswordComponent)
       }

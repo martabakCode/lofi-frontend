@@ -5,11 +5,13 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ProductService } from '../services/product.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { ProductVM } from '../models/product.models';
+import { PageHeaderComponent } from '../../../shared/components/page/page-header.component';
+import { CardComponent } from '../../../shared/components/card/card.component';
 
 @Component({
   selector: 'app-product-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, PageHeaderComponent, CardComponent],
   templateUrl: './product-form.component.html',
   styleUrls: ['./product-form.component.css']
 })
@@ -70,7 +72,7 @@ export class ProductFormComponent implements OnInit {
       error: () => {
         this.toastService.show('Failed to load product', 'error');
         this.isSubmitting.set(false);
-        this.router.navigate(['/products']);
+        this.router.navigate(['/dashboard/products']);
       }
     });
   }
@@ -112,7 +114,7 @@ export class ProductFormComponent implements OnInit {
       this.productService.updateProduct(this.productId()!, productData).subscribe({
         next: () => {
           this.toastService.show('Product updated successfully', 'success');
-          this.router.navigate(['/products']);
+          this.router.navigate(['/dashboard/products']);
         },
         error: (err) => {
           this.isSubmitting.set(false);
@@ -124,7 +126,7 @@ export class ProductFormComponent implements OnInit {
       this.productService.createProduct(productData).subscribe({
         next: () => {
           this.toastService.show('Product created successfully', 'success');
-          this.router.navigate(['/products']);
+          this.router.navigate(['/dashboard/products']);
         },
         error: (err) => {
           this.isSubmitting.set(false);

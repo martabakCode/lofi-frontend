@@ -39,4 +39,5 @@ export interface CreateProductRequest {
     maxTenor: number;
     minLoanAmount: number;
     maxLoanAmount: number;
+    isActive?: boolean;
 }

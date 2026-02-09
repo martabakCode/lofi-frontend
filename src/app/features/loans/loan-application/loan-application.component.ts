@@ -39,11 +39,11 @@ export class LoanApplicationComponent implements OnInit {
     submittedLoanId = signal<string | null>(null);
 
     // Document types for upload
-    readonly documentTypes = ['KTP', 'KK', 'NPWP'] as const;
+    readonly documentTypes = ['KTP', 'SELFIE_KTP', 'NPWP'] as const;
 
     // Expose document upload status signals for template
     ktpStatus = this.documentUploadService.ktpStatus;
-    kkStatus = this.documentUploadService.kkStatus;
+    selfieKtpStatus = this.documentUploadService.selfieKtpStatus;
     npwpStatus = this.documentUploadService.npwpStatus;
 
     // Computed property from service
@@ -161,7 +161,7 @@ export class LoanApplicationComponent implements OnInit {
      * Legacy method for direct file selection (kept for backward compatibility)
      * Now delegates to DocumentUploadService
      */
-    onFileSelected(event: Event, type: 'KTP' | 'KK' | 'NPWP') {
+    onFileSelected(event: Event, type: 'KTP' | 'SELFIE_KTP' | 'NPWP') {
         const input = event.target as HTMLInputElement;
         if (!input.files?.length) return;
         const file = input.files[0];
@@ -173,7 +173,7 @@ export class LoanApplicationComponent implements OnInit {
 
     onSubmitFinal() {
         if (!this.allDocumentsUploaded()) {
-            this.toast.show('Please upload all required documents (KTP, KK, NPWP)', 'error');
+            this.toast.show('Please upload all required documents (KTP, Photo with KTP, NPWP)', 'error');
             return;
         }
 
@@ -199,16 +199,14 @@ export class LoanApplicationComponent implements OnInit {
 
         if (!confirm('Are you sure you want to cancel this application?')) return;
 
-        this.loading.set(true);
-        this.loanService.cancelLoan(id, 'Cancelled by user during application').subscribe({
+        // Facade handles loading state
+        this.loanFacade.cancelLoan(id, 'Cancelled by user during application').subscribe({
             next: () => {
-                this.toast.show('Application cancelled.', 'info');
+                // this.toast.show('Application cancelled.', 'info'); // Facade handles toast
                 this.submittedLoanId.set(null);
                 this.documentUploadService.resetStatuses();
-                this.loading.set(false);
             },
             error: (err) => {
-                this.loading.set(false);
                 console.error(err);
             }
         });

@@ -54,7 +54,7 @@ import { AuthService } from '../../../core/services/auth.service';
           <input id="remember" type="checkbox" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-surface-300 rounded">
           <label for="remember" class="ml-2 block text-sm text-surface-600 dark:text-surface-400">Remember me</label>
         </div>
-        <a routerLink="/auth/forgot-password" class="text-sm font-medium text-primary-600 hover:text-primary-500 transition-colors">Forgot password?</a>
+        <a href="/auth/forgot-password" class="text-sm font-medium text-primary-600 hover:text-primary-500 transition-colors">Forgot password?</a>
       </div>
 
       <app-p-button 
@@ -64,13 +64,6 @@ import { AuthService } from '../../../core/services/auth.service';
         (onClick)="onLogin()"
         styleClass="w-full"
       ></app-p-button>
-
-      <div class="text-center mt-6">
-        <p class="text-sm text-surface-500 dark:text-surface-400">
-          Don't have an account? 
-          <a href="#" class="font-medium text-primary-600 hover:text-primary-500 transition-colors">Sign up</a>
-        </p>
-      </div>
     </form>
   `
 })

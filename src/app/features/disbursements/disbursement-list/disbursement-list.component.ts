@@ -4,29 +4,48 @@ import { RouterModule } from '@angular/router';
 import { LoanFacade } from '../../../core/facades/loan.facade';
 import { LoanEventBus } from '../../../core/patterns/loan-event-bus.service';
 import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
+import { LoanWorkflowModalComponent, LoanDetailInfo, LoanWorkflowStep } from '../../../shared/components/loan-workflow-modal/loan-workflow-modal.component';
 import { LoanDisbursementBuilder } from '../../../core/patterns/disbursement-builder';
 import { ToastService } from '../../../core/services/toast.service';
+import { LoanService } from '../../../core/services/loan.service';
 import { Subject, takeUntil } from 'rxjs';
+import { Router } from '@angular/router';
+import { LoanVM } from '../../loans/models/loan.models';
 
 @Component({
   selector: 'app-disbursement-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, ConfirmationModalComponent],
+  imports: [CommonModule, RouterModule, ConfirmationModalComponent, LoanWorkflowModalComponent],
   templateUrl: './disbursement-list.component.html',
   styleUrls: ['./disbursement-list.component.css']
 })
 export class DisbursementComponent implements OnInit, OnDestroy {
   private loanFacade = inject(LoanFacade);
+  private loanService = inject(LoanService);
   private eventBus = inject(LoanEventBus);
   private toast = inject(ToastService);
+  private router = inject(Router);
   private destroy$ = new Subject<void>();
 
-  loans = signal<any[]>([]);
+  loans = signal<LoanVM[]>([]);
   loading = this.loanFacade.loading;
   error = signal<string | null>(null);
   processingId = signal<string | null>(null);
 
-  // Modal State
+  // Workflow Modal State
+  workflowModal = signal<{
+    isOpen: boolean;
+    loanDetail: LoanDetailInfo | null;
+    workflowSteps: LoanWorkflowStep[];
+    availableActions: string[];
+  }>({
+    isOpen: false,
+    loanDetail: null,
+    workflowSteps: [],
+    availableActions: ['DISBURSE']
+  });
+
+  // Confirmation Modal State (for simple disbursement without workflow modal)
   modal = signal({
     isOpen: false,
     loanId: '',
@@ -119,7 +138,7 @@ export class DisbursementComponent implements OnInit, OnDestroy {
       loan.customerName,
       loan.productName,
       loan.amount,
-      loan.tenure,
+      loan.tenor,
       loan.status,
       loan.appliedDate
     ]);
@@ -192,5 +211,118 @@ export class DisbursementComponent implements OnInit, OnDestroy {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(amount);
+  }
+
+  // ========== Workflow Modal Methods ==========
+
+  onViewWorkflowDetails(loan: any): void {
+    // Load loan detail and workflow history
+    this.loanService.getLoanDetailForWorkflow(loan.id).subscribe({
+      next: (detail) => {
+        const loanDetail: LoanDetailInfo = {
+          id: detail.id,
+          customerName: detail.customerName,
+          productName: detail.product?.productName || 'Unknown',
+          amount: detail.loanAmount,
+          tenor: detail.tenor,
+          interestRate: detail.product?.interestRate,
+          adminFee: detail.product?.adminFee,
+          status: detail.loanStatus,
+          currentStage: detail.currentStage,
+          disbursementReference: detail.disbursementReference,
+          submittedAt: detail.submittedAt,
+          approvedAt: detail.approvedAt,
+          disbursedAt: detail.disbursedAt,
+          appliedDate: detail.submittedAt || detail.createdAt
+        };
+
+        // Build workflow steps from the loan data
+        const workflowSteps = this.buildWorkflowSteps(detail);
+
+        this.workflowModal.set({
+          isOpen: true,
+          loanDetail,
+          workflowSteps,
+          availableActions: this.getAvailableActions(detail.loanStatus)
+        });
+      },
+      error: (err) => {
+        this.toast.show('Failed to load loan details', 'error');
+      }
+    });
+  }
+
+  private buildWorkflowSteps(detail: any): LoanWorkflowStep[] {
+    const steps: LoanWorkflowStep[] = [
+      {
+        step: 'SUBMITTED',
+        status: detail.submittedAt ? 'completed' : 'pending',
+        timestamp: detail.submittedAt,
+        userName: 'Customer'
+      },
+      {
+        step: 'REVIEW',
+        status: detail.reviewedAt ? 'completed' : (detail.submittedAt ? 'current' : 'pending'),
+        timestamp: detail.reviewedAt
+      },
+      {
+        step: 'APPROVAL',
+        status: detail.approvedAt ? 'completed' : (detail.reviewedAt ? 'current' : 'pending'),
+        timestamp: detail.approvedAt
+      },
+      {
+        step: 'DISBURSE',
+        status: detail.disbursedAt ? 'completed' : (detail.approvedAt ? 'current' : 'pending'),
+        timestamp: detail.disbursedAt
+      }
+    ];
+    return steps;
+  }
+
+  private getAvailableActions(status: string): string[] {
+    const actions: string[] = [];
+    if (status === 'APPROVED') {
+      actions.push('DISBURSE');
+    }
+    return actions;
+  }
+
+  onWorkflowAction(event: { type: string; notes?: string }): void {
+    const loanId = this.workflowModal().loanDetail?.id;
+    if (!loanId) return;
+
+    this.processingId.set(loanId);
+
+    if (event.type === 'DISBURSE') {
+      // For disbursement, we need reference number
+      // Open the confirmation modal instead
+      this.workflowModal.set({ ...this.workflowModal(), isOpen: false });
+      this.onDisburseClickWithId(loanId);
+    } else {
+      this.processingId.set(null);
+    }
+  }
+
+  private onDisburseClickWithId(loanId: string): void {
+    const loan = this.loans().find(l => l.id === loanId);
+    if (loan) {
+      this.modal.set({
+        ...this.modal(),
+        isOpen: true,
+        loanId: loan.id,
+        message: `Finalize disbursement for ${loan.customerName} of ${this.formatCurrency(loan.amount)}?`
+      });
+    }
+  }
+
+  onWorkflowClose(): void {
+    this.workflowModal.set({
+      ...this.workflowModal(),
+      isOpen: false
+    });
+  }
+
+  onViewFullPage(loanId: string): void {
+    this.router.navigate(['/dashboard/loans', loanId]);
   }
 }

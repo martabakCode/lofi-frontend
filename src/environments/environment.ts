@@ -8,6 +8,7 @@ export const environment = {
     storageBucket: "lofi-41bc7.firebasestorage.app",
     messagingSenderId: "353182557200",
     appId: "1:353182557200:web:5439ae7a7cfcc36a939695",
-    measurementId: "G-LJ97ZLWSNF"
+    measurementId: "G-LJ97ZLWSNF",
+    vapidKey: "BLioJonrMzZr7Q3NWjMIr4QGGWRiwGfKAOxJZZVtNoN1Gh1DusyXy9wb-iyuOTgtm5aHysPWa4-yRVk_23Hdj84"
   }
 };

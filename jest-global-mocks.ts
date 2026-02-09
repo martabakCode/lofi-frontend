@@ -3,14 +3,8 @@
  * that are not available in JSDOM test environment
  */
 
-// Mock for Angular's ng-zone
-Object.defineProperty(global, 'Zone', {
-    value: {
-        current: {
-            fork: () => ({ run: (fn: Function) => fn() })
-        }
-    }
-});
+// Zone is automatically handled by jest-preset-angular/setup-jest
+// and importing it here manually was causing issues with fakeAsync and other test utilities.
 
 // Mock for ResizeObserver
 class ResizeObserverMock {

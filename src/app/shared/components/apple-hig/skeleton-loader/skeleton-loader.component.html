@@ -1,0 +1,52 @@
+<ng-container [ngSwitch]="type">
+    <!-- Text Skeleton -->
+    <div *ngSwitchCase="'text'" class="flex flex-col gap-2 w-full animate-pulse">
+        <div *ngFor="let i of countArray" class="h-4 bg-gray-200 rounded w-full" [style.width]="width"
+            [style.height]="height">
+        </div>
+    </div>
+
+    <!-- Avatar Skeleton -->
+    <div *ngSwitchCase="'avatar'" class="flex gap-4 items-center animate-pulse">
+        <div *ngFor="let i of countArray" class="bg-gray-200 rounded-full flex-shrink-0" [class.w-10]="!width"
+            [class.h-10]="!height" [style.width]="width" [style.height]="height">
+        </div>
+    </div>
+
+    <!-- Card Skeleton -->
+    <div *ngSwitchCase="'card'" class="grid gap-4 w-full" [class.grid-cols-1]="true" [class.md:grid-cols-2]="count > 1"
+        [class.lg:grid-cols-3]="count > 2">
+        <div *ngFor="let i of countArray"
+            class="border border-gray-200 rounded-xl p-6 bg-white shadow-sm space-y-4 animate-pulse">
+            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div class="space-y-2">
+                <div class="h-3 bg-gray-200 rounded"></div>
+                <div class="h-3 bg-gray-200 rounded w-5/6"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Skeleton -->
+    <div *ngSwitchCase="'table'"
+        class="w-full border border-gray-200 rounded-xl overflow-hidden bg-white animate-pulse">
+        <div class="bg-gray-50 border-b border-gray-200 p-4 flex gap-4">
+            <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+            <div class="h-4 bg-gray-200 rounded w-1/6"></div>
+            <div class="h-4 bg-gray-200 rounded w-1/6"></div>
+            <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+        </div>
+        <div class="p-4 space-y-4">
+            <div *ngFor="let row of rowsArray" class="flex gap-4">
+                <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+                <div class="h-3 bg-gray-200 rounded w-1/6"></div>
+                <div class="h-3 bg-gray-200 rounded w-1/6"></div>
+                <div class="h-3 bg-gray-200 rounded w-1/4"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Skeleton -->
+    <div *ngSwitchCase="'custom'" class="bg-gray-200 rounded animate-pulse" [style.width]="width"
+        [style.height]="height">
+    </div>
+</ng-container>

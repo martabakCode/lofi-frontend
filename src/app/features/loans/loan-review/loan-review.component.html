@@ -101,6 +101,10 @@
                         </td>
                         <td class="pr-6 py-4">
                             <div class="flex items-center justify-center gap-2">
+                                <button (click)="onViewWorkflowDetails(loan)" class="btn-icon"
+                                    title="View Workflow Details">
+                                    <i class="pi pi-info-circle text-brand-main"></i>
+                                </button>
                                 <a [routerLink]="['/dashboard/loans', loan.id]" class="btn-icon" title="View Details">
                                     <i class="pi pi-eye text-brand-main"></i>
                                 </a>
@@ -135,4 +139,10 @@
         [requireNotes]="modal().requireNotes" [placeholder]="modal().placeholder" (confirm)="onExecuteAction($event)"
         (close)="closeModal()">
     </app-confirmation-modal>
+
+    <!-- Loan Workflow Modal -->
+    <app-loan-workflow-modal [isOpen]="workflowModal().isOpen" [loanDetail]="workflowModal().loanDetail"
+        [workflowSteps]="workflowModal().workflowSteps" [availableActions]="workflowModal().availableActions"
+        (onAction)="onWorkflowAction($event)" (onClose)="onWorkflowClose()" (onViewFullPage)="onViewFullPage($event)">
+    </app-loan-workflow-modal>
 </div>

@@ -12,13 +12,16 @@ import { ThemeService } from '../../../core/services/theme.service';
       (click)="toggle()"
       [attr.aria-label]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
       [attr.title]="isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
-      class="p-2 rounded-full
-             text-blue-600 dark:text-blue-400
-             hover:bg-blue-100 dark:hover:bg-blue-800
-             transition-colors duration-200"
+      class="p-2.5 rounded-xl
+             text-text-muted hover:text-brand-main
+             hover:bg-bg-muted
+             transition-all duration-200 active:scale-95"
     >
-      <span *ngIf="isDark()">☀️</span>
-      <span *ngIf="!isDark()">🌙</span>
+      @if (isDark()) {
+        <i class="pi pi-sun text-lg"></i>
+      } @else {
+        <i class="pi pi-moon text-lg"></i>
+      }
     </button>
   `,
 })

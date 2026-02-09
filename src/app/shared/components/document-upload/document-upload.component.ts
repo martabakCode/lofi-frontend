@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { DocumentUploadService, DocumentUploadStatus } from '../../../core/services/document-upload.service';
 
 export interface DocumentConfig {
-    type: string;
-    label: string;
-    required: boolean;
-    icon?: string;
+  type: string;
+  label: string;
+  required: boolean;
+  icon?: string;
 }
 
 /**
@@ -24,10 +24,10 @@ export interface DocumentConfig {
  * </app-document-upload>
  */
 @Component({
-    selector: 'app-document-upload',
-    standalone: true,
-    imports: [CommonModule],
-    template: `
+  selector: 'app-document-upload',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
     <div class="document-upload-container space-y-4">
       @for (doc of documents; track doc.type) {
         <div class="document-item border rounded-lg p-4 transition-all"
@@ -118,7 +118,7 @@ export interface DocumentConfig {
       }
     </div>
   `,
-    styles: [`
+  styles: [`
     :host {
       display: block;
     }
@@ -128,84 +128,84 @@ export interface DocumentConfig {
   `]
 })
 export class DocumentUploadComponent {
-    private documentUploadService = inject(DocumentUploadService);
+  private documentUploadService = inject(DocumentUploadService);
 
-    @Input() loanId: string | null = null;
-    @Input() documents: DocumentConfig[] = [];
-    @Input() acceptedFileTypes = '.pdf,.jpg,.jpeg,.png';
-    @Input() showOverallStatus = true;
+  @Input() loanId: string | null = null;
+  @Input() documents: DocumentConfig[] = [];
+  @Input() acceptedFileTypes = '.pdf,.jpg,.jpeg,.png';
+  @Input() showOverallStatus = true;
 
-    @Output() allUploaded = new EventEmitter<boolean>();
-    @Output() uploadComplete = new EventEmitter<{ type: string; success: boolean }>();
-    @Output() fileSelected = new EventEmitter<{ type: string; file: File }>();
+  @Output() allUploaded = new EventEmitter<boolean>();
+  @Output() uploadComplete = new EventEmitter<{ type: string; success: boolean }>();
+  @Output() fileSelected = new EventEmitter<{ type: string; file: File }>();
 
-    // Expose service signals for template access
-    getStatus(type: string): DocumentUploadStatus {
-        return this.documentUploadService.getStatus(type);
+  // Expose service signals for template access
+  getStatus(type: string): DocumentUploadStatus {
+    return this.documentUploadService.getStatus(type);
+  }
+
+  get allRequiredUploaded(): boolean {
+    const requiredDocs = this.documents.filter(d => d.required);
+    return requiredDocs.every(doc => this.getStatus(doc.type) === 'done');
+  }
+
+  get uploadedCount(): number {
+    return this.documents.filter(doc => this.getStatus(doc.type) === 'done').length;
+  }
+
+  get requiredCount(): number {
+    return this.documents.filter(d => d.required).length;
+  }
+
+  getDefaultIcon(type: string): string {
+    switch (type.toUpperCase()) {
+      case 'KTP': return '🆔';
+      case 'KK': return '👨‍👩‍👧‍👦';
+      case 'NPWP': return '📋';
+      case 'PAYSLIP':
+      case 'SLIPGAJI': return '💰';
+      default: return '📄';
+    }
+  }
+
+  onFileSelected(event: Event, type: string): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    const file = input.files[0];
+    this.fileSelected.emit({ type, file });
+
+    if (!this.loanId) {
+      console.error('Cannot upload: loanId is not set');
+      return;
     }
 
-    get allRequiredUploaded(): boolean {
-        const requiredDocs = this.documents.filter(d => d.required);
-        return requiredDocs.every(doc => this.getStatus(doc.type) === 'done');
+    this.documentUploadService.uploadDocument(this.loanId, file, type, {
+      onSuccess: () => {
+        this.uploadComplete.emit({ type, success: true });
+        this.checkAllUploaded();
+      },
+      onError: (err) => {
+        this.uploadComplete.emit({ type, success: false });
+      }
+    });
+  }
+
+  reupload(type: string): void {
+    const statusSignal = this.documentUploadService.getStatusSignal(type);
+    if (statusSignal) {
+      statusSignal.set('pending');
     }
+  }
 
-    get uploadedCount(): number {
-        return this.documents.filter(doc => this.getStatus(doc.type) === 'done').length;
-    }
+  private checkAllUploaded(): void {
+    this.allUploaded.emit(this.allRequiredUploaded);
+  }
 
-    get requiredCount(): number {
-        return this.documents.filter(d => d.required).length;
-    }
-
-    getDefaultIcon(type: string): string {
-        switch (type.toUpperCase()) {
-            case 'KTP': return '🆔';
-            case 'KK': return '👨‍👩‍👧‍👦';
-            case 'NPWP': return '📋';
-            case 'SLIP_GAJI':
-            case 'SLIPGAJI': return '💰';
-            default: return '📄';
-        }
-    }
-
-    onFileSelected(event: Event, type: string): void {
-        const input = event.target as HTMLInputElement;
-        if (!input.files?.length) return;
-
-        const file = input.files[0];
-        this.fileSelected.emit({ type, file });
-
-        if (!this.loanId) {
-            console.error('Cannot upload: loanId is not set');
-            return;
-        }
-
-        this.documentUploadService.uploadDocument(this.loanId, file, type, {
-            onSuccess: () => {
-                this.uploadComplete.emit({ type, success: true });
-                this.checkAllUploaded();
-            },
-            onError: (err) => {
-                this.uploadComplete.emit({ type, success: false });
-            }
-        });
-    }
-
-    reupload(type: string): void {
-        const statusSignal = this.documentUploadService.getStatusSignal(type);
-        if (statusSignal) {
-            statusSignal.set('pending');
-        }
-    }
-
-    private checkAllUploaded(): void {
-        this.allUploaded.emit(this.allRequiredUploaded);
-    }
-
-    /**
-     * Reset all document statuses
-     */
-    reset(): void {
-        this.documentUploadService.resetStatuses();
-    }
+  /**
+   * Reset all document statuses
+   */
+  reset(): void {
+    this.documentUploadService.resetStatuses();
+  }
 }

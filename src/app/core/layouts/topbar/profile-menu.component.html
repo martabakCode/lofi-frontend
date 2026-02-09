@@ -5,7 +5,7 @@
         [class.bg-bg-muted]="isOpen()">
         <div class="text-right hidden sm:block">
             <p class="text-sm font-bold text-text-primary leading-tight group-hover:text-brand-main transition-colors">
-                {{ user()?.fullName || 'Guest' }}
+                {{ user()?.fullName || user()?.username || 'Guest' }}
             </p>
             <p class="text-[10px] text-brand-main font-semibold uppercase tracking-widest">
                 {{ getRoleName() || 'Access' }}
@@ -45,7 +45,7 @@
 
         <div class="p-1.5">
             <button (click)="logout()"
-                class="flex w-full items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-500 rounded-lg hover:bg-red-500/10 transition-colors">
+                class="flex w-full items-center gap-3 px-3 py-2.5 text-sm font-semibold text-error-text rounded-lg hover:bg-error-bg/10 transition-colors">
                 <i class="pi pi-sign-out text-base"></i>
                 Logout
             </button>

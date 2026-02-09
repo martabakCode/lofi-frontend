@@ -72,7 +72,7 @@ export interface MarketingLoanApplicationRequest {
     incomeSource: string;
     incomeType: string;
     monthlyIncome: number;
-    age: number;
+    // Note: age is calculated from dateOfBirth on backend, not sent
     nik: string;
     dateOfBirth: string;
     placeOfBirth: string;
@@ -84,18 +84,24 @@ export interface MarketingLoanApplicationRequest {
     postalCode: string;
     gender: string;
     maritalStatus: string;
-    education: string;
+    // Note: education is not in backend DTO, removed
     occupation: string;
     productId: string;
     loanAmount: number;
     tenor: number;
-    longitude?: number;
-    latitude?: number;
+    // Loan purpose and bank account details (required by backend)
+    purpose?: string;
+    bankName?: string;
+    bankBranch?: string;
+    accountNumber?: string;
+    accountHolderName?: string;
+    // Note: longitude and latitude are not in backend DTO, removed
 }
 
 // UI Model (matches current component usage)
 export interface Loan {
     id: string;
+    customerId: string;
     customerName: string;
     productName: string;
     amount: number;
@@ -105,12 +111,33 @@ export interface Loan {
     stage?: string;
 }
 
+// Workflow History Interfaces
+export interface WorkflowHistoryStep {
+    step: 'SUBMITTED' | 'REVIEW' | 'APPROVAL' | 'DISBURSE';
+    status: 'completed' | 'current' | 'pending';
+    timestamp?: string;
+    userName?: string;
+    userId?: string;
+    notes?: string;
+}
+
+export interface WorkflowHistoryResponse {
+    loanId: string;
+    steps: WorkflowHistoryStep[];
+    currentStatus: string;
+    currentStage: string;
+}
+
 @Injectable({
     providedIn: 'root'
 })
 export class LoanService {
     private http = inject(HttpClient);
     private readonly baseUrl = `${environment.apiUrl}/loans`;
+
+    private generateIdempotencyKey(): string {
+        return crypto.randomUUID();
+    }
 
     getLoans(params: any): Observable<PaginatedResponse<Loan>> {
         return this.http.get<ApiResponse<any>>(`${this.baseUrl}`, { params }).pipe(
@@ -159,25 +186,33 @@ export class LoanService {
     }
 
     submitLoan(id: string): Observable<BackendLoanResponse> {
-        return this.http.post<ApiResponse<BackendLoanResponse>>(`${this.baseUrl}/${id}/submit`, {}).pipe(
+        return this.http.post<ApiResponse<BackendLoanResponse>>(`${this.baseUrl}/${id}/submit`, {}, {
+            headers: { 'Idempotency-Key': this.generateIdempotencyKey() }
+        }).pipe(
             map(res => res.data)
         );
     }
 
     reviewLoan(id: string, notes: string): Observable<BackendLoanResponse> {
-        return this.http.post<ApiResponse<BackendLoanResponse>>(`${this.baseUrl}/${id}/review`, { notes }).pipe(
+        return this.http.post<ApiResponse<BackendLoanResponse>>(`${this.baseUrl}/${id}/review`, { notes }, {
+            headers: { 'Idempotency-Key': this.generateIdempotencyKey() }
+        }).pipe(
             map(res => res.data)
         );
     }
 
     approveLoan(id: string, notes: string): Observable<BackendLoanResponse> {
-        return this.http.post<ApiResponse<BackendLoanResponse>>(`${this.baseUrl}/${id}/approve`, { notes }).pipe(
+        return this.http.post<ApiResponse<BackendLoanResponse>>(`${this.baseUrl}/${id}/approve`, { notes }, {
+            headers: { 'Idempotency-Key': this.generateIdempotencyKey() }
+        }).pipe(
             map(res => res.data)
         );
     }
 
     rejectLoan(id: string, reason: string): Observable<BackendLoanResponse> {
-        return this.http.post<ApiResponse<BackendLoanResponse>>(`${this.baseUrl}/${id}/reject`, { reason }).pipe(
+        return this.http.post<ApiResponse<BackendLoanResponse>>(`${this.baseUrl}/${id}/reject`, { reason }, {
+            headers: { 'Idempotency-Key': this.generateIdempotencyKey() }
+        }).pipe(
             map(res => res.data)
         );
     }
@@ -189,7 +224,9 @@ export class LoanService {
     }
 
     rollbackLoan(id: string, notes: string): Observable<BackendLoanResponse> {
-        return this.http.post<ApiResponse<BackendLoanResponse>>(`${this.baseUrl}/${id}/rollback`, { notes }).pipe(
+        return this.http.post<ApiResponse<BackendLoanResponse>>(`${this.baseUrl}/${id}/rollback`, { notes }, {
+            headers: { 'Idempotency-Key': this.generateIdempotencyKey() }
+        }).pipe(
             map(res => res.data)
         );
     }
@@ -198,6 +235,8 @@ export class LoanService {
         return this.http.post<ApiResponse<BackendLoanResponse>>(`${this.baseUrl}/${id}/disburse`, {
             disbursementDate,
             referenceNumber
+        }, {
+            headers: { 'Idempotency-Key': this.generateIdempotencyKey() }
         }).pipe(
             map(res => res.data)
         );
@@ -222,6 +261,20 @@ export class LoanService {
                     number: data.meta?.page || 0
                 };
             })
+        );
+    }
+
+    // Get workflow history for a loan
+    getWorkflowHistory(loanId: string): Observable<WorkflowHistoryResponse> {
+        return this.http.get<ApiResponse<WorkflowHistoryResponse>>(`${this.baseUrl}/${loanId}/workflow-history`).pipe(
+            map(res => res.data)
+        );
+    }
+
+    // Get full loan detail with all information for workflow modal
+    getLoanDetailForWorkflow(loanId: string): Observable<BackendLoanResponse> {
+        return this.http.get<ApiResponse<BackendLoanResponse>>(`${this.baseUrl}/${loanId}`).pipe(
+            map(res => res.data)
         );
     }
 }

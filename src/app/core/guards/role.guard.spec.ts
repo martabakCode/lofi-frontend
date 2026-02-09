@@ -18,7 +18,10 @@ describe('roleGuard', () => {
             isAuthenticated: jest.fn(),
             currentUser: signal(null),
             getUserRoles: jest.fn().mockReturnValue([]),
-            hasRole: jest.fn()
+            hasRole: jest.fn((role: string) => {
+                const user = authServiceMock.currentUser();
+                return user ? user.roles.includes(role) : false;
+            })
         } as unknown as jest.Mocked<AuthService>;
 
         routerMock = {

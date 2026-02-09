@@ -44,7 +44,7 @@ export interface UserBiodata {
 })
 export class ProfileService {
     private http = inject(HttpClient);
-    private apiUrl = `${environment.apiUrl}/users/profile`;
+    private apiUrl = `${environment.apiUrl}/users/me`;
 
     getProfile(): Observable<ApiResponse<UserProfile>> {
         return this.http.get<ApiResponse<UserProfile>>(this.apiUrl);

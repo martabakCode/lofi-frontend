@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RbacService } from '../../../core/services/rbac.service';
@@ -15,7 +15,7 @@ import { ConfirmationModalComponent } from '../../../shared/components/confirmat
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
+    RouterModule,
     PaginationComponent,
     SortableHeaderComponent,
     ConfirmationModalComponent
@@ -28,9 +28,9 @@ import { ConfirmationModalComponent } from '../../../shared/components/confirmat
           <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Permissions</h2>
           <p class="text-slate-500 dark:text-slate-400">Define fine-grained access levels.</p>
         </div>
-        <button (click)="openNew()" class="btn-primary">
+        <a routerLink="/dashboard/roles/permissions/new" class="btn-primary">
           <i class="pi pi-plus mr-2"></i> Add Permission
-        </button>
+        </a>
       </header>
 
       <!-- Search -->
@@ -56,10 +56,14 @@ import { ConfirmationModalComponent } from '../../../shared/components/confirmat
       </div>
 
       <!-- Table -->
-      <div class="card">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm">
-            <thead class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 font-medium border-b border-slate-200 dark:border-slate-700">
+      <div class="table-card">
+        <div class="card-header flex items-center justify-between">
+          <h3 class="text-lg font-semibold m-0">All Permissions</h3>
+          <span class="text-sm text-text-muted">{{ totalItems() }} permissions found</span>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
               <tr>
                 <app-sortable-header 
                   field="name" 
@@ -68,46 +72,47 @@ import { ConfirmationModalComponent } from '../../../shared/components/confirmat
                   (sort)="onSort($event)">
                   Name
                 </app-sortable-header>
-                <th class="px-6 py-4">Description</th>
-                <th class="px-6 py-4 text-center">Actions</th>
+                <th>Description</th>
+                <th class="text-center">Actions</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+            <tbody>
               <!-- Loading -->
               <tr *ngIf="isLoading()">
-                <td colspan="3" class="px-6 py-8 text-center text-slate-500">
-                  <i class="pi pi-spin pi-spinner mr-2"></i>Loading...
+                <td colspan="3" class="loading-cell">
+                  <div class="loading-spinner">
+                    <i class="pi pi-spin pi-spinner"></i>
+                    <span>Loading permissions...</span>
+                  </div>
                 </td>
               </tr>
 
               <!-- Empty -->
               <tr *ngIf="!isLoading() && permissions().length === 0">
-                <td colspan="3" class="px-6 py-8 text-center text-slate-500">
-                  No permissions found.
+                <td colspan="3" class="empty-cell">
+                  <div class="empty-state">
+                    <i class="pi pi-key"></i>
+                    <span>No permissions found</span>
+                    <p>Click "Add Permission" to create one</p>
+                  </div>
                 </td>
               </tr>
 
               <!-- Data -->
-              <tr *ngFor="let permission of permissions()" class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
-                <td class="px-6 py-4">
-                  <span class="px-2 py-1 bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 rounded text-xs font-mono font-bold uppercase">
-                    {{permission.name}}
+              <tr *ngFor="let permission of permissions()" class="data-row">
+                <td>
+                  <span class="badge badge-info font-mono uppercase">
+                    {{ permission.name }}
                   </span>
                 </td>
-                <td class="px-6 py-4 text-slate-600 dark:text-slate-400">{{permission.description}}</td>
-                <td class="px-6 py-4 text-center">
-                  <div class="flex justify-center gap-2">
-                    <button (click)="editPermission(permission)" 
-                      class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-all flex items-center justify-center"
-                      title="Edit">
-                      <i class="pi pi-pencil"></i>
-                    </button>
-                    <button (click)="confirmDelete(permission)" 
-                      class="w-8 h-8 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-all flex items-center justify-center"
-                      title="Delete">
-                      <i class="pi pi-trash"></i>
-                    </button>
-                  </div>
+                <td class="text-text-secondary">{{ permission.description }}</td>
+                <td class="actions-cell">
+                  <a [routerLink]="['/dashboard/roles/permissions', permission.id, 'edit']" class="btn-action edit" title="Edit">
+                    <i class="pi pi-pencil"></i>
+                  </a>
+                  <button class="btn-action delete" (click)="confirmDelete(permission)" title="Delete">
+                    <i class="pi pi-trash"></i>
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -116,50 +121,12 @@ import { ConfirmationModalComponent } from '../../../shared/components/confirmat
 
         <!-- Pagination -->
         <app-pagination 
-          [currentPageValue]="currentPage()"
-          [pageSizeValue]="pageSize()"
-          [totalItemsValue]="totalItems()"
+          [page]="currentPage()"
+          [pageSize]="pageSize()"
+          [total]="totalItems()"
           (pageChange)="onPageChange($event)"
           (pageSizeChange)="onPageSizeChange($event)">
         </app-pagination>
-      </div>
-    </div>
-
-    <!-- Add/Edit Modal -->
-    <div *ngIf="displayDialog" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeDialog()"></div>
-      <div class="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-md z-10 overflow-hidden border border-slate-200 dark:border-slate-700">
-        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-            <h3 class="text-lg font-bold text-slate-800 dark:text-white">{{isEdit ? 'Edit Permission' : 'New Permission'}}</h3>
-            <button (click)="closeDialog()" class="text-slate-400 hover:text-slate-600">
-              <i class="pi pi-times"></i>
-            </button>
-        </div>
-        
-        <form [formGroup]="permissionForm" (ngSubmit)="savePermission()" class="p-6 space-y-4">
-            <div class="space-y-1">
-                <label for="name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Permission Name</label>
-                <input id="name" formControlName="name" placeholder="READ_USERS" 
-                    class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none bg-transparent" />
-                <p class="text-xs text-slate-500">Should be uppercase with underscores.</p>
-            </div>
-
-            <div class="space-y-1">
-                <label for="description" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Description</label>
-                <input id="description" formControlName="description" placeholder="Ability to view user list" 
-                    class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none bg-transparent" />
-            </div>
-
-            <div class="flex justify-end gap-3 pt-4">
-                <button type="button" class="btn-secondary" (click)="closeDialog()">Cancel</button>
-                <button type="submit" 
-                    [disabled]="permissionForm.invalid || isSaving()"
-                    class="btn-primary flex items-center gap-2">
-                    <i *ngIf="isSaving()" class="pi pi-spin pi-spinner"></i>
-                    Save
-                </button>
-            </div>
-        </form>
       </div>
     </div>
 
@@ -178,12 +145,10 @@ import { ConfirmationModalComponent } from '../../../shared/components/confirmat
 export class PermissionListComponent implements OnInit {
   private rbacService = inject(RbacService);
   private toastService = inject(ToastService);
-  private fb = inject(FormBuilder);
 
   // Data signals
   permissions = signal<Permission[]>([]);
   isLoading = signal(false);
-  isSaving = signal(false);
   totalItems = signal(0);
 
   // Pagination
@@ -199,22 +164,12 @@ export class PermissionListComponent implements OnInit {
   searchQuery = signal('');
   private searchSubject = new Subject<string>();
 
-  // Modal state
-  displayDialog = false;
-  isEdit = false;
-  selectedId: string | null = null;
-
   // Delete confirmation
   isDeleteModalOpen = signal(false);
   permissionToDelete = signal<Permission | null>(null);
 
   // Export
   isExporting = signal(false);
-
-  permissionForm = this.fb.group({
-    name: ['', [Validators.required, Validators.pattern(/^[A-Z_]+$/)]],
-    description: ['', Validators.required]
-  });
 
   constructor() {
     this.searchSubject.pipe(
@@ -276,62 +231,6 @@ export class PermissionListComponent implements OnInit {
     this.sortField.set(sortConfig.field);
     this.sortDirection.set(sortConfig.direction);
     this.loadPermissions();
-  }
-
-  openNew() {
-    this.isEdit = false;
-    this.selectedId = null;
-    this.permissionForm.reset();
-    this.displayDialog = true;
-  }
-
-  editPermission(permission: Permission) {
-    this.isEdit = true;
-    this.selectedId = permission.id;
-    this.permissionForm.patchValue(permission);
-    this.displayDialog = true;
-  }
-
-  closeDialog() {
-    this.displayDialog = false;
-    this.isEdit = false;
-    this.selectedId = null;
-    this.permissionForm.reset();
-  }
-
-  savePermission() {
-    if (this.permissionForm.invalid) return;
-
-    this.isSaving.set(true);
-    const data = this.permissionForm.value as Partial<Permission>;
-
-    if (this.isEdit && this.selectedId) {
-      this.rbacService.updatePermission(this.selectedId, data).subscribe({
-        next: () => {
-          this.isSaving.set(false);
-          this.closeDialog();
-          this.toastService.show('Permission updated successfully', 'success');
-          this.loadPermissions();
-        },
-        error: () => {
-          this.isSaving.set(false);
-          this.toastService.show('Failed to update permission', 'error');
-        }
-      });
-    } else {
-      this.rbacService.createPermission(data).subscribe({
-        next: () => {
-          this.isSaving.set(false);
-          this.closeDialog();
-          this.toastService.show('Permission created successfully', 'success');
-          this.loadPermissions();
-        },
-        error: () => {
-          this.isSaving.set(false);
-          this.toastService.show('Failed to create permission', 'error');
-        }
-      });
-    }
   }
 
   confirmDelete(permission: Permission) {

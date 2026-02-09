@@ -1,14 +1,8 @@
-import { Component, signal, ElementRef, HostListener, inject, output, computed } from '@angular/core';
+import { Component, signal, ElementRef, HostListener, inject, output, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-interface Notification {
-    id: string;
-    title: string;
-    message: string;
-    time: string;
-    read: boolean;
-    type: 'info' | 'success' | 'warning' | 'error';
-}
+import { Router } from '@angular/router';
+import { UserNotificationFacade } from '../../../features/notifications/facades/user-notification.facade';
+import { Notification } from '../../models/notification.models';
 
 @Component({
     selector: 'app-notification-panel',
@@ -22,40 +16,21 @@ interface Notification {
     }
   `]
 })
-export class NotificationPanelComponent {
+export class NotificationPanelComponent implements OnInit {
+    public facade = inject(UserNotificationFacade);
+    private router = inject(Router);
+    private elementRef = inject(ElementRef);
+
     isOpen = signal(false);
 
-    notifications = signal<Notification[]>([
-        {
-            id: '1',
-            title: 'Loan Approved',
-            message: 'Loan application #LN-2024-001 has been approved.',
-            time: '2 mins ago',
-            read: false,
-            type: 'success'
-        },
-        {
-            id: '2',
-            title: 'New Policy Update',
-            message: 'Please review the updated credit scoring policy.',
-            time: '1 hour ago',
-            read: false,
-            type: 'info'
-        },
-        {
-            id: '3',
-            title: 'System Maintenance',
-            message: 'Scheduled maintenance tonight at 00:00.',
-            time: '5 hours ago',
-            read: true,
-            type: 'warning'
-        }
-    ]);
+    notifications = this.facade.items;
+    loading = this.facade.loading;
+    unreadCount = this.facade.unreadCount;
+    hasUnread = computed(() => this.unreadCount() > 0);
 
-    hasUnread = computed(() => this.notifications().some(n => !n.read));
-    unreadCount = computed(() => this.notifications().filter(n => !n.read).length);
-
-    private elementRef = inject(ElementRef);
+    ngOnInit() {
+        this.facade.loadMyNotifications();
+    }
 
     toggle() {
         this.isOpen.update(v => !v);
@@ -69,8 +44,35 @@ export class NotificationPanelComponent {
     }
 
     markAsRead(id: string) {
-        this.notifications.update(notes =>
-            notes.map(n => n.id === id ? { ...n, read: true } : n)
-        );
+        this.facade.markAsRead(id);
+    }
+
+    markAllRead() {
+        this.facade.markAllAsRead();
+    }
+
+    formatTime(dateStr: string): string {
+        const date = new Date(dateStr);
+        const now = new Date();
+        const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+        if (seconds < 60) return 'Just now';
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes}m ago`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours}h ago`;
+        const days = Math.floor(hours / 24);
+        if (days < 7) return `${days}d ago`;
+        return date.toLocaleDateString();
+    }
+
+    getIconClass(type: string): string {
+        switch (type) {
+            case 'LOAN': return 'pi-money-bill text-success-text';
+            case 'PAYMENT': return 'pi-wallet text-info-text';
+            case 'ACCOUNT': return 'pi-user text-brand-main';
+            case 'SYSTEM': return 'pi-cog text-warning-text';
+            default: return 'pi-bell text-text-muted';
+        }
     }
 }

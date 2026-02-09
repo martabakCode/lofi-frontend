@@ -1,11 +1,11 @@
 <div class="space-y-6 max-w-4xl mx-auto">
     <!-- Header -->
     <div class="flex items-center gap-4">
-        <button [routerLink]="['/users']"
+        <button [routerLink]="['/dashboard/users']"
             class="w-10 h-10 rounded-lg bg-bg-muted text-text-secondary hover:text-text-primary flex items-center justify-center transition-colors">
             <i class="pi pi-arrow-left"></i>
         </button>
-        <div>
+        <div class="flex-1">
             <h1 class="text-2xl font-bold text-text-primary m-0">
                 {{ isEditMode() ? 'Edit User' : 'Add New User' }}
             </h1>
@@ -13,6 +13,8 @@
                 {{ isEditMode() ? 'Update user information and assignments' : 'Create a new user account' }}
             </p>
         </div>
+        <app-autosave-indicator [status]="autosaveStatus()" [lastSaved]="lastSavedTime()">
+        </app-autosave-indicator>
     </div>
 
     <!-- Form Card -->
@@ -119,7 +121,7 @@
 
             <!-- Actions -->
             <div class="flex justify-end gap-3 pt-4 border-t border-border-default">
-                <button type="button" [routerLink]="['/users']" class="btn-secondary">
+                <button type="button" [routerLink]="['/dashboard/users']" class="btn-secondary">
                     Cancel
                 </button>
                 <button type="submit" [disabled]="isSubmitting() || userForm.invalid"

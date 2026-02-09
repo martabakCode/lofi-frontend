@@ -39,6 +39,10 @@ export const DASHBOARD_ROUTES: Routes = [
     loadComponent: () => import('./pages/role-dashboards/admin/admin-dashboard.component').then(m => m.AdminDashboardComponent),
     canActivate: [roleGuard],
     data: { roles: [ROLES.ADMIN, ROLES.SUPER_ADMIN] }
+  },
+  {
+    path: 'unauthorized',
+    loadComponent: () => import('../errors/unauthorized.component').then(m => m.UnauthorizedComponent)
   }
 ];
 

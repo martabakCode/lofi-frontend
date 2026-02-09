@@ -3,6 +3,7 @@ import { initializeApp } from 'firebase/app';
 import { getMessaging, getToken, onMessage, Messaging } from 'firebase/messaging';
 import { environment } from '../../../environments/environment';
 import { ToastService } from './toast.service';
+import { UserNotificationFacade } from '../../features/notifications/facades/user-notification.facade';
 
 @Injectable({
     providedIn: 'root'
@@ -11,6 +12,7 @@ export class NotificationService {
     private messaging: Messaging | null = null;
     private app: any;
     private toastService = inject(ToastService);
+    private userNotificationFacade = inject(UserNotificationFacade);
 
     constructor() {
         this.initFirebase();
@@ -31,6 +33,8 @@ export class NotificationService {
                         const title = payload.notification.title || 'Notification';
                         const body = payload.notification.body || '';
                         this.toastService.show(`${title}: ${body}`, 'info');
+                        // Refresh notifications list when a new one arrives
+                        this.userNotificationFacade.loadMyNotifications();
                     }
                 });
 
@@ -43,9 +47,20 @@ export class NotificationService {
     async requestPermission() {
         if (!this.messaging) return;
 
+        // Check if browser supports notifications and what the current status is
+        if (!('Notification' in window)) {
+            console.log('This browser does not support desktop notification');
+            return;
+        }
+
+        if (Notification.permission === 'denied') {
+            console.info('Notification permission is blocked. Skipping token retrieval.');
+            return;
+        }
+
         try {
             const currentToken = await getToken(this.messaging, {
-                // vapidKey: 'YOUR_VAPID_KEY_HERE' 
+                vapidKey: (environment.firebase as any).vapidKey
             });
 
             if (currentToken) {
@@ -54,8 +69,12 @@ export class NotificationService {
             } else {
                 console.log('No registration token available. Request permission to generate one.');
             }
-        } catch (err) {
-            console.log('An error occurred while retrieving token. ', err);
+        } catch (err: any) {
+            if (err.code === 'messaging/permission-blocked') {
+                console.info('Notification permission was blocked by user.');
+            } else {
+                console.warn('An error occurred while retrieving token:', err);
+            }
         }
     }
 }

@@ -1,0 +1,259 @@
+<div class="space-y-8 max-w-6xl mx-auto pb-12">
+    <app-page-header title="Branch Details" [subtitle]="branch()?.name || 'Loading...'">
+        <div actions class="flex items-center gap-3">
+            <a routerLink="/dashboard/branches" class="btn-secondary">
+                <i class="pi pi-arrow-left mr-2"></i> Back
+            </a>
+            <a *ngIf="branch()" [routerLink]="['/dashboard/branches', branchId(), 'edit']" class="btn-primary">
+                <i class="pi pi-pencil mr-2"></i> Edit Branch
+            </a>
+        </div>
+    </app-page-header>
+
+    <div *ngIf="loading()" class="py-12 text-center text-gray-500">
+        <i class="pi pi-spinner pi-spin text-3xl mb-4"></i>
+        <p>Loading branch details...</p>
+    </div>
+
+    <div *ngIf="error()" class="bg-red-50 border border-red-200 rounded-lg p-6 text-center text-red-700">
+        <i class="pi pi-exclamation-triangle text-2xl mb-2"></i>
+        <h3 class="font-medium text-lg">Error Loading Branch</h3>
+        <p>{{ error() }}</p>
+        <button (click)="loadBranch()" class="mt-4 text-sm font-medium hover:underline">Try Again</button>
+    </div>
+
+    <div *ngIf="!loading() && branch()" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Main Info -->
+        <div class="lg:col-span-7 space-y-6">
+            <app-card title="Branch Information" icon="pi-building">
+                <div class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-1">Branch Name</label>
+                            <p class="text-lg font-medium text-gray-900">{{ branch()?.name }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-1">Phone</label>
+                            <div class="flex items-center gap-2 text-gray-900">
+                                <i class="pi pi-phone text-gray-400"></i>
+                                <span class="font-medium">{{ branch()?.phone }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="border-gray-100">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-2">Address</label>
+                        <div class="flex items-start gap-3 bg-gray-50 p-4 rounded-lg">
+                            <div class="mt-1 bg-white p-2 rounded shadow-sm border border-gray-100">
+                                <i class="pi pi-map text-brand-main"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">{{ branch()?.address }}</p>
+                                <p class="text-gray-500 text-sm mt-0.5">{{ branch()?.city }}, {{ branch()?.state }} {{
+                                    branch()?.zipCode }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </app-card>
+        </div>
+
+        <!-- Map Side -->
+        <div class="lg:col-span-5 space-y-6">
+            <app-card title="Location" icon="pi-map-marker">
+                <div class="space-y-4">
+                    <div class="h-64 rounded-lg overflow-hidden border border-gray-200 bg-gray-50"
+                        *ngIf="hasLocation(branch()!)">
+                        <app-leaflet-map [defaultLocation]="getLocation(branch()!)" [showCoordinates]="false"
+                            [readonly]="true">
+                        </app-leaflet-map>
+                    </div>
+                    <div *ngIf="!hasLocation(branch()!)"
+                        class="h-40 flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200 text-gray-500">
+                        <div class="text-center">
+                            <i class="pi pi-map-marker text-2xl mb-2 opacity-50"></i>
+                            <p>No location set</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4" *ngIf="hasLocation(branch()!)">
+                        <div>
+                            <label
+                                class="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wide">Latitude</label>
+                            <div class="bg-gray-50 px-3 py-2 rounded border border-gray-200 text-sm font-mono text-gray-700 truncate"
+                                title="{{ branch()?.latitude }}">
+                                {{ branch()?.latitude }}
+                            </div>
+                        </div>
+                        <div>
+                            <label
+                                class="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wide">Longitude</label>
+                            <div class="bg-gray-50 px-3 py-2 rounded border border-gray-200 text-sm font-mono text-gray-700 truncate"
+                                title="{{ branch()?.longitude }}">
+                                {{ branch()?.longitude }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </app-card>
+        </div>
+        <!-- Staff Section -->
+        <div class="lg:col-span-12">
+            <app-card title="Staff Members" icon="pi-users">
+                <div class="space-y-6">
+                    <!-- Stats & Actions -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex gap-4 text-sm">
+                            <div class="px-3 py-1 bg-gray-50 rounded-lg border border-gray-200">
+                                <span class="text-gray-500 mr-2">Total</span>
+                                <span class="font-bold text-gray-900">{{ staffStats().total }}</span>
+                            </div>
+                            <div class="px-3 py-1 bg-blue-50 rounded-lg border border-blue-100">
+                                <span class="text-blue-600 mr-2">Managers</span>
+                                <span class="font-bold text-blue-900">{{ staffStats().bmCount }}</span>
+                            </div>
+                            <div class="px-3 py-1 bg-green-50 rounded-lg border border-green-100">
+                                <span class="text-green-600 mr-2">Marketing</span>
+                                <span class="font-bold text-green-900">{{ staffStats().marketingCount }}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <div class="flex bg-gray-100 p-1 rounded-lg">
+                                <button (click)="setStaffFilter('ALL')" [class.bg-white]="staffFilterRole() === 'ALL'"
+                                    [class.shadow-sm]="staffFilterRole() === 'ALL'"
+                                    class="px-3 py-1 text-xs font-medium rounded-md transition-all">All</button>
+                                <button (click)="setStaffFilter('BRANCH_MANAGER')"
+                                    [class.bg-white]="staffFilterRole() === 'BRANCH_MANAGER'"
+                                    [class.shadow-sm]="staffFilterRole() === 'BRANCH_MANAGER'"
+                                    class="px-3 py-1 text-xs font-medium rounded-md transition-all">Managers</button>
+                                <button (click)="setStaffFilter('MARKETING')"
+                                    [class.bg-white]="staffFilterRole() === 'MARKETING'"
+                                    [class.shadow-sm]="staffFilterRole() === 'MARKETING'"
+                                    class="px-3 py-1 text-xs font-medium rounded-md transition-all">Marketing</button>
+                            </div>
+                            <button (click)="openAssignModal()" class="btn-primary py-1.5 px-3 text-sm">
+                                <i class="pi pi-plus mr-1.5"></i> Assign
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Staff List -->
+                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+                        <div *ngIf="loadingStaff()" class="p-8 text-center text-gray-500">
+                            <i class="pi pi-spin pi-spinner mr-2"></i> Loading staff...
+                        </div>
+
+                        <div *ngIf="!loadingStaff() && filteredBranchStaff().length === 0"
+                            class="p-12 text-center text-gray-500">
+                            <i class="pi pi-users text-3xl mb-2 opacity-30"></i>
+                            <p>No staff members found matching criteria.</p>
+                        </div>
+
+                        <div *ngIf="!loadingStaff() && filteredBranchStaff().length > 0"
+                            class="divide-y divide-gray-100">
+                            <div *ngFor="let staff of filteredBranchStaff()"
+                                class="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-brand-soft text-brand-main flex items-center justify-center font-bold text-sm">
+                                        {{ getInitials(staff.fullName) }}
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-900 text-sm">{{ staff.fullName }}</p>
+                                        <p class="text-xs text-gray-500">{{ staff.email }}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="flex gap-1">
+                                        <span *ngFor="let role of staff.roles"
+                                            class="px-2 py-0.5 text-xs rounded-full border"
+                                            [ngClass]="getRoleDisplayName(role).includes('MANAGER') ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-green-50 text-green-700 border-green-100'">
+                                            {{ getRoleDisplayName(role) }}
+                                        </span>
+                                    </div>
+                                    <button (click)="removeStaff(staff.id)"
+                                        class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                                        title="Remove from branch">
+                                        <i class="pi pi-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </app-card>
+        </div>
+    </div>
+</div>
+
+<!-- Assign Staff Modal -->
+<app-detail-modal [isOpen]="isAssignModalOpen()" title="Assign Staff to Branch" (close)="closeAssignModal()">
+    <div class="space-y-6">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Select User</label>
+            <div *ngIf="loadingUsers()" class="text-sm text-gray-500 py-2">
+                <i class="pi pi-spin pi-spinner mr-2"></i>Loading available users...
+            </div>
+            <select *ngIf="!loadingUsers()" [ngModel]="selectedUserId()" (ngModelChange)="selectedUserId.set($event)"
+                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-main focus:ring-brand-main sm:text-sm h-10">
+                <option value="">Choose a user...</option>
+                <option *ngFor="let user of availableUsers()" [value]="user.id">
+                    {{ user.fullName }} ({{ user.email }})
+                </option>
+            </select>
+            <p *ngIf="!loadingUsers() && availableUsers().length === 0" class="mt-2 text-xs text-yellow-600">
+                <i class="pi pi-info-circle mr-1"></i> No available users found (all users might be assigned to this
+                branch already).
+            </p>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Assign Role</label>
+            <div class="grid grid-cols-2 gap-4">
+                <label class="relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none"
+                    [class.border-brand-main]="selectedStaffRole() === 'MARKETING'"
+                    [class.ring-1]="selectedStaffRole() === 'MARKETING'"
+                    [class.ring-brand-main]="selectedStaffRole() === 'MARKETING'"
+                    [class.border-gray-300]="selectedStaffRole() !== 'MARKETING'">
+                    <input type="radio" name="staffRole" value="MARKETING"
+                        [checked]="selectedStaffRole() === 'MARKETING'" (change)="selectedStaffRole.set('MARKETING')"
+                        class="sr-only">
+                    <div class="flex flex-col">
+                        <span class="block text-sm font-medium text-gray-900">Marketing Staff</span>
+                        <span class="mt-1 flex items-center text-xs text-gray-500">Sales & Promotion</span>
+                    </div>
+                    <i *ngIf="selectedStaffRole() === 'MARKETING'"
+                        class="pi pi-check-circle absolute top-4 right-4 text-brand-main text-lg h-5 w-5"></i>
+                </label>
+
+                <label class="relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none"
+                    [class.border-brand-main]="selectedStaffRole() === 'BRANCH_MANAGER'"
+                    [class.ring-1]="selectedStaffRole() === 'BRANCH_MANAGER'"
+                    [class.ring-brand-main]="selectedStaffRole() === 'BRANCH_MANAGER'"
+                    [class.border-gray-300]="selectedStaffRole() !== 'BRANCH_MANAGER'">
+                    <input type="radio" name="staffRole" value="BRANCH_MANAGER"
+                        [checked]="selectedStaffRole() === 'BRANCH_MANAGER'"
+                        (change)="selectedStaffRole.set('BRANCH_MANAGER')" class="sr-only">
+                    <div class="flex flex-col">
+                        <span class="block text-sm font-medium text-gray-900">Branch Manager</span>
+                        <span class="mt-1 flex items-center text-xs text-gray-500">Full Access</span>
+                    </div>
+                    <i *ngIf="selectedStaffRole() === 'BRANCH_MANAGER'"
+                        class="pi pi-check-circle absolute top-4 right-4 text-brand-main text-lg h-5 w-5"></i>
+                </label>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+            <button (click)="closeAssignModal()"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                Cancel
+            </button>
+            <button (click)="onAssignStaff()" [disabled]="!selectedUserId()"
+                class="px-4 py-2 text-sm font-medium text-white bg-brand-main rounded-lg hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed">
+                Assign Staff
+            </button>
+        </div>
+    </div>
+</app-detail-modal>

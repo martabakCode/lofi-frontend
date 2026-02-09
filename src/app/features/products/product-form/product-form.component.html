@@ -1,211 +1,206 @@
 <div class="space-y-6 max-w-4xl mx-auto">
     <!-- Header -->
-    <div class="flex items-center gap-4">
-        <button [routerLink]="['/products']"
-            class="w-10 h-10 rounded-lg bg-bg-muted text-text-secondary hover:text-text-primary flex items-center justify-center transition-colors">
-            <i class="pi pi-arrow-left"></i>
-        </button>
-        <div>
-            <h1 class="text-2xl font-bold text-text-primary m-0">
-                {{ isEditMode() ? 'Edit Product' : 'Add New Product' }}
-            </h1>
-            <p class="text-text-secondary m-0">
-                {{ isEditMode() ? 'Update product details and settings' : 'Create a new loan product' }}
-            </p>
-        </div>
+    <app-page-header [title]="isEditMode() ? 'Edit Product' : 'Add New Product'"
+        [subtitle]="isEditMode() ? 'Update product details and settings' : 'Create a new loan product'"
+        [showBackButton]="true" [backUrl]="'/dashboard/products'">
+    </app-page-header>
+
+    <!-- Error Message -->
+    <div *ngIf="error()" class="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3 text-red-700">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>{{ error() }}</span>
     </div>
 
-    <!-- Form Card -->
-    <div class="card">
-        <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="p-6 space-y-6">
+    <!-- Form -->
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="space-y-6">
 
-            <!-- Basic Information -->
+        <!-- Basic Info -->
+        <app-card title="Basic Information" icon="pi-info-circle">
             <div class="space-y-4">
-                <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
-                    <i class="pi pi-info-circle text-brand-main"></i>
-                    Basic Information
-                </h3>
-
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="form-label">Product Code <span class="text-red-500">*</span></label>
-                        <input type="text" formControlName="productCode" class="form-input" placeholder="e.g., PROD-001"
+                        <label class="form-label mb-1.5 block text-sm font-medium text-gray-700">Product Code <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" formControlName="productCode"
+                            class="form-input w-full rounded-lg border-gray-300 focus:border-brand-main focus:ring-brand-main"
+                            placeholder="e.g., PROD-001"
                             [class.border-red-500]="productForm.get('productCode')?.invalid && productForm.get('productCode')?.touched">
                         <p *ngIf="productForm.get('productCode')?.invalid && productForm.get('productCode')?.touched"
-                            class="form-error">
+                            class="mt-1 text-sm text-red-500">
                             Product code is required
                         </p>
                     </div>
 
                     <div>
-                        <label class="form-label">Product Name <span class="text-red-500">*</span></label>
-                        <input type="text" formControlName="productName" class="form-input"
+                        <label class="form-label mb-1.5 block text-sm font-medium text-gray-700">Product Name <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" formControlName="productName"
+                            class="form-input w-full rounded-lg border-gray-300 focus:border-brand-main focus:ring-brand-main"
                             placeholder="Enter product name"
                             [class.border-red-500]="productForm.get('productName')?.invalid && productForm.get('productName')?.touched">
                         <p *ngIf="productForm.get('productName')?.invalid && productForm.get('productName')?.touched"
-                            class="form-error">
+                            class="mt-1 text-sm text-red-500">
                             Product name is required
                         </p>
                     </div>
                 </div>
 
                 <div>
-                    <label class="form-label">Description</label>
-                    <textarea formControlName="description" rows="3" class="form-textarea"
+                    <label class="form-label mb-1.5 block text-sm font-medium text-gray-700">Description</label>
+                    <textarea formControlName="description" rows="3"
+                        class="form-textarea w-full rounded-lg border-gray-300 focus:border-brand-main focus:ring-brand-main"
                         placeholder="Enter product description"></textarea>
                 </div>
             </div>
+        </app-card>
 
-            <hr class="border-border-default">
-
-            <!-- Loan Amount Settings -->
-            <div class="space-y-4">
-                <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
-                    <i class="pi pi-money-bill text-brand-main"></i>
-                    Loan Amount Settings
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="form-label">Minimum Amount <span class="text-red-500">*</span></label>
-                        <div class="relative">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">Rp</span>
-                            <input type="number" formControlName="minLoanAmount" class="form-input pl-12"
-                                placeholder="0" min="0"
-                                [class.border-red-500]="productForm.get('minLoanAmount')?.invalid && productForm.get('minLoanAmount')?.touched">
+        <!-- Loan Amount Settings -->
+        <app-card title="Loan Amount Settings" icon="pi-money-bill">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="form-label mb-1.5 block text-sm font-medium text-gray-700">Minimum Amount <span
+                            class="text-red-500">*</span></label>
+                    <div class="relative rounded-md shadow-sm">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                            <span class="text-gray-500 sm:text-sm">Rp</span>
                         </div>
-                        <p *ngIf="productForm.get('minLoanAmount')?.invalid && productForm.get('minLoanAmount')?.touched"
-                            class="form-error">
-                            Minimum amount is required
-                        </p>
+                        <input type="number" formControlName="minLoanAmount"
+                            class="form-input w-full rounded-lg border-gray-300 pl-10 focus:border-brand-main focus:ring-brand-main"
+                            placeholder="0" min="0"
+                            [class.border-red-500]="productForm.get('minLoanAmount')?.invalid && productForm.get('minLoanAmount')?.touched">
                     </div>
+                    <p *ngIf="productForm.get('minLoanAmount')?.invalid && productForm.get('minLoanAmount')?.touched"
+                        class="mt-1 text-sm text-red-500">
+                        Minimum amount is required
+                    </p>
+                </div>
 
-                    <div>
-                        <label class="form-label">Maximum Amount <span class="text-red-500">*</span></label>
-                        <div class="relative">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">Rp</span>
-                            <input type="number" formControlName="maxLoanAmount" class="form-input pl-12"
-                                placeholder="0" min="0"
-                                [class.border-red-500]="productForm.get('maxLoanAmount')?.invalid && productForm.get('maxLoanAmount')?.touched">
+                <div>
+                    <label class="form-label mb-1.5 block text-sm font-medium text-gray-700">Maximum Amount <span
+                            class="text-red-500">*</span></label>
+                    <div class="relative rounded-md shadow-sm">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                            <span class="text-gray-500 sm:text-sm">Rp</span>
                         </div>
-                        <p *ngIf="productForm.get('maxLoanAmount')?.invalid && productForm.get('maxLoanAmount')?.touched"
-                            class="form-error">
-                            Maximum amount is required
-                        </p>
+                        <input type="number" formControlName="maxLoanAmount"
+                            class="form-input w-full rounded-lg border-gray-300 pl-10 focus:border-brand-main focus:ring-brand-main"
+                            placeholder="0" min="0"
+                            [class.border-red-500]="productForm.get('maxLoanAmount')?.invalid && productForm.get('maxLoanAmount')?.touched">
                     </div>
+                    <p *ngIf="productForm.get('maxLoanAmount')?.invalid && productForm.get('maxLoanAmount')?.touched"
+                        class="mt-1 text-sm text-red-500">
+                        Maximum amount is required
+                    </p>
                 </div>
             </div>
+        </app-card>
 
-            <hr class="border-border-default">
+        <!-- Tenor Settings -->
+        <app-card title="Tenor Settings" icon="pi-calendar">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="form-label mb-1.5 block text-sm font-medium text-gray-700">Minimum Tenor (months)
+                        <span class="text-red-500">*</span></label>
+                    <input type="number" formControlName="minTenor"
+                        class="form-input w-full rounded-lg border-gray-300 focus:border-brand-main focus:ring-brand-main"
+                        placeholder="0" min="1"
+                        [class.border-red-500]="productForm.get('minTenor')?.invalid && productForm.get('minTenor')?.touched">
+                    <p *ngIf="productForm.get('minTenor')?.invalid && productForm.get('minTenor')?.touched"
+                        class="mt-1 text-sm text-red-500">
+                        Minimum tenor is required
+                    </p>
+                </div>
 
-            <!-- Tenor Settings -->
-            <div class="space-y-4">
-                <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
-                    <i class="pi pi-calendar text-brand-main"></i>
-                    Tenor Settings
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="form-label">Minimum Tenor (months) <span class="text-red-500">*</span></label>
-                        <input type="number" formControlName="minTenor" class="form-input" placeholder="0" min="1"
-                            [class.border-red-500]="productForm.get('minTenor')?.invalid && productForm.get('minTenor')?.touched">
-                        <p *ngIf="productForm.get('minTenor')?.invalid && productForm.get('minTenor')?.touched"
-                            class="form-error">
-                            Minimum tenor is required
-                        </p>
-                    </div>
-
-                    <div>
-                        <label class="form-label">Maximum Tenor (months) <span class="text-red-500">*</span></label>
-                        <input type="number" formControlName="maxTenor" class="form-input" placeholder="0" min="1"
-                            [class.border-red-500]="productForm.get('maxTenor')?.invalid && productForm.get('maxTenor')?.touched">
-                        <p *ngIf="productForm.get('maxTenor')?.invalid && productForm.get('maxTenor')?.touched"
-                            class="form-error">
-                            Maximum tenor is required
-                        </p>
-                    </div>
+                <div>
+                    <label class="form-label mb-1.5 block text-sm font-medium text-gray-700">Maximum Tenor (months)
+                        <span class="text-red-500">*</span></label>
+                    <input type="number" formControlName="maxTenor"
+                        class="form-input w-full rounded-lg border-gray-300 focus:border-brand-main focus:ring-brand-main"
+                        placeholder="0" min="1"
+                        [class.border-red-500]="productForm.get('maxTenor')?.invalid && productForm.get('maxTenor')?.touched">
+                    <p *ngIf="productForm.get('maxTenor')?.invalid && productForm.get('maxTenor')?.touched"
+                        class="mt-1 text-sm text-red-500">
+                        Maximum tenor is required
+                    </p>
                 </div>
             </div>
+        </app-card>
 
-            <hr class="border-border-default">
-
-            <!-- Interest & Fees -->
-            <div class="space-y-4">
-                <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
-                    <i class="pi pi-percentage text-brand-main"></i>
-                    Interest & Fees
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="form-label">Interest Rate (%) <span class="text-red-500">*</span></label>
-                        <div class="relative">
-                            <input type="number" formControlName="interestRate" class="form-input pr-10"
-                                placeholder="0.00" min="0" step="0.01"
-                                [class.border-red-500]="productForm.get('interestRate')?.invalid && productForm.get('interestRate')?.touched">
-                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted">%</span>
+        <!-- Interest & Fees -->
+        <app-card title="Interest & Fees" icon="pi-percentage">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="form-label mb-1.5 block text-sm font-medium text-gray-700">Interest Rate (% p.a.)
+                        <span class="text-red-500">*</span></label>
+                    <div class="relative rounded-md shadow-sm">
+                        <input type="number" formControlName="interestRate"
+                            class="form-input w-full rounded-lg border-gray-300 pr-10 focus:border-brand-main focus:ring-brand-main"
+                            placeholder="0.00" min="0" step="0.01"
+                            [class.border-red-500]="productForm.get('interestRate')?.invalid && productForm.get('interestRate')?.touched">
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                            <span class="text-gray-500 sm:text-sm">%</span>
                         </div>
-                        <p *ngIf="productForm.get('interestRate')?.invalid && productForm.get('interestRate')?.touched"
-                            class="form-error">
-                            Interest rate is required
-                        </p>
                     </div>
+                    <p *ngIf="productForm.get('interestRate')?.invalid && productForm.get('interestRate')?.touched"
+                        class="mt-1 text-sm text-red-500">
+                        Interest rate is required
+                    </p>
+                </div>
 
-                    <div>
-                        <label class="form-label">Admin Fee <span class="text-red-500">*</span></label>
-                        <div class="relative">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">Rp</span>
-                            <input type="number" formControlName="adminFee" class="form-input pl-12" placeholder="0"
-                                min="0"
-                                [class.border-red-500]="productForm.get('adminFee')?.invalid && productForm.get('adminFee')?.touched">
+                <div>
+                    <label class="form-label mb-1.5 block text-sm font-medium text-gray-700">Admin Fee <span
+                            class="text-red-500">*</span></label>
+                    <div class="relative rounded-md shadow-sm">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                            <span class="text-gray-500 sm:text-sm">Rp</span>
                         </div>
-                        <p *ngIf="productForm.get('adminFee')?.invalid && productForm.get('adminFee')?.touched"
-                            class="form-error">
-                            Admin fee is required
-                        </p>
+                        <input type="number" formControlName="adminFee"
+                            class="form-input w-full rounded-lg border-gray-300 pl-10 focus:border-brand-main focus:ring-brand-main"
+                            placeholder="0" min="0"
+                            [class.border-red-500]="productForm.get('adminFee')?.invalid && productForm.get('adminFee')?.touched">
                     </div>
+                    <p *ngIf="productForm.get('adminFee')?.invalid && productForm.get('adminFee')?.touched"
+                        class="mt-1 text-sm text-red-500">
+                        Admin fee is required
+                    </p>
                 </div>
             </div>
+        </app-card>
 
-            <hr class="border-border-default">
+        <!-- Status -->
+        <app-card title="Product Status" icon="pi-check-circle">
+            <div class="flex items-center gap-6">
+                <label
+                    class="relative flex items-center cursor-pointer p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                    [class.border-brand-main]="productForm.get('isActive')?.value === true"
+                    [class.bg-brand-soft]="productForm.get('isActive')?.value === true">
+                    <input type="radio" formControlName="isActive" [value]="true"
+                        class="h-4 w-4 text-brand-main border-gray-300 focus:ring-brand-main">
+                    <span class="ml-3 block text-sm font-medium text-gray-700">Active</span>
+                </label>
 
-            <!-- Status -->
-            <div class="space-y-4">
-                <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
-                    <i class="pi pi-check-circle text-brand-main"></i>
-                    Product Status
-                </h3>
-
-                <div class="flex items-center gap-4">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" formControlName="isActive" [value]="true" class="text-brand-main">
-                        <span>Active</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" formControlName="isActive" [value]="false" class="text-brand-main">
-                        <span>Inactive</span>
-                    </label>
-                </div>
+                <label
+                    class="relative flex items-center cursor-pointer p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                    [class.border-brand-main]="productForm.get('isActive')?.value === false"
+                    [class.bg-brand-soft]="productForm.get('isActive')?.value === false">
+                    <input type="radio" formControlName="isActive" [value]="false"
+                        class="h-4 w-4 text-brand-main border-gray-300 focus:ring-brand-main">
+                    <span class="ml-3 block text-sm font-medium text-gray-700">Inactive</span>
+                </label>
             </div>
+        </app-card>
 
-            <!-- Error Message -->
-            <div *ngIf="error()" class="error-alert">
-                <i class="pi pi-exclamation-triangle"></i>
-                <span>{{ error() }}</span>
-            </div>
-
-            <!-- Actions -->
-            <div class="flex justify-end gap-3 pt-4 border-t border-border-default">
-                <button type="button" [routerLink]="['/products']" class="btn-secondary">
-                    Cancel
-                </button>
-                <button type="submit" [disabled]="isSubmitting() || productForm.invalid"
-                    class="btn-primary flex items-center gap-2">
-                    <i *ngIf="isSubmitting()" class="pi pi-spin pi-spinner"></i>
-                    {{ isEditMode() ? 'Update Product' : 'Create Product' }}
-                </button>
-            </div>
-        </form>
-    </div>
+        <!-- Actions -->
+        <div class="flex justify-end gap-3 pt-6">
+            <button type="button" [routerLink]="['/dashboard/products']"
+                class="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-main transition-colors">
+                Cancel
+            </button>
+            <button type="submit" [disabled]="isSubmitting() || productForm.invalid"
+                class="inline-flex justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-brand-main hover:bg-brand-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-main disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95">
+                <i *ngIf="isSubmitting()" class="pi pi-spin pi-spinner mr-2"></i>
+                {{ isEditMode() ? 'Update Product' : 'Create Product' }}
+            </button>
+        </div>
+    </form>
 </div>

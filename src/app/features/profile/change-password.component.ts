@@ -70,8 +70,17 @@ export class ChangePasswordComponent {
             return;
         }
 
+        // Ensure we have valid string values
+        if (!val.currentPassword || !val.newPassword) {
+            this.toast.show('Please fill in all password fields', 'error');
+            return;
+        }
+
         this.loading = true;
-        this.authService.changePassword(val).subscribe({
+        this.authService.changePassword({
+            currentPassword: val.currentPassword,
+            newPassword: val.newPassword
+        }).subscribe({
             next: () => {
                 this.toast.show('Password updated successfully', 'success');
                 this.loading = false;

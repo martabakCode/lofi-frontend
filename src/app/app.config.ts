@@ -9,8 +9,7 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(
       routes,
-      withComponentInputBinding(),
-      withViewTransitions()
+      withComponentInputBinding()
     ),
     ...provideCore(),
     provideServiceWorker('ngsw-worker.js', {

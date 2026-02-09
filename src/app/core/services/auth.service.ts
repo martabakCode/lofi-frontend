@@ -11,10 +11,29 @@ export interface UserInfo {
     id: string;
     email: string;
     username: string;
+    fullName?: string; // Added to support profile display
     branchId?: string;
     branchName?: string;
     roles: string[]; // Backend returns role names as strings
     permissions: string[];
+}
+
+// Forgot Password Response
+export interface ForgotPasswordResponse {
+    success: boolean;
+    message: string;
+    code: string;
+    data: Record<string, unknown>;
+    errors: Record<string, unknown>;
+}
+
+// Reset Password Response
+export interface ResetPasswordResponse {
+    success: boolean;
+    message: string;
+    code: string;
+    data: Record<string, unknown>;
+    errors: Record<string, unknown>;
 }
 
 @Injectable({
@@ -62,10 +81,18 @@ export class AuthService {
         );
     }
 
-    logout(): void {
-        this.tokenStorage.clearToken();
-        this.token.set(null);
-        this.currentUser.set(null);
+    logout(): Observable<ApiResponse<Object>> {
+        const token = this.tokenStorage.getToken();
+        // Call backend logout first, then clear local storage
+        return this.http.post<ApiResponse<Object>>(`${this.baseUrl}/logout`, {}, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).pipe(
+            tap(() => {
+                this.tokenStorage.clearToken();
+                this.token.set(null);
+                this.currentUser.set(null);
+            })
+        );
     }
 
     private fetchCurrentUser(): Observable<ApiResponse<UserInfo>> {
@@ -96,12 +123,32 @@ export class AuthService {
         return user ? user.permissions.includes(permission) : false;
     }
 
-    forgotPassword(email: string): Observable<ApiResponse<Object>> {
-        return this.http.post<ApiResponse<Object>>(`${this.baseUrl}/forgot-password`, { email });
+    /**
+     * Request a password reset email
+     * @param email - User's email address
+     */
+    forgotPassword(email: string): Observable<ApiResponse<ForgotPasswordResponse>> {
+        return this.http.post<ApiResponse<ForgotPasswordResponse>>(`${this.baseUrl}/forgot-password`, { email });
     }
 
-    changePassword(payload: any): Observable<ApiResponse<Object>> {
+    /**
+     * Change password for authenticated user
+     * @param payload - Object containing currentPassword and newPassword
+     */
+    changePassword(payload: { currentPassword: string; newPassword: string }): Observable<ApiResponse<Object>> {
         return this.http.post<ApiResponse<Object>>(`${this.baseUrl}/change-password`, payload);
+    }
+
+    /**
+     * Reset password with token from email
+     * @param token - Reset token from email
+     * @param newPassword - New password
+     */
+    resetPassword(token: string, newPassword: string): Observable<ApiResponse<ResetPasswordResponse>> {
+        return this.http.post<ApiResponse<ResetPasswordResponse>>(`${this.baseUrl}/reset-password`, {
+            token,
+            newPassword
+        });
     }
 
     /**

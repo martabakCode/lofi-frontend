@@ -1,29 +1,14 @@
 @import "tailwindcss";
 
 @theme {
+    /* Colors */
     --color-primary-50: var(--primary-50);
     --color-primary-100: var(--primary-100);
-    --color-primary-200: var(--primary-200);
-    --color-primary-300: var(--primary-300);
-    --color-primary-400: var(--primary-400);
     --color-primary-500: var(--primary-500);
     --color-primary-600: var(--primary-600);
-    --color-primary-700: var(--primary-700);
-    --color-primary-800: var(--primary-800);
-    --color-primary-900: var(--primary-900);
-    --color-primary-950: var(--primary-950);
+    /* Add other primary shades if needed */
 
-    --color-accent-100: var(--accent-100);
-    --color-accent-200: var(--accent-200);
-    --color-accent-300: var(--accent-300);
-    --color-accent-400: var(--accent-400);
-    --color-accent-500: var(--accent-500);
-    --color-accent-600: var(--accent-600);
-    --color-accent-700: var(--accent-700);
-    --color-accent-800: var(--accent-800);
-    --color-accent-900: var(--accent-900);
-    --color-accent-950: var(--accent-950);
-
+    /* Surface Color Scale (for utility classes like bg-surface-700) */
     --color-surface-0: var(--surface-0);
     --color-surface-50: var(--surface-50);
     --color-surface-100: var(--surface-100);
@@ -37,7 +22,6 @@
     --color-surface-900: var(--surface-900);
     --color-surface-950: var(--surface-950);
 
-    /* Semantic Aliases */
     --color-bg-page: var(--bg-page);
     --color-bg-surface: var(--bg-surface);
     --color-bg-muted: var(--bg-muted);
@@ -53,6 +37,34 @@
 
     --color-border-default: var(--border-default);
     --color-border-muted: var(--border-muted);
+
+    /* Semantic Status Colors */
+    --color-success-bg: var(--success-bg);
+    --color-success-text: var(--success-text);
+    --color-success-border: var(--success-border);
+
+    --color-warning-bg: var(--warning-bg);
+    --color-warning-text: var(--warning-text);
+    --color-warning-border: var(--warning-border);
+
+    --color-error-bg: var(--error-bg);
+    --color-error-text: var(--error-text);
+    --color-error-border: var(--error-border);
+
+    --color-info-bg: var(--info-bg);
+    --color-info-text: var(--info-text);
+    --color-info-border: var(--info-border);
+
+    /* Shadows */
+    --shadow-apple-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-apple: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-apple-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-apple-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+    /* Radius */
+    --radius-apple: 0.75rem;
+    --radius-apple-lg: 1rem;
+    --radius-apple-xl: 1.25rem;
 }
 
 @custom-variant dark (&:where(.dark, .dark *));

@@ -111,7 +111,7 @@
                             <span class="amount-value">{{ formatCurrency(loan.amount) }}</span>
                         </td>
                         <td>
-                            <span class="tenure-value">{{ loan.tenure }} <span class="tenure-unit">months</span></span>
+                            <span class="tenure-value">{{ loan.tenor }} <span class="tenure-unit">months</span></span>
                         </td>
                         <td>
                             <span class="date-value">{{ loan.appliedDate | date:'mediumDate' }}</span>
@@ -123,12 +123,16 @@
                             </span>
                         </td>
                         <td class="actions-cell">
+                            <button class="btn-secondary mr-2" (click)="onViewWorkflowDetails(loan)"
+                                title="View Workflow Details">
+                                <i class="pi pi-info-circle"></i>
+                            </button>
                             <button class="btn-secondary mr-2" [routerLink]="['/dashboard/loans', loan.id]"
                                 title="View Details">
                                 <i class="pi pi-eye"></i>
                             </button>
                             <button
-                                class="mr-2  btn-primary bg-amber-600 hover:bg-amber-700 text-xs py-1.5 px-4 shadow-amber-600/20"
+                                class="mr-2 btn-primary bg-amber-600 hover:bg-amber-700 text-xs py-1.5 px-4 shadow-amber-600/20"
                                 (click)="onDisburseClick(loan)" [disabled]="processingId() === loan.id"
                                 title="Disburse Loan">
                                 <i class="pi mr-2" [class.pi-spin]="processingId() === loan.id"
@@ -154,4 +158,10 @@
         [requireNotes]="modal().requireNotes" [placeholder]="modal().placeholder"
         (confirm)="executeDisbursement($event)" (close)="modal().isOpen = false">
     </app-confirmation-modal>
+
+    <!-- Loan Workflow Modal -->
+    <app-loan-workflow-modal [isOpen]="workflowModal().isOpen" [loanDetail]="workflowModal().loanDetail"
+        [workflowSteps]="workflowModal().workflowSteps" [availableActions]="workflowModal().availableActions"
+        (onAction)="onWorkflowAction($event)" (onClose)="onWorkflowClose()" (onViewFullPage)="onViewFullPage($event)">
+    </app-loan-workflow-modal>
 </div>

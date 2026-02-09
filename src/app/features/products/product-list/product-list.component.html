@@ -1,254 +1,149 @@
 <div class="space-y-6">
-    <!-- Header Section -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div class="flex items-center gap-4">
-            <div class="w-14 h-14 bg-brand-soft text-brand-main rounded-2xl flex items-center justify-center shadow-sm">
-                <i class="pi pi-box text-2xl"></i>
+    <!-- Header -->
+    <app-page-header title="Product Management" subtitle="Configure and manage loan products">
+    </app-page-header>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-green-50 text-green-600 flex items-center justify-center">
+                <i class="pi pi-check-circle text-xl"></i>
             </div>
             <div>
-                <h1 class="text-2xl font-bold text-text-primary m-0">Product Management</h1>
-                <p class="text-text-secondary m-0">Configure and manage loan products</p>
+                <p class="text-2xl font-bold text-gray-900">{{ activeProductCount() }}</p>
+                <p class="text-sm text-gray-500">Active Products</p>
             </div>
         </div>
+        <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">
+                <i class="pi pi-times-circle text-xl"></i>
+            </div>
+            <div>
+                <p class="text-2xl font-bold text-gray-900">{{ inactiveProductCount() }}</p>
+                <p class="text-sm text-gray-500">Inactive Products</p>
+            </div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                <i class="pi pi-database text-xl"></i>
+            </div>
+            <div>
+                <p class="text-2xl font-bold text-gray-900">{{ totalItems() }}</p>
+                <p class="text-sm text-gray-500">Total Products</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toolbar -->
+    <app-page-toolbar>
+        <app-search-input (search)="onSearch($event)"></app-search-input>
+
         <div class="flex items-center gap-3">
-            <button class="btn-secondary px-3" (click)="exportProducts()" title="Export" [disabled]="isExporting()">
+            <!-- Status Filter -->
+            <select [ngModel]="selectedStatusFilter()"
+                (ngModelChange)="selectedStatusFilter.set($event); onFilterChange()"
+                class="form-select h-9 text-sm border-gray-200 rounded-lg focus:ring-brand-main focus:border-brand-main">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+
+            <app-sort-dropdown [options]="sortOptions" (sortChange)="onSortChange($event)">
+            </app-sort-dropdown>
+
+            <button *ngIf="hasActiveFilters()" (click)="clearFilters()"
+                class="px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                Clear
+            </button>
+
+            <div class="h-6 w-px bg-gray-200 mx-1"></div>
+
+            <button (click)="exportProducts()" [disabled]="isExporting()"
+                class="p-2 text-gray-500 hover:text-brand-main hover:bg-brand-soft rounded-lg transition-colors"
+                title="Export">
                 <i class="pi pi-download" [class.pi-spin]="isExporting()"></i>
             </button>
 
-            <a routerLink="/products/new" class="btn-primary">
-                <i class="pi pi-plus mr-2"></i> New Product
-            </a>
-            <button class="btn-secondary px-3" (click)="loadProducts()" title="Refresh" [disabled]="loading()">
+            <button (click)="loadProducts()" [disabled]="loading()"
+                class="p-2 text-gray-500 hover:text-brand-main hover:bg-brand-soft rounded-lg transition-colors"
+                title="Refresh">
                 <i class="pi pi-refresh" [class.pi-spin]="loading()"></i>
             </button>
-        </div>
-    </div>
 
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon active">
-                <i class="pi pi-check-circle"></i>
-            </div>
-            <div class="stat-content">
-                <span class="stat-value">{{ activeProductCount() }}</span>
-                <span class="stat-label">Active Products</span>
-            </div>
+            <a routerLink="/dashboard/products/new"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-brand-main text-white text-sm font-medium rounded-lg hover:bg-brand-hover shadow-sm transition-all active:scale-95">
+                <i class="pi pi-plus"></i> New Product
+            </a>
         </div>
-        <div class="stat-card">
-            <div class="stat-icon inactive">
-                <i class="pi pi-times-circle"></i>
-            </div>
-            <div class="stat-content">
-                <span class="stat-value">{{ inactiveProductCount() }}</span>
-                <span class="stat-label">Inactive Products</span>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon total">
-                <i class="pi pi-database"></i>
-            </div>
-            <div class="stat-content">
-                <span class="stat-value">{{ products().length }}</span>
-                <span class="stat-label">Total Products</span>
-            </div>
-        </div>
-    </div>
+    </app-page-toolbar>
 
-    <!-- Search and Filters -->
-    <div class="card p-4">
-        <div class="flex flex-col lg:flex-row gap-4">
-            <div class="relative flex-1">
-                <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"></i>
-                <input type="text" placeholder="Search products..." (input)="onSearch($event)"
-                    class="form-input pl-10 w-full" [value]="searchQuery()" />
-            </div>
+    <!-- Table -->
+    <app-card-table>
+        <app-table-header [columns]="columns" [hasActions]="true" (sort)="onSort($event)"></app-table-header>
 
-            <div class="flex flex-col sm:flex-row gap-3">
-                <!-- Status Filter -->
-                <select [ngModel]="selectedStatusFilter()"
-                    (ngModelChange)="selectedStatusFilter.set($event); onFilterChange()" class="form-select w-40">
-                    <option value="">All Status</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                </select>
+        <!-- Loading -->
+        <tr *ngIf="loading()">
+            <td colspan="7" class="p-8 text-center text-gray-500">
+                <i class="pi pi-spinner pi-spin text-3xl mb-2"></i>
+                <p>Loading products...</p>
+            </td>
+        </tr>
 
-                <!-- Clear Filters -->
-                <button *ngIf="hasActiveFilters()" (click)="clearFilters()" class="btn-secondary px-3 text-sm">
-                    <i class="pi pi-times mr-1"></i> Clear
+        <!-- Empty -->
+        <tr *ngIf="!loading() && filteredProducts().length === 0">
+            <td colspan="7" class="p-12 text-center">
+                <app-empty-state [title]="hasActiveFilters() ? 'No products found' : 'No products yet'"
+                    [message]="hasActiveFilters() ? 'Try adjusting your filters' : 'Create a new product to get started'"
+                    [actionText]="!hasActiveFilters() ? 'Create Product' : undefined">
+                </app-empty-state>
+            </td>
+        </tr>
+
+        <!-- Rows -->
+        <app-table-row *ngFor="let product of filteredProducts()">
+            <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex flex-col">
+                    <span class="text-sm font-semibold text-gray-900">{{ product.name }}</span>
+                    <span class="text-xs text-gray-500">{{ product.code }}</span>
+                </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ product.amountRangeLabel }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ product.tenorLabel }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ product.interestRateLabel }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                {{ product.adminFee ? (product.adminFee | currency:'IDR':'symbol-narrow':'1.0-0') : '-' }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <app-status-badge [status]="product.isActive ? 'ACTIVE' : 'INACTIVE'"
+                    [label]="product.isActive ? 'Active' : 'Inactive'"></app-status-badge>
+            </td>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-end gap-2">
+                <button (click)="toggleStatus(product)"
+                    class="p-1.5 text-gray-400 hover:text-brand-main rounded-md transition-colors"
+                    [title]="product.isActive ? 'Deactivate' : 'Activate'">
+                    <i [class]="product.isActive ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+                </button>
+                <a [routerLink]="['/dashboard/products', product.id, 'edit']"
+                    class="p-1.5 text-gray-400 hover:text-blue-600 rounded-md transition-colors" title="Edit">
+                    <i class="pi pi-pencil"></i>
+                </a>
+                <button (click)="confirmDelete(product)"
+                    class="p-1.5 text-gray-400 hover:text-red-600 rounded-md transition-colors" title="Delete">
+                    <i class="pi pi-trash"></i>
                 </button>
             </div>
-        </div>
-    </div>
-
-    <!-- Error Message -->
-    <div *ngIf="error()" class="error-alert">
-        <i class="pi pi-exclamation-triangle"></i>
-        <span>{{ error() }}</span>
-        <button class="btn-link" (click)="loadProducts()">Try Again</button>
-    </div>
-
-    <!-- Table Card -->
-    <div class="table-card">
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <app-sortable-header field="name" [sortField]="sortField()" [sortDirection]="sortDirection()"
-                            (sort)="onSort($event)">
-                            Product
-                        </app-sortable-header>
-                        <app-sortable-header field="minAmount" [sortField]="sortField()"
-                            [sortDirection]="sortDirection()" (sort)="onSort($event)">
-                            Loan Amount Range
-                        </app-sortable-header>
-                        <th>Tenure Range</th>
-                        <app-sortable-header field="interestRate" [sortField]="sortField()"
-                            [sortDirection]="sortDirection()" (sort)="onSort($event)">
-                            Interest Rate
-                        </app-sortable-header>
-                        <th>Admin Fee</th>
-                        <th>Status</th>
-                        <th class="text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Loading State -->
-                    <tr *ngIf="loading()">
-                        <td colspan="7" class="loading-cell">
-                            <div class="loading-spinner">
-                                <i class="pi pi-spin pi-spinner"></i>
-                                <span>Loading products...</span>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Empty State -->
-                    <tr *ngIf="!loading() && filteredProducts().length === 0 && !error()">
-                        <td colspan="7" class="empty-cell">
-                            <div class="empty-state">
-                                <i class="pi pi-inbox"></i>
-                                <span>No products found</span>
-                                <p *ngIf="hasActiveFilters()">Try adjusting your filters</p>
-                                <p *ngIf="!hasActiveFilters()">Create your first product to get started</p>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Data Rows -->
-                    <tr *ngFor="let product of filteredProducts()" class="data-row">
-                        <td>
-                            <div class="product-info">
-                                <span class="product-name">{{ product.name }}</span>
-                                <span class="product-code">{{ product.code }}</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="range-info">
-                                <span class="range-value">{{ product.amountRangeLabel }}</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="tenure-info">
-                                <span>{{ product.tenorLabel }}</span>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="interest-rate">{{ product.interestRateLabel }}</span>
-                        </td>
-                        <td>
-                            <span class="admin-fee">{{ product.adminFee | currency:'IDR':'symbol-narrow':'1.0-0'
-                                }}</span>
-                        </td>
-                        <td>
-                            <span class="status-badge" [class.active]="product.isActive"
-                                [class.inactive]="!product.isActive">
-                                <i [class.pi-check-circle]="product.isActive"
-                                    [class.pi-times-circle]="!product.isActive" class="pi"></i>
-                                {{ product.isActive ? 'Active' : 'Inactive' }}
-                            </span>
-                        </td>
-                        <td class="actions-cell">
-                            <button class="btn-action view" (click)="openDetailModal(product)" title="View Details">
-                                <i class="pi pi-eye"></i>
-                            </button>
-                            <a [routerLink]="['/products', product.id, 'edit']" class="btn-action edit"
-                                title="Edit Product">
-                                <i class="pi pi-pencil"></i>
-                            </a>
-                            <button class="btn-action toggle" (click)="toggleStatus(product)"
-                                [title]="product.isActive ? 'Deactivate' : 'Activate'">
-                                <i [class.pi-eye-slash]="product.isActive" [class.pi-eye]="!product.isActive"
-                                    class="pi"></i>
-                            </button>
-                            <button class="btn-action delete" (click)="confirmDelete(product)" title="Delete Product">
-                                <i class="pi pi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        </app-table-row>
 
         <!-- Pagination -->
-        <app-pagination [currentPageValue]="currentPage()" [pageSizeValue]="pageSize()" [totalItemsValue]="totalItems()"
+        <app-pagination [page]="currentPage()" [pageSize]="pageSize()" [total]="totalItems()"
             (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
         </app-pagination>
-    </div>
+    </app-card-table>
 </div>
 
-<!-- Product Detail Modal -->
-<app-detail-modal [isOpen]="isDetailModalOpen()" [title]="(selectedProduct()?.name || '') + ' - Product Details'"
-    (close)="closeDetailModal()">
-
-    <div *ngIf="selectedProduct()" class="space-y-6">
-        <!-- Product Header -->
-        <div class="flex items-center gap-4 pb-4 border-b border-border-default">
-            <div
-                class="w-16 h-16 rounded-xl bg-brand-soft text-brand-main flex items-center justify-center text-2xl font-bold">
-                {{ selectedProduct()!.name.charAt(0) }}
-            </div>
-            <div>
-                <h3 class="text-xl font-bold text-text-primary">{{ selectedProduct()!.name }}</h3>
-                <p class="text-text-muted">{{ selectedProduct()!.code }}</p>
-            </div>
-            <span class="ml-auto status-badge" [class.active]="selectedProduct()!.isActive"
-                [class.inactive]="!selectedProduct()!.isActive">
-                {{ selectedProduct()!.isActive ? 'Active' : 'Inactive' }}
-            </span>
-        </div>
-
-        <!-- Product Info Grid -->
-        <div class="grid grid-cols-2 gap-4">
-            <div class="space-y-1">
-                <label class="text-xs text-text-muted uppercase">Interest Rate</label>
-                <p class="font-medium text-text-primary text-lg">{{ selectedProduct()!.interestRateLabel }}</p>
-            </div>
-            <div class="space-y-1">
-                <label class="text-xs text-text-muted uppercase">Admin Fee</label>
-                <p class="font-medium text-text-primary text-lg">
-                    {{ selectedProduct()!.adminFee | currency:'IDR':'symbol-narrow':'1.0-0' }}
-                </p>
-            </div>
-            <div class="space-y-1">
-                <label class="text-xs text-text-muted uppercase">Loan Amount Range</label>
-                <p class="font-medium text-text-primary">{{ selectedProduct()!.amountRangeLabel }}</p>
-            </div>
-            <div class="space-y-1">
-                <label class="text-xs text-text-muted uppercase">Tenor Range</label>
-                <p class="font-medium text-text-primary">{{ selectedProduct()!.tenorLabel }}</p>
-            </div>
-        </div>
-
-        <!-- Description -->
-        <div *ngIf="selectedProduct()!.description" class="space-y-1">
-            <label class="text-xs text-text-muted uppercase">Description</label>
-            <p class="text-text-secondary">{{ selectedProduct()!.description }}</p>
-        </div>
-    </div>
-</app-detail-modal>
-
-<!-- Delete Confirmation Modal -->
+<!-- Confirmation Modal -->
 <app-confirmation-modal [isOpen]="isDeleteModalOpen()" title="Delete Product"
     [message]="'Are you sure you want to delete ' + (productToDelete()?.name || '') + '? This action cannot be undone.'"
     confirmLabel="Delete" confirmBtnClass="bg-red-500 hover:bg-red-600" (confirm)="onDeleteConfirmed()"

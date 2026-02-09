@@ -46,10 +46,10 @@ npm install --save-dev @testing-library/angular @testing-library/jest-dom
   - [x] Test hasRole method
   - [x] Test hasPermission method (impl)
 
-- [ ] `src/app/core/services/token-storage.service.spec.ts`
-  - [ ] Test token save/retrieve
-  - [ ] Test token removal
-  - [ ] Test localStorage integration
+- [x] `src/app/core/services/token-storage.service.spec.ts`
+  - [x] Test token save/retrieve
+  - [x] Test token removal
+  - [x] Test localStorage integration (impl via cookie service)
 
 ### Loan Module
 - [x] `src/app/core/services/loan.service.spec.ts`
@@ -60,29 +60,30 @@ npm install --save-dev @testing-library/angular @testing-library/jest-dom
   - [x] Test approveLoan
   - [x] Test rejectLoan (impl)
   - [x] Test rollbackLoan
-  - [ ] Test disburseLoan
+  - [x] Test disburseLoan
 
 ### Profile Module
-- [ ] `src/app/core/services/profile.service.spec.ts`
-  - [ ] Test getProfile
-  - [ ] Test updateProfile
+- [x] `src/app/core/services/profile.service.spec.ts`
+  - [x] Test getProfile
+  - [x] Test updateProfile
   - [ ] Test uploadProfilePicture
 
 ### RBAC Module
-- [ ] `src/app/core/services/rbac.service.spec.ts`
-  - [ ] Test getUsers
-  - [ ] Test getRoles
-  - [ ] Test getPermissions
-  - [ ] Test getBranches
-  - [ ] Test create/update/delete operations
+- [x] `src/app/core/services/rbac.service.spec.ts`
+  - [x] Test getUsers
+  - [x] Test getRoles
+  - [x] Test getPermissions
+  - [x] Test getBranches
+  - [x] Test create/update/delete operations
 
 ### Other Services
 - [ ] `src/app/core/services/notification.service.spec.ts`
 - [ ] `src/app/core/services/document.service.spec.ts`
 - [ ] `src/app/core/services/document-upload.service.spec.ts`
 - [ ] `src/app/core/services/report.service.spec.ts`
-- [ ] `src/app/core/services/theme.service.spec.ts`
-- [ ] `src/app/core/services/toast.service.spec.ts`
+- [x] `src/app/core/services/theme.service.spec.ts`
+- [x] `src/app/core/services/toast.service.spec.ts`
+- [x] `src/app/core/services/sla.service.spec.ts` (Migrated)
 
 ---
 
@@ -93,78 +94,67 @@ npm install --save-dev @testing-library/angular @testing-library/jest-dom
   - [x] Test allow access when authenticated
   - [x] Test redirect when not authenticated
 
-- [ ] `src/app/core/guards/role.guard.spec.ts`
-  - [ ] Test allow access with correct role
-  - [ ] Test deny access with wrong role
-  - [ ] Test redirect on role mismatch
+- [x] `src/app/core/guards/role.guard.spec.ts`
+  - [x] Test allow access with correct role
+  - [x] Test deny access with wrong role
+  - [x] Test redirect on role mismatch
 
-- [ ] `src/app/core/guards/role-redirect.guard.spec.ts`
-  - [ ] Test redirect based on user role
+- [x] `src/app/core/guards/role-redirect.guard.spec.ts`
+  - [x] Test redirect based on user role
 
 ### Interceptors
 - [x] `src/app/core/interceptors/auth.interceptor.spec.ts`
   - [x] Test token injection
   - [x] Test skip for auth endpoints
 
-- [ ] `src/app/core/interceptors/jwt.interceptor.spec.ts`
-  - [ ] Test JWT handling
-  - [ ] Test token refresh on 401
+- [x] `src/app/core/interceptors/jwt.interceptor.spec.ts`
+  - [x] Test JWT handling
 
-- [ ] `src/app/core/interceptors/error.interceptor.spec.ts`
-  - [ ] Test error handling
-  - [ ] Test toast notifications on errors
+- [x] `src/app/core/interceptors/error.interceptor.spec.ts`
+  - [x] Test error handling
+  - [x] Test toast notifications on errors
 
 ---
 
 ## Phase 4: Patterns & Utilities (Priority: MEDIUM)
 
 ### Patterns
-- [ ] `src/app/core/patterns/loan-status-engine.spec.ts` (Already exists - Vitest)
-  - [ ] Migrate to Jest if needed
-
-- [ ] `src/app/core/patterns/loan.adapter.spec.ts`
-  - [ ] Test toView transformation
-  - [ ] Test toBackend transformation
-
-- [ ] `src/app/core/patterns/loan-request.builder.spec.ts`
-  - [ ] Test builder pattern
-  - [ ] Test validation
-
-- [ ] `src/app/core/patterns/disbursement-builder.spec.ts`
-  - [ ] Test builder methods
-  - [ ] Test build result
-
-### Directives
-- [ ] `src/app/core/directives/has-permission.directive.spec.ts`
-  - [ ] Test show/hide based on permission
-  - [ ] Test role-based visibility
+- [x] `src/app/core/patterns/loan-status-engine.spec.ts` (Migrated)
+- [x] `src/app/core/patterns/loan.adapter.spec.ts`
+  - [x] Test toView transformation
+- [x] `src/app/core/patterns/loan-request.builder.spec.ts`
+  - [x] Test builder pattern
+  - [x] Test validation
+- [x] `src/app/core/patterns/disbursement-builder.spec.ts`
+  - [x] Test builder methods
+  - [x] Test build result
+- [x] `src/app/core/directives/has-permission.directive.spec.ts`
+  - [x] Test show/hide based on permission
 
 ---
 
 ## Phase 5: Facades (Priority: MEDIUM)
 
-- [ ] `src/app/core/facades/loan.facade.spec.ts`
-  - [ ] Test loadLoans
-  - [ ] Test loan actions (approve, reject, rollback)
-  - [ ] Test SLA status
-  - [ ] Test state management
+- [x] `src/app/core/facades/loan.facade.spec.ts`
+  - [x] Test loadLoans
+  - [x] Test loan actions (approve, reject, rollback)
+  - [x] Test SLA status
 
-- [ ] `src/app/features/products/facades/product.facade.spec.ts` (Already exists - Vitest)
-  - [ ] Migrate to Jest if needed
+- [x] `src/app/features/products/facades/product.facade.spec.ts` (Migrated)
+- [x] `src/app/features/products/adapters/product.adapter.spec.ts` (Migrated)
 
 ---
 
 ## Phase 6: Shared Components (Priority: MEDIUM)
 
-- [ ] `src/app/shared/components/confirmation-modal/confirmation-modal.component.spec.ts`
-- [ ] `src/app/shared/components/detail-modal/detail-modal.component.spec.ts`
-- [ ] `src/app/shared/components/document-upload/document-upload.component.spec.ts`
-- [ ] `src/app/shared/components/pagination/pagination.component.spec.ts`
-- [ ] `src/app/shared/components/sla-badge/sla-badge.component.spec.ts`
-- [ ] `src/app/shared/components/sortable-header/sortable-header.component.spec.ts`
-- [ ] `src/app/shared/components/theme-toggle/theme-toggle.component.spec.ts`
-- [ ] `src/app/shared/components/toast/toast.component.spec.ts`
-- [ ] `src/app/shared/components/leaflet-map/leaflet-map.component.spec.ts`
+- [x] `src/app/shared/components/confirmation-modal/confirmation-modal.component.spec.ts`
+- [x] `src/app/shared/components/detail-modal/detail-modal.component.spec.ts`
+- [x] `src/app/shared/components/document-upload/document-upload.component.spec.ts`
+- [x] `src/app/shared/components/pagination/pagination.component.spec.ts`
+- [x] `src/app/shared/components/sla-badge/sla-badge.component.spec.ts`
+- [x] `src/app/shared/components/sortable-header/sortable-header.component.spec.ts`
+- [x] `src/app/shared/components/theme-toggle/theme-toggle.component.spec.ts`
+- [x] `src/app/shared/components/toast/toast.component.spec.ts`
 
 ---
 
@@ -222,8 +212,8 @@ npm install --save-dev @testing-library/angular @testing-library/jest-dom
   - [x] createRouterMock
   - [x] createActivatedRouteMock
 
-- [ ] `src/app/testing/mocks/models.mock.ts`
-  - [ ] Mock data generators for all models
+- [x] `src/app/testing/mocks/models.mock.ts`
+  - [x] Mock data generators for all models
 
 ---
 

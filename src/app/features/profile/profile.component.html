@@ -9,18 +9,17 @@
             <!-- Profile Picture -->
             <div class="relative group">
                 <div
-                    class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white/30 overflow-hidden bg-white/20 backdrop-blur-md shadow-inner flex items-center justify-center">
+                    class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white/30 overflow-hidden bg-white/20 backdrop-blur-md shadow-inner flex items-center justify-center relative">
                     @if (profile()?.profilePictureUrl) {
                     <img [src]="profile()?.profilePictureUrl" class="w-full h-full object-cover" alt="Profile">
                     } @else {
                     <span class="text-5xl font-bold uppercase">{{ user()?.username?.charAt(0) }}</span>
                     }
 
-                    <!-- Upload Overlay -->
+                    <!-- Camera Action Button (Always visible on small screens, hover on large) -->
                     <label
-                        class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                        <i class="pi pi-camera text-2xl mb-1"></i>
-                        <span class="text-xs font-bold uppercase tracking-wider">Change</span>
+                        class="absolute bottom-1 right-1 w-10 h-10 bg-white text-brand-main rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 transition-all border border-brand-soft">
+                        <i class="pi pi-camera text-lg"></i>
                         <input type="file" (change)="onPhotoSelected($event)" class="hidden" accept="image/*">
                     </label>
                 </div>
@@ -73,7 +72,7 @@
                 <div class="flex items-center justify-between mb-8">
                     <h2 class="text-2xl font-bold text-text-primary">Biodata Information</h2>
                     <button type="button" (click)="isEditing.set(!isEditing())"
-                        class="min-h-[44px] px-4 py-2 text-accent-700 hover:bg-accent-soft rounded-xl transition-colors font-bold flex items-center justify-center gap-2">
+                        [class]="isEditing() ? 'btn-secondary' : 'btn-primary'" class="gap-2">
                         <i [class]="isEditing() ? 'pi pi-times' : 'pi pi-user-edit'"></i>
                         {{ isEditing() ? 'Cancel Edit' : 'Edit Profile' }}
                     </button>

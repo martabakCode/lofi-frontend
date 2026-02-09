@@ -82,7 +82,13 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
                         break;
 
                     case 500:
-                        errorMessage = 'Something went wrong. Please try again later.';
+                        errorMessage = httpError.error?.message || 'Something went wrong. Please try again later.';
+                        console.error('[ErrorInterceptor] 500 Server Error:', {
+                            url: httpError.url,
+                            error: httpError.error,
+                            status: httpError.status,
+                            statusText: httpError.statusText
+                        });
                         toastService.show(errorMessage, 'error');
                         break;
 

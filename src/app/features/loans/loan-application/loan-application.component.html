@@ -136,7 +136,8 @@
                 <h4 class="text-lg font-bold text-text-primary mb-4">Required Documents</h4>
                 <div class="space-y-4">
                     <!-- KTP -->
-                    <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-border-default">
+                    <div
+                        class="flex items-center justify-between p-3 bg-bg-surface rounded-xl border border-border-default">
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
@@ -157,7 +158,7 @@
                             <input type="file" id="ktp" (change)="onFileSelected($event, 'KTP')" class="hidden"
                                 accept="image/*,.pdf">
                             <label for="ktp"
-                                class="cursor-pointer px-4 py-2 bg-white border border-border-default hover:bg-gray-50 text-text-primary rounded-lg text-sm font-medium transition-colors shadow-sm">
+                                class="cursor-pointer px-4 py-2 bg-bg-surface border border-border-default hover:bg-bg-muted text-text-primary rounded-lg text-sm font-medium transition-colors shadow-sm">
                                 Upload
                             </label>
                             }
@@ -165,7 +166,8 @@
                     </div>
 
                     <!-- NPWP -->
-                    <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-border-default">
+                    <div
+                        class="flex items-center justify-between p-3 bg-bg-surface rounded-xl border border-border-default">
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center">
@@ -186,36 +188,37 @@
                             <input type="file" id="npwp" (change)="onFileSelected($event, 'NPWP')" class="hidden"
                                 accept="image/*,.pdf">
                             <label for="npwp"
-                                class="cursor-pointer px-4 py-2 bg-white border border-border-default hover:bg-gray-50 text-text-primary rounded-lg text-sm font-medium transition-colors shadow-sm">
+                                class="cursor-pointer px-4 py-2 bg-bg-surface border border-border-default hover:bg-bg-muted text-text-primary rounded-lg text-sm font-medium transition-colors shadow-sm">
                                 Upload
                             </label>
                             }
                         </div>
                     </div>
 
-                    <!-- KK -->
-                    <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-border-default">
+                    <!-- Selfie with KTP -->
+                    <div
+                        class="flex items-center justify-between p-3 bg-bg-surface rounded-xl border border-border-default">
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center">
-                                <i class="pi pi-users"></i>
+                                <i class="pi pi-camera"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-text-primary">KK</p>
-                                <p class="text-xs text-text-muted">Family Card</p>
+                                <p class="font-medium text-text-primary">Photo with KTP</p>
+                                <p class="text-xs text-text-muted">Selfie holding KTP</p>
                             </div>
                         </div>
                         <div>
-                            @if (kkStatus() === 'done') {
+                            @if (selfieKtpStatus() === 'done') {
                             <span class="text-green-600 font-bold flex items-center gap-2"><i
                                     class="pi pi-check-circle"></i> Uploaded</span>
-                            } @else if (kkStatus() === 'uploading') {
+                            } @else if (selfieKtpStatus() === 'uploading') {
                             <i class="pi pi-spin pi-spinner text-brand-main"></i>
                             } @else {
-                            <input type="file" id="kk" (change)="onFileSelected($event, 'KK')" class="hidden"
-                                accept="image/*,.pdf">
-                            <label for="kk"
-                                class="cursor-pointer px-4 py-2 bg-white border border-border-default hover:bg-gray-50 text-text-primary rounded-lg text-sm font-medium transition-colors shadow-sm">
+                            <input type="file" id="selfieKtp" (change)="onFileSelected($event, 'SELFIE_KTP')"
+                                class="hidden" accept="image/*">
+                            <label for="selfieKtp"
+                                class="cursor-pointer px-4 py-2 bg-bg-surface border border-border-default hover:bg-bg-muted text-text-primary rounded-lg text-sm font-medium transition-colors shadow-sm">
                                 Upload
                             </label>
                             }

@@ -1,0 +1,4 @@
+/* Styles moved to template for better Tailwind v4 compatibility */
+:host {
+    display: block;
+}

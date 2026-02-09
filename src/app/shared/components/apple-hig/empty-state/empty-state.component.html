@@ -1,0 +1,11 @@
+<div class="flex flex-col items-center justify-center py-20 px-4">
+    <div class="w-20 h-20 rounded-2xl bg-bg-muted flex items-center justify-center mb-6">
+        <i [class]="icon" class="text-4xl text-text-muted opacity-50"></i>
+    </div>
+    <h3 class="text-xl font-semibold text-text-primary mb-2">{{ title }}</h3>
+    <p class="text-text-secondary text-center max-w-md mb-6">{{ message }}</p>
+    <button *ngIf="actionText" class="btn-primary" (click)="onActionClick()">
+        <i [class]="actionIcon" class="mr-2"></i>
+        {{ actionText }}
+    </button>
+</div>

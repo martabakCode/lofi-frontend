@@ -1,0 +1,38 @@
+<div class="activity-timeline space-y-6">
+    <div *ngFor="let item of items; let last = last" class="timeline-item flex gap-4 relative">
+        <!-- Vertical Line (except for last item) -->
+        <div class="absolute left-[15px] top-8 bottom-[-24px] w-0.5 bg-gray-200" *ngIf="!last"></div>
+
+        <div class="timeline-icon flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center border-2 border-white shadow-sm z-10"
+            [ngClass]="{
+                 'bg-green-100 text-green-600': item.type === 'success',
+                 'bg-yellow-100 text-yellow-600': item.type === 'warning',
+                 'bg-red-100 text-red-600': item.type === 'error',
+                 'bg-blue-100 text-blue-600': item.type === 'info',
+                 'bg-brand-soft text-brand-main': item.type === 'primary'
+             }">
+            <i [class]="item.icon" class="text-sm"></i>
+        </div>
+
+        <div class="timeline-content flex-1 pt-1">
+            <div class="flex justify-between items-start">
+                <p class="font-medium text-text-primary text-sm">{{ item.title }}</p>
+                <span class="text-xs text-text-muted whitespace-nowrap ml-2">{{ item.timestamp | date:'MMM d, h:mm a'
+                    }}</span>
+            </div>
+
+            <p *ngIf="item.description" class="text-text-secondary text-sm mt-0.5">
+                {{ item.description }}
+            </p>
+
+            <p *ngIf="item.user" class="text-xs text-text-muted mt-1">
+                by {{ item.user }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Empty State for Timeline -->
+    <div *ngIf="items.length === 0" class="text-center py-6 text-text-muted text-sm italic">
+        No activity recorded yet
+    </div>
+</div>

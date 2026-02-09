@@ -33,7 +33,7 @@ export class RbacService {
   private buildParams(params: PaginationParams): HttpParams {
     let httpParams = new HttpParams();
     if (params.page !== undefined) {
-      httpParams = httpParams.set('page', params.page.toString());
+      httpParams = httpParams.set('page', (params.page - 1).toString());
     }
     if (params.pageSize !== undefined) {
       httpParams = httpParams.set('size', params.pageSize.toString());
@@ -56,8 +56,14 @@ export class RbacService {
   }
 
   getAllBranches(): Observable<Branch[]> {
-    return this.http.get<ApiResponse<Branch[]>>(`${this.baseUrl}/rbac/branches/all`).pipe(
-      map(res => res.data)
+    // Use paginated endpoint with large pageSize instead of non-existent /all endpoint
+    return this.http.get<ApiResponse<any>>(`${this.baseUrl}/rbac/branches`, {
+      params: new HttpParams().set('size', '1000')
+    }).pipe(
+      map(res => {
+        if (Array.isArray(res.data)) return res.data;
+        return res.data?.items || res.data?.content || [];
+      })
     );
   }
 
@@ -105,8 +111,14 @@ export class RbacService {
   }
 
   getAllPermissions(): Observable<Permission[]> {
-    return this.http.get<ApiResponse<Permission[]>>(`${this.baseUrl}/rbac/permissions/all`).pipe(
-      map(res => res.data)
+    // Use paginated endpoint with large pageSize instead of non-existent /all endpoint
+    return this.http.get<ApiResponse<any>>(`${this.baseUrl}/rbac/permissions`, {
+      params: new HttpParams().set('size', '1000')
+    }).pipe(
+      map(res => {
+        if (Array.isArray(res.data)) return res.data;
+        return res.data?.items || res.data?.content || [];
+      })
     );
   }
 
@@ -131,8 +143,14 @@ export class RbacService {
   }
 
   getAllRoles(): Observable<Role[]> {
-    return this.http.get<ApiResponse<Role[]>>(`${this.baseUrl}/rbac/roles/all`).pipe(
-      map(res => res.data)
+    // Use paginated endpoint with large pageSize instead of non-existent /all endpoint
+    return this.http.get<ApiResponse<any>>(`${this.baseUrl}/rbac/roles`, {
+      params: new HttpParams().set('size', '1000')
+    }).pipe(
+      map(res => {
+        if (Array.isArray(res.data)) return res.data;
+        return res.data?.items || res.data?.content || [];
+      })
     );
   }
 
@@ -166,7 +184,7 @@ export class RbacService {
       httpParams = httpParams.set('status', params.status);
     }
 
-    return this.http.get<ApiResponse<PaginatedResponse<User>>>(`${this.baseUrl}/users`, { params: httpParams }).pipe(
+    return this.http.get<ApiResponse<PaginatedResponse<User>>>(`${this.baseUrl}/rbac/users`, { params: httpParams }).pipe(
       map(res => toPaginatedResponse(res.data))
     );
   }
@@ -176,7 +194,7 @@ export class RbacService {
   }
 
   createUser(user: Partial<User>): Observable<User> {
-    return this.http.post<ApiResponse<User>>(`${this.baseUrl}/users`, user).pipe(map(res => res.data));
+    return this.http.post<ApiResponse<User>>(`${this.baseUrl}/rbac/users`, user).pipe(map(res => res.data));
   }
 
   updateUser(id: string, user: Partial<User>): Observable<User> {
@@ -184,6 +202,6 @@ export class RbacService {
   }
 
   deleteUser(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/users/admin/users/${id}`);
+    return this.http.delete<void>(`${this.baseUrl}/rbac/users/${id}`);
   }
 }

@@ -1,0 +1,141 @@
+<div class="space-y-8 max-w-6xl mx-auto pb-12">
+    <!-- Header -->
+    <app-page-header [title]="isEditMode() ? 'Edit Branch' : 'Add New Branch'"
+        [subtitle]="isEditMode() ? 'Update branch details and location' : 'Create a new branch location'">
+        <div actions class="flex items-center gap-3">
+            <button type="button" (click)="goBack()"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-main transition-all">
+                Cancel
+            </button>
+            <button type="button" (click)="onSubmit()" [disabled]="isSubmitting() || branchForm.invalid"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-brand-main hover:bg-brand-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-main disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                <i *ngIf="isSubmitting()" class="pi pi-spin pi-spinner mr-2"></i>
+                {{ isEditMode() ? 'Save Changes' : 'Create Branch' }}
+            </button>
+        </div>
+    </app-page-header>
+
+    <form [formGroup]="branchForm" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Main Content -->
+        <div class="lg:col-span-7 space-y-6">
+            <app-card title="Basic Information" icon="pi-building">
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Branch Name <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" formControlName="name"
+                            class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-main focus:ring-brand-main sm:text-sm"
+                            placeholder="Enter branch name"
+                            [class.border-red-300]="branchForm.get('name')?.invalid && branchForm.get('name')?.touched">
+                        <p *ngIf="branchForm.get('name')?.invalid && branchForm.get('name')?.touched"
+                            class="mt-1 text-sm text-red-600">
+                            Branch name is required
+                        </p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Address <span
+                                class="text-red-500">*</span></label>
+                        <textarea formControlName="address" rows="3"
+                            class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-main focus:ring-brand-main sm:text-sm"
+                            placeholder="Enter full address"
+                            [class.border-red-300]="branchForm.get('address')?.invalid && branchForm.get('address')?.touched"></textarea>
+                        <p *ngIf="branchForm.get('address')?.invalid && branchForm.get('address')?.touched"
+                            class="mt-1 text-sm text-red-600">
+                            Address is required
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">City <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text" formControlName="city"
+                                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-main focus:ring-brand-main sm:text-sm"
+                                placeholder="City"
+                                [class.border-red-300]="branchForm.get('city')?.invalid && branchForm.get('city')?.touched">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">State <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text" formControlName="state"
+                                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-main focus:ring-brand-main sm:text-sm"
+                                placeholder="State">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ZIP Code <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text" formControlName="zipCode"
+                                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-main focus:ring-brand-main sm:text-sm"
+                                placeholder="ZIP Code">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text" formControlName="phone"
+                                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-main focus:ring-brand-main sm:text-sm"
+                                placeholder="Phone number">
+                        </div>
+                    </div>
+                </div>
+            </app-card>
+
+            <div *ngIf="error()" class="rounded-md bg-red-50 p-4 border border-red-200">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="pi pi-times-circle text-red-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">Error submitting form</h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <p>{{ error() }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar / Location -->
+        <div class="lg:col-span-5 space-y-6">
+            <app-card title="Location" icon="pi-map-marker">
+                <div class="space-y-4">
+                    <div
+                        class="bg-blue-50 border border-blue-100 rounded-lg p-3 text-sm text-blue-700 flex items-start gap-2">
+                        <i class="pi pi-info-circle mt-0.5 text-blue-500"></i>
+                        <span>Click on the map to automatically set the latitude and longitude.</span>
+                    </div>
+
+                    <div class="h-64 md:h-80 w-full rounded-lg overflow-hidden border border-gray-200">
+                        <app-leaflet-map [defaultLocation]="getCurrentLocation()" [showCoordinates]="false"
+                            (locationChange)="onLocationChange($event)">
+                        </app-leaflet-map>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 pt-2">
+                        <div>
+                            <label
+                                class="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wide">Latitude</label>
+                            <div class="relative rounded-md shadow-sm">
+                                <input type="text" formControlName="latitude" readonly
+                                    class="block w-full rounded-md border-gray-300 bg-gray-50 text-gray-500 focus:border-gray-300 focus:ring-0 sm:text-sm"
+                                    placeholder="Click map">
+                            </div>
+                        </div>
+                        <div>
+                            <label
+                                class="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wide">Longitude</label>
+                            <div class="relative rounded-md shadow-sm">
+                                <input type="text" formControlName="longitude" readonly
+                                    class="block w-full rounded-md border-gray-300 bg-gray-50 text-gray-500 focus:border-gray-300 focus:ring-0 sm:text-sm"
+                                    placeholder="Click map">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </app-card>
+        </div>
+    </form>
+</div>

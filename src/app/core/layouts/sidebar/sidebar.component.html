@@ -1,51 +1,84 @@
-<aside class="sidebar fixed inset-y-0 left-0 z-50 w-64 transform transition-all duration-300 lg:translate-x-0"
-    [class.translate-x-0]="isOpen()" [class.-translate-x-full]="!isOpen()">
+<aside class="sidebar fixed inset-y-0 left-0 z-50 transform transition-all duration-300 lg:translate-x-0"
+    [class.w-64]="!isCollapsed()" [class.w-20]="isCollapsed()" [class.translate-x-0]="isOpen()"
+    [class.-translate-x-full]="!isOpen()" [class.collapsed]="isCollapsed()">
 
-    <div class="logo-container">
-        <div class="flex items-center gap-4">
-            <img src="logo.png" alt="LoFi Logo"
-                class="w-8 h-8 rounded object-contain transition-transform hover:scale-105 duration-300">
-            <span class="text-xl font-extrabold text-text-primary tracking-tight">
+    <div class="logo-container relative">
+        <div class="flex items-center gap-3 overflow-hidden">
+            <img src="assets/logo.png" alt="LoFi Logo"
+                class="w-8 h-8 rounded object-contain transition-transform hover:scale-105 duration-300 min-w-[2rem]">
+            <span
+                class="text-xl font-extrabold text-text-primary tracking-tight logo-text whitespace-nowrap opacity-100 transition-opacity duration-200">
                 Lofi<span
                     class="text-transparent bg-clip-text bg-gradient-to-r from-brand-main to-brand-accent">Admin</span>
             </span>
         </div>
+
+        <!-- Desktop Collapse Toggle -->
+        <button (click)="toggleCollapse()"
+            class="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-bg-surface border border-border-default rounded-full items-center justify-center shadow-sm hover:bg-bg-muted text-text-muted z-50 collapse-btn transition-all duration-200">
+            <i class="pi" [class.pi-angle-left]="!isCollapsed()" [class.pi-angle-right]="isCollapsed()"
+                style="font-size: 0.7rem;"></i>
+        </button>
     </div>
 
     <nav class="menu-section">
         <div class="menu-label">Main Navigation</div>
 
         <a routerLink="/dashboard" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }"
-            class="menu-item">
+            class="menu-item" title="Dashboard">
             <i class="pi pi-home"></i>
             <span>Dashboard</span>
         </a>
 
+        <a routerLink="/dashboard/notifications/my" routerLinkActive="active-link"
+            class="menu-item flex justify-between items-center group" title="My Notifications">
+            <div class="flex items-center gap-3 w-full">
+                <i class="pi pi-bell"></i>
+                <span class="truncate flex-1">My Notifications</span>
+                @if (notificationFacade.unreadCount() > 0) {
+                <span class="nav-badge">
+                    {{ notificationFacade.unreadCount() }}
+                </span>
+                }
+            </div>
+        </a>
+
+        @if (isAdmin()) {
+        <a routerLink="/dashboard/notifications/manage" routerLinkActive="active-link"
+            class="menu-item flex items-center group" title="Manage Notifications">
+            <i class="pi pi-cog"></i>
+            <span>Manage Notifications</span>
+        </a>
+        }
+
         <!-- Loan Management -->
-        <ng-container *ngIf="isAdmin() || hasAnyRole(['ROLE_MARKETING', 'ROLE_CUSTOMER'])">
+        <ng-container *ngIf="hasAnyRole(['ROLE_CUSTOMER'])">
             <div class="menu-label mt-6">Loan Management</div>
-            <a routerLink="/dashboard/loans/apply" routerLinkActive="active-link" class="menu-item">
+            <a routerLink="/dashboard/loans/apply" routerLinkActive="active-link" class="menu-item" title="Apply Loan">
                 <i class="pi pi-pencil"></i>
                 <span>Apply Loan</span>
             </a>
         </ng-container>
 
         <ng-container *ngIf="isAdmin() || hasAnyRole(['ROLE_MARKETING'])">
-            <a routerLink="/dashboard/loans/review" routerLinkActive="active-link" class="menu-item">
+            <a routerLink="/dashboard/loans/review" routerLinkActive="active-link" class="menu-item"
+                title="Loan Review">
                 <i class="pi pi-search-plus"></i>
                 <span>Loan Review</span>
             </a>
         </ng-container>
 
         <ng-container *ngIf="isAdmin() || hasAnyRole(['ROLE_BRANCH_MANAGER', 'ROLE_BACK_OFFICE'])">
-            <a routerLink="/dashboard/loans/approval" routerLinkActive="active-link" class="menu-item">
+            <a routerLink="/dashboard/loans/approval" routerLinkActive="active-link" class="menu-item"
+                title="Loan Approval">
                 <i class="pi pi-check-square"></i>
                 <span>Loan Approval</span>
             </a>
         </ng-container>
 
         <ng-container *ngIf="isAdmin() || hasAnyRole(['ROLE_BACK_OFFICE'])">
-            <a routerLink="/dashboard/disbursements" routerLinkActive="active-link" class="menu-item">
+            <a routerLink="/dashboard/disbursements" routerLinkActive="active-link" class="menu-item"
+                title="Disbursements">
                 <i class="pi pi-money-bill"></i>
                 <span>Disbursements</span>
             </a>
@@ -55,30 +88,37 @@
         <ng-container *ngIf="isAdmin()">
             <div class="menu-label mt-6">Configurations</div>
 
-            <a routerLink="/dashboard/products" routerLinkActive="active-link" class="menu-item">
+            <a routerLink="/dashboard/products" routerLinkActive="active-link" class="menu-item" title="Products">
                 <i class="pi pi-box"></i>
                 <span>Products</span>
             </a>
 
-            <a routerLink="/dashboard/users" routerLinkActive="active-link" class="menu-item">
+            <a routerLink="/dashboard/users" routerLinkActive="active-link" class="menu-item" title="Staff & Roles">
                 <i class="pi pi-users"></i>
                 <span>Staff & Roles</span>
             </a>
 
-            <a routerLink="/dashboard/branches" routerLinkActive="active-link" class="menu-item">
+            <a routerLink="/dashboard/branches" routerLinkActive="active-link" class="menu-item" title="Branches">
                 <i class="pi pi-map-marker"></i>
                 <span>Branches</span>
             </a>
 
-            <a routerLink="/dashboard/roles" routerLinkActive="active-link" class="menu-item">
+            <a routerLink="/dashboard/roles" routerLinkActive="active-link" class="menu-item" title="Permissions">
                 <i class="pi pi-shield"></i>
                 <span>Permissions</span>
             </a>
         </ng-container>
+
+        <!-- Account Section (Everyone) -->
+        <div class="menu-label mt-6">Account Settings</div>
+        <a routerLink="/dashboard/profile" routerLinkActive="active-link" class="menu-item" title="My Profile">
+            <i class="pi pi-user"></i>
+            <span>My Profile</span>
+        </a>
     </nav>
 
     <div class="logout-container">
-        <button type="button" (click)="onLogout.emit()" class="btn-logout">
+        <button type="button" (click)="onLogout.emit()" class="btn-logout" title="Sign Out">
             <i class="pi pi-power-off"></i>
             <span>Sign Out</span>
         </button>

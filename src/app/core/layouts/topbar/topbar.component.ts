@@ -1,7 +1,8 @@
-import { Component, input, output, inject } from '@angular/core';
+import { Component, input, output, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { ThemeService } from '../../../core/services/theme.service';
 import { ThemeToggleComponent } from '../../../shared/components/theme-toggle/theme-toggle.component';
 import { NotificationPanelComponent } from './notification-panel.component';
 import { ProfileMenuComponent } from './profile-menu.component';
@@ -16,7 +17,7 @@ import { ProfileMenuComponent } from './profile-menu.component';
         <div class="flex items-center gap-4 flex-1">
             <!-- Mobile Logo -->
             <a routerLink="/dashboard" class="lg:hidden flex items-center gap-2">
-                <img src="logo.png" alt="LoFi Logo" class="w-7 h-7 rounded object-contain">
+                <img src="assets/logo.png" alt="LoFi Logo" class="w-7 h-7 rounded object-contain">
             </a>
             <button (click)="onToggleSidebar.emit()" class="lg:hidden p-2 text-text-muted hover:bg-bg-muted rounded-lg transition-colors">
                 <i class="pi pi-bars text-xl"></i>
@@ -46,6 +47,34 @@ import { ProfileMenuComponent } from './profile-menu.component';
   `,
     styles: [`
     :host { display: block; width: 100%; }
+    
+    /* Synchronized dark theme styles for topbar */
+    :host ::ng-deep .topbar-search {
+        background: var(--bg-muted);
+        border-color: var(--border-default);
+        color: var(--text-primary);
+        transition: all 0.2s ease;
+    }
+    
+    :host ::ng-deep .topbar-search:focus-within {
+        border-color: var(--brand-accent);
+        box-shadow: 0 0 0 2px rgba(0, 227, 234, 0.1);
+    }
+    
+    :host ::ng-deep .topbar-button {
+        color: var(--text-muted);
+        transition: all 0.2s ease;
+    }
+    
+    :host ::ng-deep .topbar-button:hover {
+        background: var(--bg-muted);
+        color: var(--text-primary);
+    }
+    
+    /* Dark mode specific adjustments */
+    :host-context(.dark) .topbar-search {
+        background: var(--bg-muted);
+    }
   `]
 })
 export class TopbarComponent {
@@ -53,7 +82,12 @@ export class TopbarComponent {
     onToggleSidebar = output<void>();
 
     private router = inject(Router);
+    private themeService = inject(ThemeService);
+
     searchQuery = '';
+
+    // Computed property for dark mode state
+    isDarkMode = computed(() => this.themeService.isDarkMode());
 
     menuItems: any[] = [
         { label: 'Profile', icon: 'pi pi-user' },

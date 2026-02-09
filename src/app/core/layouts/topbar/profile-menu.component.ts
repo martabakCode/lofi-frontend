@@ -41,11 +41,15 @@ export class ProfileMenuComponent {
         if (!roles || roles.length === 0) return '';
         const role = roles[0];
         const name = typeof role === 'string' ? role : role.name;
-        return name ? name.replace('ROLE_', '').replace('_', ' ') : '';
+        // Clean up ROLE_ prefix and handle SUPER_ADMIN case elegantly
+        return name ? name.replace('ROLE_', '').replace(/_/g, ' ') : '';
     }
 
     getInitials(): string {
-        return this.user()?.fullName?.[0]?.toUpperCase() || 'G';
+        const u = this.user();
+        if (!u) return 'G';
+        const name = u.fullName || u.username || 'User';
+        return name.charAt(0).toUpperCase();
     }
 
     logout() {

@@ -12,7 +12,8 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="sticky top-0 z-50 bg-surface-0/90 backdrop-blur-sm border-b border-surface-200 transition-colors">
+    <nav
+        class="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700 transition-colors">
         <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer" (click)="scrollToSection('hero')">
                 <img src="logo.png" alt="LoFi Logo" class="w-8 h-8 rounded object-contain">
@@ -30,7 +31,7 @@
 
             <div class="flex items-center gap-4">
                 <button (click)="toggleTheme()"
-                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-100 border border-surface-200 transition-all hover:bg-surface-200">
+                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all hover:bg-slate-200 dark:hover:bg-slate-700">
                     <span *ngIf="isDarkMode">🌞</span>
                     <span *ngIf="!isDarkMode">🌚</span>
                 </button>
@@ -60,7 +61,7 @@
             </p>
             <div class="flex flex-wrap gap-4">
                 <button (click)="scrollToSection('features')"
-                    class="bg-surface-0 border border-surface-200 px-8 py-4 rounded-2xl font-bold transition-all hover:bg-surface-100 group">
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-8 py-4 rounded-2xl font-bold transition-all hover:bg-slate-100 dark:hover:bg-slate-700 group">
                     Pelajari Fitur
                     <span class="inline-block transition-transform group-hover:translate-x-1">→</span>
                 </button>
@@ -71,15 +72,16 @@
             <div
                 class="aspect-square bg-gradient-to-tr from-primary-500 to-primary-800 rounded-[3rem] shadow-2xl overflow-hidden group rotate-2 hover:rotate-0 transition-transform duration-700">
                 <div class="absolute inset-0 bg-black/10 dark:bg-white/5 flex items-center justify-center p-12">
-                    <div class="w-full h-full bg-surface-0 rounded-3xl shadow-xl p-8 border border-white/20">
+                    <div
+                        class="w-full h-full bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-8 border border-white/20">
                         <div class="flex gap-1.5 mb-6">
                             <div class="w-2.5 h-2.5 rounded-full bg-red-400/50"></div>
                             <div class="w-2.5 h-2.5 rounded-full bg-yellow-400/50"></div>
                             <div class="w-2.5 h-2.5 rounded-full bg-green-400/50"></div>
                         </div>
                         <div class="space-y-4">
-                            <div class="h-3 w-3/4 bg-surface-100 rounded"></div>
-                            <div class="h-3 w-1/2 bg-surface-100 rounded opacity-60"></div>
+                            <div class="h-3 w-3/4 bg-slate-100 dark:bg-slate-700 rounded"></div>
+                            <div class="h-3 w-1/2 bg-slate-100 dark:bg-slate-700 rounded opacity-60"></div>
                             <div class="pt-8 space-y-3">
                                 <div
                                     class="h-10 w-full bg-primary-100/50 dark:bg-primary-900/20 border border-primary-200/50 dark:border-primary-800/50 rounded-xl flex items-center px-4">
@@ -87,9 +89,9 @@
                                     <div class="h-2 w-24 bg-primary-600/30 rounded"></div>
                                 </div>
                                 <div
-                                    class="h-10 w-full bg-surface-50 border border-surface-200 rounded-xl flex items-center px-4">
-                                    <div class="w-2 h-2 rounded-full bg-surface-300 mr-3"></div>
-                                    <div class="h-2 w-32 bg-surface-200 rounded"></div>
+                                    class="h-10 w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl flex items-center px-4">
+                                    <div class="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-500 mr-3"></div>
+                                    <div class="h-2 w-32 bg-slate-200 dark:bg-slate-600 rounded"></div>
                                 </div>
                             </div>
                         </div>
@@ -106,7 +108,8 @@
     </header>
 
     <!-- Problem-Solution Section -->
-    <section id="problem" class="bg-surface-100/50 py-32 border-y border-surface-200 transition-colors">
+    <section id="problem"
+        class="bg-slate-100/50 dark:bg-slate-800/50 py-32 border-y border-slate-200 dark:border-slate-700 transition-colors">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-20">
             <div>
                 <h2 class="text-xs font-black uppercase tracking-[0.4em] text-primary-600 mb-6">Masalah Umum</h2>
@@ -123,7 +126,7 @@
                 </ul>
             </div>
             <div
-                class="bg-surface-0 p-10 rounded-[2.5rem] shadow-xl border border-surface-200 transition-all hover:shadow-2xl">
+                class="bg-white dark:bg-slate-800 p-10 rounded-[2.5rem] shadow-xl border border-slate-200 dark:border-slate-700 transition-all hover:shadow-2xl">
                 <h2 class="text-xs font-black uppercase tracking-[0.4em] text-green-600 mb-6 font-bold">Solusi LoFi</h2>
                 <h3 class="text-4xl font-black mb-10 leading-tight">Kecepatan tanpa kompromi.</h3>
                 <ul class="space-y-6">
@@ -132,7 +135,7 @@
                             class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center transition-transform group-hover:rotate-[360deg] duration-500">
                             <span class="text-green-600 text-xs text-bold">✓</span>
                         </div>
-                        <span class="text-sm font-bold text-surface-800">{{ s.text }}</span>
+                        <span class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ s.text }}</span>
                     </li>
                 </ul>
             </div>
@@ -155,14 +158,15 @@
                 <p class="text-sm opacity-60 leading-relaxed">{{ step.description }}</p>
                 <!-- Line decoration for desktop -->
                 <div *ngIf="i < 3"
-                    class="hidden md:block absolute top-8 left-[calc(100%-2rem)] w-full h-[2px] bg-surface-200 -z-10">
+                    class="hidden md:block absolute top-8 left-[calc(100%-2rem)] w-full h-[2px] bg-slate-200 dark:bg-slate-700 -z-10">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Simuasi Kredit Section -->
-    <section id="simulation" class="py-32 bg-surface-50 border-y border-surface-200 transition-colors">
+    <section id="simulation"
+        class="py-32 bg-slate-50 dark:bg-slate-900 border-y border-slate-200 dark:border-slate-700 transition-colors">
         <div class="max-w-4xl mx-auto px-6">
             <div class="text-center mb-16">
                 <h2 class="text-4xl font-black mb-4">Simulasi Kredit</h2>
@@ -170,16 +174,18 @@
                     pengajuan sebenarnya.</p>
             </div>
 
-            <div class="bg-surface-0 rounded-[2.5rem] shadow-xl border border-surface-200 overflow-hidden">
+            <div
+                class="bg-white dark:bg-slate-800 rounded-[2.5rem] shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
                 <div class="grid grid-cols-1 md:grid-cols-2">
                     <!-- Input Area -->
-                    <div class="p-10 space-y-8 border-b md:border-b-0 md:border-r border-surface-200">
+                    <div
+                        class="p-10 space-y-8 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-700">
                         <!-- Product Selection -->
                         <div class="space-y-3">
                             <label class="text-xs font-bold uppercase tracking-wider opacity-60">Pilih Produk</label>
                             <div class="relative">
                                 <select [(ngModel)]="simSelectedProductId" (change)="onProductChange()"
-                                    class="w-full bg-surface-50 border border-surface-200 rounded-2xl px-5 py-4 font-bold text-lg outline-none focus:border-primary-600 transition-colors cursor-pointer appearance-none text-text-primary pr-10">
+                                    class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-2xl px-5 py-4 font-bold text-lg outline-none focus:border-primary-600 transition-colors cursor-pointer appearance-none text-text-primary pr-10">
                                     <option value="" disabled selected>Pilih salah satu...</option>
                                     <option *ngFor="let p of products()" [value]="p.id">
                                         {{ p.name }} ({{ p.interestRate }}%)
@@ -213,7 +219,7 @@
 
                                 <input type="range" [(ngModel)]="simAmount" [min]="selectedProduct.minAmount"
                                     [max]="selectedProduct.maxAmount" [step]="1000000"
-                                    class="w-full h-2 bg-surface-200 rounded-full appearance-none cursor-pointer accent-primary-600 hover:accent-primary-500 transition-all">
+                                    class="w-full h-2 bg-slate-200 dark:bg-slate-600 rounded-full appearance-none cursor-pointer accent-primary-600 hover:accent-primary-500 transition-all">
 
                                 <div
                                     class="flex justify-between text-[10px] font-bold opacity-40 uppercase tracking-widest">
@@ -234,7 +240,7 @@
 
                                 <input type="range" [(ngModel)]="simTenor" [min]="selectedProduct.minTenor"
                                     [max]="selectedProduct.maxTenor" [step]="1"
-                                    class="w-full h-2 bg-surface-200 rounded-full appearance-none cursor-pointer accent-primary-600 hover:accent-primary-500 transition-all">
+                                    class="w-full h-2 bg-slate-200 dark:bg-slate-600 rounded-full appearance-none cursor-pointer accent-primary-600 hover:accent-primary-500 transition-all">
 
                                 <div
                                     class="flex justify-between text-[10px] font-bold opacity-40 uppercase tracking-widest">
@@ -247,7 +253,7 @@
 
                         <!-- Empty State for Sliders -->
                         <div *ngIf="!selectedProduct"
-                            class="py-12 border-2 border-dashed border-surface-200 rounded-2xl flex flex-col items-center justify-center text-center opacity-40">
+                            class="py-12 border-2 border-dashed border-slate-200 dark:border-slate-600 rounded-2xl flex flex-col items-center justify-center text-center opacity-40">
                             <span class="text-4xl mb-2">👆</span>
                             <p class="text-sm font-bold">Pilih produk diatas untuk memulai simulasi</p>
                         </div>
@@ -327,7 +333,7 @@
     </section>
 
     <!-- Benefits Section -->
-    <section id="benefits" class="py-32 bg-surface-0 transition-colors">
+    <section id="benefits" class="py-32 bg-white dark:bg-slate-900 transition-colors">
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex flex-col lg:flex-row gap-20 items-center">
                 <div class="lg:w-1/2">
@@ -342,11 +348,11 @@
                                 <span
                                     class="w-3 h-3 rounded-full bg-primary-600 shadow-sm shadow-primary-500/20"></span>
                                 <h4
-                                    class="text-xl font-bold tracking-tight text-surface-900 group-hover:text-primary-600 transition-colors">
+                                    class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 group-hover:text-primary-600 transition-colors">
                                     {{ b.title }}
                                 </h4>
                             </div>
-                            <p class="text-sm text-surface-600 leading-relaxed font-bold">
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-bold">
                                 {{ b.description }}
                             </p>
                         </div>
@@ -356,7 +362,7 @@
                 <div class="lg:w-1/2 w-full grid grid-cols-2 gap-4">
                     <div class="space-y-4">
                         <div
-                            class="h-48 rounded-3xl bg-surface-100 border border-surface-200 flex items-center justify-center text-4xl shadow-inner">
+                            class="h-48 rounded-3xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-4xl shadow-inner">
                             ⚡</div>
                         <div
                             class="h-64 rounded-3xl bg-primary-600 flex flex-col justify-end p-8 text-white shadow-xl relative overflow-hidden group">
@@ -367,7 +373,7 @@
                     </div>
                     <div class="space-y-4 pt-12">
                         <div
-                            class="h-64 rounded-3xl bg-surface-900 flex flex-col justify-end p-8 text-white group shadow-xl transition-all hover:bg-surface-800">
+                            class="h-64 rounded-3xl bg-slate-900 dark:bg-slate-800 flex flex-col justify-end p-8 text-white group shadow-xl transition-all hover:bg-slate-800 dark:hover:bg-slate-700">
                             <span class="text-4xl mb-4 text-primary-500">🔒</span>
                             <span class="text-sm font-bold uppercase tracking-widest opacity-60">Secure Vault</span>
                         </div>
@@ -383,7 +389,8 @@
 
     <!-- CTA Section -->
     <section class="py-32 text-center transition-colors">
-        <div class="max-w-4xl mx-auto px-6 bg-surface-100 py-20 rounded-[3rem] border border-surface-200 shadow-2xl">
+        <div
+            class="max-w-4xl mx-auto px-6 bg-slate-100 dark:bg-slate-800 py-20 rounded-[3rem] border border-slate-200 dark:border-slate-700 shadow-2xl">
             <h2 class="text-4xl md:text-6xl font-black mb-8 tracking-tighter">Mulai Transformasi <span
                     class="text-primary-600">Hari Ini</span></h2>
             <p class="text-lg opacity-60 mb-12 max-w-xl mx-auto font-medium">
@@ -394,7 +401,7 @@
     </section>
 
     <!-- Footer -->
-    <footer class="py-20 border-t border-surface-200 bg-surface-0 transition-colors">
+    <footer class="py-20 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 transition-colors">
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex flex-col md:flex-row justify-between items-center gap-8 mb-16">
                 <div class="flex items-center gap-2">
@@ -413,7 +420,7 @@
                 </div>
             </div>
             <div
-                class="pt-8 border-t border-surface-200 flex justify-between items-center gap-4 text-[10px] uppercase font-black tracking-[0.3em] opacity-30">
+                class="pt-8 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center gap-4 text-[10px] uppercase font-black tracking-[0.3em] opacity-30">
                 <span>&copy; 2026 LOFI INC.</span>
                 <span class="hidden sm:block">SISTEM ALUR KERJA TERPADU</span>
                 <span>STATUS: STABLE</span>

@@ -10,34 +10,41 @@ export interface SortConfig {
   selector: 'app-sortable-header',
   standalone: true,
   imports: [CommonModule],
+  // Use attribute selector so it can be applied directly to th element
+  host: {
+    '[class.cursor-pointer]': 'true',
+    '[class.select-none]': 'true',
+    '[class.text-brand-main]': 'isActive()',
+    '(click)': 'toggleSort()'
+  },
   template: `
-    <th 
-      (click)="toggleSort()"
-      class="cursor-pointer select-none hover:bg-bg-muted/50 transition-colors"
-      [class.text-brand-main]="isActive()">
-      <div class="flex items-center gap-1">
-        <ng-content></ng-content>
-        <span class="sort-icon">
-          <i *ngIf="!isActive()" class="pi pi-sort text-text-muted text-xs"></i>
-          <i *ngIf="isActive() && direction() === 'asc'" class="pi pi-sort-up text-brand-main text-xs"></i>
-          <i *ngIf="isActive() && direction() === 'desc'" class="pi pi-sort-down text-brand-main text-xs"></i>
-        </span>
-      </div>
-    </th>
+    <div class="flex items-center gap-1 w-full">
+      <ng-content></ng-content>
+      <span class="sort-icon ml-auto">
+        <i *ngIf="!isActive()" class="pi pi-sort text-text-muted text-xs"></i>
+        <i *ngIf="isActive() && direction() === 'asc'" class="pi pi-sort-up text-brand-main text-xs"></i>
+        <i *ngIf="isActive() && direction() === 'desc'" class="pi pi-sort-down text-brand-main text-xs"></i>
+      </span>
+    </div>
   `,
   styles: [`
-    :host { display: table-cell; }
-    
-    th {
+    :host {
+      display: table-cell;
       padding: 0.75rem 1rem;
       background-color: var(--bg-muted);
       font-weight: 600;
       color: var(--text-secondary);
       border-bottom: 1px solid var(--border-default);
+      transition: background-color 0.15s ease;
+      white-space: nowrap;
+    }
+    
+    :host:hover {
+      background-color: rgba(var(--bg-muted-rgb, 241, 245, 249), 0.7);
     }
     
     .sort-icon {
-      margin-left: 0.25rem;
+      flex-shrink: 0;
     }
   `]
 })

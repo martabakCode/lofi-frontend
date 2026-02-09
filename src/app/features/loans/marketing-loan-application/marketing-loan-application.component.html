@@ -1,54 +1,54 @@
-<div class="max-w-4xl mx-auto py-8 px-4">
+<div class="max-w-7xl mx-auto py-8 px-4">
     <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">Marketing Loan Application</h1>
-        <p class="text-gray-500">Apply on behalf of a customer</p>
+        <h1 class="text-3xl font-bold text-text-primary">Marketing Loan Application</h1>
+        <p class="text-text-secondary">Apply on behalf of a customer</p>
     </div>
 
     <!-- Initialization Form -->
-    <div *ngIf="!submittedLoanId()" class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+    <div *ngIf="!submittedLoanId()" class="bg-bg-surface rounded-xl shadow-lg p-6 md:p-8">
         <form [formGroup]="applyForm" (ngSubmit)="onApply()" class="space-y-8">
 
             <!-- Section: Personal Info -->
             <div>
                 <h3 class="text-lg font-semibold text-text-primary border-b border-border-muted pb-2 mb-4">Personal
                     Information</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">Full Name</label>
                         <input type="text" formControlName="fullName"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">Email</label>
                         <input type="email" formControlName="email"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">Phone Number</label>
                         <input type="tel" formControlName="phoneNumber"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">NIK (16 digits)</label>
                         <input type="text" formControlName="nik" maxlength="16"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">Place of Birth</label>
                         <input type="text" formControlName="placeOfBirth"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">Date of Birth</label>
                         <input type="date" formControlName="dateOfBirth"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">Gender</label>
                         <select formControlName="gender"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
                             <option value="MALE">Male</option>
                             <option value="FEMALE">Female</option>
                         </select>
@@ -56,10 +56,18 @@
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">Marital Status</label>
                         <select formControlName="maritalStatus"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
                             <option value="SINGLE">Single</option>
                             <option value="MARRIED">Married</option>
                             <option value="DIVORCED">Divorced</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Education</label>
+                        <select formControlName="education"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
+                            <option value="" disabled>Select Education</option>
+                            <option *ngFor="let edu of educationOptions" [value]="edu.value">{{ edu.label }}</option>
                         </select>
                     </div>
                 </div>
@@ -69,35 +77,36 @@
             <div>
                 <h3 class="text-lg font-semibold text-text-primary border-b border-border-muted pb-2 mb-4">Employment &
                     Financial</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">Occupation</label>
-                        <input type="text" formControlName="occupation"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-text-secondary">Education</label>
-                        <input type="text" formControlName="education"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                        <select formControlName="occupation"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
+                            <option value="" disabled>Select Occupation</option>
+                            <option *ngFor="let occ of occupationOptions" [value]="occ.value">{{ occ.label }}</option>
+                        </select>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">Income Source</label>
-                        <input type="text" formControlName="incomeSource"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                        <select formControlName="incomeSource"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
+                            <option value="" disabled>Select Income Source</option>
+                            <option *ngFor="let src of incomeSourceOptions" [value]="src.value">{{ src.label }}</option>
+                        </select>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">Income Type</label>
                         <select formControlName="incomeType"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
-                            <option value="SALARY">Salary</option>
-                            <option value="BUSINESS">Business</option>
-                            <option value="OTHER">Other</option>
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
+                            <option value="" disabled>Select Income Type</option>
+                            <option *ngFor="let type of incomeTypeOptions" [value]="type.value">{{ type.label }}
+                            </option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">Monthly Income</label>
                         <input type="number" formControlName="monthlyIncome"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
                     </div>
                 </div>
             </div>
@@ -105,36 +114,51 @@
             <!-- Section: Address -->
             <div>
                 <h3 class="text-lg font-semibold text-text-primary border-b border-border-muted pb-2 mb-4">Address</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="md:col-span-2">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="md:col-span-2 lg:col-span-3">
                         <label class="block text-sm font-medium text-text-secondary">Street Address</label>
                         <textarea formControlName="address" rows="2"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200"></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-text-secondary">City</label>
-                        <input type="text" formControlName="city"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary"></textarea>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">Province</label>
-                        <input type="text" formControlName="province"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                        <select formControlName="province"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
+                            <option value="" disabled>Select Province</option>
+                            <option *ngFor="let prov of provinces()" [value]="prov.id">{{ prov.name }}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">City/Regency</label>
+                        <select formControlName="city"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary"
+                            [disabled]="!applyForm.get('province')?.value">
+                            <option value="" disabled>Select City</option>
+                            <option *ngFor="let reg of regencies()" [value]="reg.id">{{ reg.name }}</option>
+                        </select>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">District (Kecamatan)</label>
-                        <input type="text" formControlName="district"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                        <select formControlName="district"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary"
+                            [disabled]="!applyForm.get('city')?.value">
+                            <option value="" disabled>Select District</option>
+                            <option *ngFor="let dist of districts()" [value]="dist.id">{{ dist.name }}</option>
+                        </select>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">Sub-District (Kelurahan)</label>
-                        <input type="text" formControlName="subDistrict"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                        <select formControlName="subDistrict"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary"
+                            [disabled]="!applyForm.get('district')?.value">
+                            <option value="" disabled>Select Sub-District</option>
+                            <option *ngFor="let vill of villages()" [value]="vill.id">{{ vill.name }}</option>
+                        </select>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">Postal Code</label>
                         <input type="text" formControlName="postalCode"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
                     </div>
                 </div>
             </div>
@@ -143,12 +167,19 @@
             <div>
                 <h3 class="text-lg font-semibold text-text-primary border-b border-border-muted pb-2 mb-4">Loan Details
                 </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Branch (Read Only) -->
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Branch</label>
+                        <input type="text" [value]="currentBranchName()" readonly
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm bg-bg-muted border p-2 text-text-secondary">
+                        <input type="hidden" formControlName="branchId">
+                    </div>
 
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">Product</label>
                         <select formControlName="productId"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
                             <option value="" disabled>Select Product</option>
                             <option *ngFor="let p of filteredProducts()" [value]="p.id">{{ p.name }}</option>
                         </select>
@@ -156,12 +187,46 @@
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">Loan Amount</label>
                         <input type="number" formControlName="loanAmount"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">Tenor (Months)</label>
                         <input type="number" formControlName="tenor"
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200">
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
+                    </div>
+                    <div class="md:col-span-2 lg:col-span-3">
+                        <label class="block text-sm font-medium text-text-secondary">Loan Purpose</label>
+                        <input type="text" formControlName="purpose"
+                            placeholder="e.g., Business expansion, Education, Medical, etc."
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: Bank Account -->
+            <div>
+                <h3 class="text-lg font-semibold text-text-primary border-b border-border-muted pb-2 mb-4">Bank Account
+                    for Disbursement</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Bank Name</label>
+                        <input type="text" formControlName="bankName" placeholder="e.g., Bank Central Asia"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Bank Branch (Optional)</label>
+                        <input type="text" formControlName="bankBranch" placeholder="e.g., Jakarta Main Branch"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Account Number</label>
+                        <input type="text" formControlName="accountNumber"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary">Account Holder Name</label>
+                        <input type="text" formControlName="accountHolderName"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm focus:border-brand-main focus:ring-brand-main border p-2 transition-all duration-200 bg-bg-surface text-text-primary">
                     </div>
                 </div>
             </div>
@@ -188,13 +253,13 @@
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">Latitude</label>
                         <input type="text" [value]="applyForm.get('latitude')?.value | number:'1.6-6'" readonly
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm bg-gray-100 border p-2 text-gray-600"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm bg-bg-muted border p-2 text-text-secondary"
                             placeholder="Not captured">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-text-secondary">Longitude</label>
                         <input type="text" [value]="applyForm.get('longitude')?.value | number:'1.6-6'" readonly
-                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm bg-gray-100 border p-2 text-gray-600"
+                            class="mt-1 block w-full rounded-xl border-border-default shadow-sm bg-bg-muted border p-2 text-text-secondary"
                             placeholder="Not captured">
                     </div>
                 </div>
@@ -213,8 +278,8 @@
                 }
 
                 @if (!hasLocation()) {
-                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-2">
-                    <p class="text-sm text-yellow-700 flex items-center gap-2">
+                <div class="bg-warning-bg border border-warning-border rounded-lg p-3 mt-2">
+                    <p class="text-sm text-warning-text flex items-center gap-2">
                         <i class="pi pi-exclamation-triangle"></i>
                         Location not captured. Click "Auto Locate" or "Set Location" to add coordinates.
                     </p>
@@ -234,7 +299,7 @@
 
     <!-- Upload Documents -->
     <div *ngIf="submittedLoanId()"
-        class="bg-white rounded-xl shadow-lg p-6 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4">
+        class="bg-bg-surface rounded-xl shadow-lg p-6 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4">
         <div class="text-center">
             <div
                 class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -247,10 +312,10 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- KTP -->
-            <div class="border rounded-lg p-4 flex flex-col items-center justify-between bg-gray-50">
+            <div class="border rounded-lg p-4 flex flex-col items-center justify-between bg-bg-muted">
                 <div class="text-center mb-4">
                     <i class="pi pi-id-card text-3xl text-brand-accent mb-2"></i>
-                    <h4 class="font-bold">KTP</h4>
+                    <h4 class="font-bold text-text-primary">KTP</h4>
                 </div>
                 <div *ngIf="ktpStatus() === 'done'" class="text-green-600 font-bold"><i class="pi pi-check-circle"></i>
                     Uploaded</div>
@@ -260,35 +325,48 @@
                     <input type="file" id="ktp" (change)="onFileSelected($event, 'KTP')" class="hidden"
                         accept="image/*,.pdf">
                     <label for="ktp"
-                        class="cursor-pointer bg-white border border-border-default px-4 py-2 rounded-xl hover:bg-surface-100 text-sm transition-colors text-brand-main font-bold">Select
+                        class="cursor-pointer bg-bg-surface border border-border-default px-4 py-2 rounded-xl hover:bg-bg-muted text-sm transition-colors text-brand-main font-bold">Select
                         File</label>
+                </div>
+                <!-- Preview -->
+                <div *ngIf="getDocumentPreview('KTP')" class="mt-2 w-full">
+                    <img [src]="getDocumentPreview('KTP')" alt="KTP Preview"
+                        class="w-full h-24 object-cover rounded-lg">
                 </div>
             </div>
 
-            <!-- KK -->
-            <div class="border rounded-lg p-4 flex flex-col items-center justify-between bg-gray-50">
+            <!-- Selfie with KTP -->
+            <div class="border rounded-lg p-4 flex flex-col items-center justify-between bg-bg-muted">
                 <div class="text-center mb-4">
-                    <i class="pi pi-users text-3xl text-brand-accent mb-2"></i>
-                    <h4 class="font-bold">KK</h4>
+                    <i class="pi pi-camera text-3xl text-brand-accent mb-2"></i>
+                    <h4 class="font-bold text-text-primary">Photo with KTP</h4>
+                    <p class="text-xs text-text-muted">Selfie holding KTP</p>
                 </div>
-                <div *ngIf="kkStatus() === 'done'" class="text-green-600 font-bold"><i class="pi pi-check-circle"></i>
+                <div *ngIf="selfieKtpStatus() === 'done'" class="text-green-600 font-bold"><i
+                        class="pi pi-check-circle"></i>
                     Uploaded</div>
-                <div *ngIf="kkStatus() === 'uploading'" class="text-brand-main"><i class="pi pi-spin pi-spinner"></i>
+                <div *ngIf="selfieKtpStatus() === 'uploading'" class="text-brand-main"><i
+                        class="pi pi-spin pi-spinner"></i>
                     Uploading...</div>
-                <div *ngIf="kkStatus() === 'pending'">
-                    <input type="file" id="kk" (change)="onFileSelected($event, 'KK')" class="hidden"
-                        accept="image/*,.pdf">
-                    <label for="kk"
-                        class="cursor-pointer bg-white border border-border-default px-4 py-2 rounded-xl hover:bg-surface-100 text-sm transition-colors text-brand-main font-bold">Select
+                <div *ngIf="selfieKtpStatus() === 'pending'">
+                    <input type="file" id="selfieKtp" (change)="onFileSelected($event, 'SELFIE_KTP')" class="hidden"
+                        accept="image/*">
+                    <label for="selfieKtp"
+                        class="cursor-pointer bg-bg-surface border border-border-default px-4 py-2 rounded-xl hover:bg-bg-muted text-sm transition-colors text-brand-main font-bold">Select
                         File</label>
+                </div>
+                <!-- Preview -->
+                <div *ngIf="getDocumentPreview('SELFIE_KTP')" class="mt-2 w-full">
+                    <img [src]="getDocumentPreview('SELFIE_KTP')" alt="Selfie KTP Preview"
+                        class="w-full h-24 object-cover rounded-lg">
                 </div>
             </div>
 
             <!-- NPWP -->
-            <div class="border rounded-lg p-4 flex flex-col items-center justify-between bg-gray-50">
+            <div class="border rounded-lg p-4 flex flex-col items-center justify-between bg-bg-muted">
                 <div class="text-center mb-4">
                     <i class="pi pi-briefcase text-3xl text-brand-accent mb-2"></i>
-                    <h4 class="font-bold">NPWP</h4>
+                    <h4 class="font-bold text-text-primary">NPWP</h4>
                 </div>
                 <div *ngIf="npwpStatus() === 'done'" class="text-green-600 font-bold"><i class="pi pi-check-circle"></i>
                     Uploaded</div>
@@ -298,35 +376,105 @@
                     <input type="file" id="npwp" (change)="onFileSelected($event, 'NPWP')" class="hidden"
                         accept="image/*,.pdf">
                     <label for="npwp"
-                        class="cursor-pointer bg-white border border-border-default px-4 py-2 rounded-xl hover:bg-surface-100 text-sm transition-colors text-brand-main font-bold">Select
+                        class="cursor-pointer bg-bg-surface border border-border-default px-4 py-2 rounded-xl hover:bg-bg-muted text-sm transition-colors text-brand-main font-bold">Select
                         File</label>
+                </div>
+                <!-- Preview -->
+                <div *ngIf="getDocumentPreview('NPWP')" class="mt-2 w-full">
+                    <img [src]="getDocumentPreview('NPWP')" alt="NPWP Preview"
+                        class="w-full h-24 object-cover rounded-lg">
                 </div>
             </div>
 
             <!-- SLIP GAJI -->
-            <div class="border rounded-lg p-4 flex flex-col items-center justify-between bg-gray-50">
+            <div class="border rounded-lg p-4 flex flex-col items-center justify-between bg-bg-muted">
                 <div class="text-center mb-4">
                     <i class="pi pi-money-bill text-3xl text-brand-accent mb-2"></i>
-                    <h4 class="font-bold">Slip Gaji</h4>
+                    <h4 class="font-bold text-text-primary">Slip Gaji</h4>
                 </div>
                 <div *ngIf="slipGajiStatus() === 'done'" class="text-green-600 font-bold"><i
-                        class="pi pi-check-circle"></i> Uploaded</div>
+                        class="pi pi-check-circle"></i>
+                    Uploaded</div>
                 <div *ngIf="slipGajiStatus() === 'uploading'" class="text-brand-main"><i
-                        class="pi pi-spin pi-spinner"></i> Uploading...</div>
+                        class="pi pi-spin pi-spinner"></i>
+                    Uploading...</div>
                 <div *ngIf="slipGajiStatus() === 'pending'">
-                    <input type="file" id="slip" (change)="onFileSelected($event, 'SLIP_GAJI')" class="hidden"
+                    <input type="file" id="slip" (change)="onFileSelected($event, 'PAYSLIP')" class="hidden"
                         accept="image/*,.pdf">
                     <label for="slip"
-                        class="cursor-pointer bg-white border border-border-default px-4 py-2 rounded-xl hover:bg-surface-100 text-sm transition-colors text-brand-main font-bold">Select
+                        class="cursor-pointer bg-bg-surface border border-border-default px-4 py-2 rounded-xl hover:bg-bg-muted text-sm transition-colors text-brand-main font-bold">Select
                         File</label>
+                </div>
+                <!-- Preview -->
+                <div *ngIf="getDocumentPreview('PAYSLIP')" class="mt-2 w-full">
+                    <img [src]="getDocumentPreview('PAYSLIP')" alt="Slip Gaji Preview"
+                        class="w-full h-24 object-cover rounded-lg">
                 </div>
             </div>
         </div>
 
+        <!-- Terms and Conditions -->
+        <div class="border-t border-border-muted pt-6">
+            <div class="flex items-start gap-3">
+                <input type="checkbox" id="tnc" [checked]="tncAccepted()"
+                    (change)="tncAccepted() ? rejectTnc() : openTncModal()"
+                    class="mt-1 w-4 h-4 text-brand-main border-border-default rounded focus:ring-brand-main">
+                <label for="tnc" class="text-sm text-text-secondary cursor-pointer" (click)="openTncModal()">
+                    I have read and agree to the <span class="text-brand-main hover:underline">Terms and
+                        Conditions</span>
+                </label>
+            </div>
+        </div>
+
         <div class="flex justify-end pt-6">
-            <button (click)="finish()"
-                class="bg-brand-main hover:bg-brand-hover text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-brand-main/20 transition-all active:scale-95">
+            <button (click)="finish()" [disabled]="!canFinish()"
+                class="bg-brand-main hover:bg-brand-hover disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-brand-main/20 transition-all active:scale-95">
                 Finish & View Details
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- TnC Modal -->
+<div *ngIf="showTncModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div class="bg-bg-surface rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[80vh] flex flex-col">
+        <div class="p-6 border-b border-border-muted flex justify-between items-center">
+            <h3 class="text-xl font-bold text-text-primary">Terms and Conditions</h3>
+            <button (click)="closeTncModal()" class="text-text-muted hover:text-text-primary">
+                <i class="pi pi-times text-xl"></i>
+            </button>
+        </div>
+        <div class="p-6 overflow-y-auto flex-1">
+            <div class="prose prose-sm max-w-none text-text-secondary">
+                <h4 class="text-text-primary font-semibold">1. Loan Application Terms</h4>
+                <p>By submitting this loan application, you confirm that all information provided is accurate and
+                    complete. Any false information may result in rejection of the application.</p>
+
+                <h4 class="text-text-primary font-semibold mt-4">2. Document Verification</h4>
+                <p>All uploaded documents will be verified by our team. The loan application process will only proceed
+                    after successful document verification.</p>
+
+                <h4 class="text-text-primary font-semibold mt-4">3. Data Privacy</h4>
+                <p>Your personal information will be handled in accordance with our Privacy Policy and applicable data
+                    protection laws.</p>
+
+                <h4 class="text-text-primary font-semibold mt-4">4. Approval Process</h4>
+                <p>Loan approval is subject to credit assessment and internal policies. We reserve the right to approve
+                    or reject any application without providing reasons.</p>
+
+                <h4 class="text-text-primary font-semibold mt-4">5. Interest and Fees</h4>
+                <p>Interest rates and fees are as specified in the loan product details. Late payments may incur
+                    additional charges.</p>
+            </div>
+        </div>
+        <div class="p-6 border-t border-border-muted flex justify-end gap-3">
+            <button (click)="rejectTnc()"
+                class="px-4 py-2 rounded-lg border border-border-default text-text-secondary hover:bg-bg-muted transition-colors">
+                Decline
+            </button>
+            <button (click)="acceptTnc()"
+                class="px-4 py-2 rounded-lg bg-brand-main text-white hover:bg-brand-hover transition-colors">
+                I Agree
             </button>
         </div>
     </div>
