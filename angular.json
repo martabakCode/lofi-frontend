@@ -8,11 +8,6 @@
   "newProjectRoot": "projects",
   "projects": {
     "lofi-frontend": {
-      "compilerOptions": {
-        "moduleResolution": "node",
-        "module": "es2022",
-        "target": "es2022"
-      },
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -62,6 +57,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "lofi-frontend:build:production"
