@@ -3,6 +3,8 @@ import { EnvironmentProviders, Provider } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 import { authInterceptor } from './interceptors/auth.interceptor';
+import { proxyInterceptor } from './interceptors/proxy.interceptor';
+
 import { errorInterceptor } from './interceptors/error.interceptor';
 import { CookieService } from 'ngx-cookie-service';
 
@@ -12,7 +14,7 @@ export const provideCore = (): (Provider | EnvironmentProviders)[] => {
     provideAnimationsAsync(),
     provideHttpClient(
       withFetch(),
-      withInterceptors([authInterceptor, errorInterceptor])
+      withInterceptors([authInterceptor, proxyInterceptor, errorInterceptor])
     ),
 
   ];
