@@ -11,9 +11,7 @@ const proxy = createProxyMiddleware({
     target: 'https://lofiapi.martabakcode.my.id',
     changeOrigin: true,
     secure: false,
-    pathRewrite: {
-        '^/api/proxy': '', // Remove /api/proxy prefix
-    },
+    // No pathRewrite needed - backend expects full path /api/v1/products
     on: {
         proxyReq: (proxyReq, req, res) => {
             // spoof origin to trick backend
