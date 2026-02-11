@@ -16,6 +16,7 @@ const proxy = createProxyMiddleware({
         proxyReq: (proxyReq, req, res) => {
             // spoof origin to trick backend
             proxyReq.setHeader('Origin', 'https://lofiapi.martabakcode.my.id');
+            proxyReq.setHeader('Referer', 'https://lofiapi.martabakcode.my.id/');
         },
         proxyRes: (proxyRes, req, res) => {
             // override CORS on response so browser allows it
