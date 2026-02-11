@@ -1,7 +1,11 @@
-import { Component, EventEmitter, Input, Output, computed, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivityTimelineComponent, TimelineItem } from '../apple-hig/activity-timeline/activity-timeline.component';
+import { LeafletMapComponent, MapLocation } from '../leaflet-map/leaflet-map.component';
+import { DocumentService } from '../../../core/services/document.service';
+import { ToastService } from '../../../core/services/toast.service';
+import { LoanDocument } from '../../../features/loans/models/loan.models';
 
 export interface LoanWorkflowStep {
     step: 'SUBMITTED' | 'REVIEW' | 'APPROVAL' | 'DISBURSE';
@@ -34,16 +38,27 @@ export interface LoanDetailInfo {
     approvedAt?: string;
     disbursedAt?: string;
     appliedDate?: string;
+    // Location data
+    latitude?: number;
+    longitude?: number;
+    address?: string;
+    city?: string;
+    province?: string;
+    // Documents
+    documents?: LoanDocument[];
 }
 
 @Component({
     selector: 'app-loan-workflow-modal',
     standalone: true,
-    imports: [CommonModule, FormsModule, ActivityTimelineComponent],
+    imports: [CommonModule, FormsModule, ActivityTimelineComponent, LeafletMapComponent],
     templateUrl: './loan-workflow-modal.component.html',
     styleUrls: ['./loan-workflow-modal.component.css']
 })
 export class LoanWorkflowModalComponent {
+    private documentService = inject(DocumentService);
+    private toastService = inject(ToastService);
+
     @Input() set isOpen(value: boolean) {
         this._isOpen.set(value);
     }
@@ -57,6 +72,8 @@ export class LoanWorkflowModalComponent {
 
     private _isOpen = signal(false);
     isOpenValue = computed(() => this._isOpen());
+    
+    downloadingDocId = signal<string | null>(null);
 
     actionNotes = '';
     activeAction = signal<string | null>(null);
@@ -123,7 +140,8 @@ export class LoanWorkflowModalComponent {
     }
 
     isActionRequired(): boolean {
-        return ['REVIEW', 'APPROVE'].includes(this.activeAction() || '');
+        // Notes are required for APPROVE and DISBURSE, optional for REVIEW
+        return ['APPROVE', 'DISBURSE'].includes(this.activeAction() || '');
     }
 
     formatCurrency(amount: number): string {
@@ -143,6 +161,72 @@ export class LoanWorkflowModalComponent {
             year: 'numeric',
             hour: '2-digit',
             minute: '2-digit'
+        });
+    }
+
+    hasLocation(): boolean {
+        return !!(this.loanDetail?.latitude && this.loanDetail?.longitude);
+    }
+
+    getMapLocation(): MapLocation | null {
+        if (this.hasLocation()) {
+            return {
+                latitude: this.loanDetail!.latitude!,
+                longitude: this.loanDetail!.longitude!
+            };
+        }
+        return null;
+    }
+
+    viewLocationOnMap(): void {
+        if (this.hasLocation()) {
+            const { latitude, longitude } = this.loanDetail!;
+            // Google Maps direct link
+            const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
+            window.open(url, '_blank');
+        }
+    }
+
+    // Document methods
+    hasDocuments(): boolean {
+        return !!(this.loanDetail?.documents && this.loanDetail.documents.length > 0);
+    }
+
+    getDocumentIcon(documentType: string): string {
+        const type = documentType.toUpperCase();
+        if (type.includes('PDF')) return 'pi-file-pdf';
+        if (type.includes('IMAGE') || type.includes('PHOTO')) return 'pi-image';
+        if (type.includes('KTP') || type.includes('ID')) return 'pi-id-card';
+        if (type.includes('KK')) return 'pi-users';
+        if (type.includes('SLIP') || type.includes('PAYROLL')) return 'pi-money-bill';
+        if (type.includes('NPWP')) return 'pi-briefcase';
+        return 'pi-file';
+    }
+
+    getDocumentIconColor(documentType: string): string {
+        const type = documentType.toUpperCase();
+        if (type.includes('PDF')) return 'text-red-500';
+        if (type.includes('IMAGE') || type.includes('PHOTO')) return 'text-blue-500';
+        if (type.includes('KTP') || type.includes('ID')) return 'text-green-500';
+        return 'text-gray-500';
+    }
+
+    formatDocType(type: string): string {
+        return type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    }
+
+    downloadDocument(doc: LoanDocument): void {
+        this.downloadingDocId.set(doc.id);
+        this.documentService.getDownloadUrl(doc.id).subscribe({
+            next: (data) => {
+                // Open download URL in new tab
+                window.open(data.downloadUrl, '_blank');
+                this.downloadingDocId.set(null);
+            },
+            error: () => {
+                this.toastService.show('Failed to get download link', 'error');
+                this.downloadingDocId.set(null);
+            }
         });
     }
 

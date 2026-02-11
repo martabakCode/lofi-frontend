@@ -59,6 +59,7 @@ export class MainLayoutComponent implements OnInit {
 
   user = this.authService.currentUser;
   isSidebarOpen = signal(false);
+  isSidebarCollapsed = signal(false);
 
   // Expose dark mode signal for template
   isDarkMode = this.themeService.isDarkMode;
@@ -89,6 +90,10 @@ export class MainLayoutComponent implements OnInit {
 
   closeSidebar() {
     this.isSidebarOpen.set(false);
+  }
+
+  onSidebarToggleCollapse(collapsed: boolean) {
+    this.isSidebarCollapsed.set(collapsed);
   }
 
   logout() {

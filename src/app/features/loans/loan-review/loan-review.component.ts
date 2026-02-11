@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, signal, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { LoanFacade } from '../../../core/facades/loan.facade';
@@ -9,17 +9,20 @@ import { ConfirmationModalComponent } from '../../../shared/components/confirmat
 import { LoanWorkflowModalComponent, LoanDetailInfo, LoanWorkflowStep } from '../../../shared/components/loan-workflow-modal/loan-workflow-modal.component';
 import { LoanStatus } from '../../../core/models/loan.models';
 import { LoanVM } from '../models/loan.models';
+import { RbacService } from '../../../core/services/rbac.service';
+import { Branch } from '../../../core/models/rbac.models';
 import { LoanEventBus } from '../../../core/patterns/loan-event-bus.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { LoanService } from '../../../core/services/loan.service';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, Subscription, retry, catchError, of, finalize, timer } from 'rxjs';
 
 @Component({
   selector: 'app-loan-review',
   standalone: true,
   imports: [CommonModule, RouterModule, SlaBadgeComponent, ConfirmationModalComponent, LoanWorkflowModalComponent],
   templateUrl: './loan-review.component.html',
-  styleUrls: ['./loan-review.component.css']
+  styleUrls: ['./loan-review.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoanReviewComponent implements OnInit, OnDestroy {
   private loanFacade = inject(LoanFacade);
@@ -29,12 +32,20 @@ export class LoanReviewComponent implements OnInit, OnDestroy {
   private eventBus = inject(LoanEventBus);
   private toast = inject(ToastService);
   private router = inject(Router);
+  private rbacService = inject(RbacService);
+  private cdr = inject(ChangeDetectorRef);
   private destroy$ = new Subject<void>();
 
+  // Track subscriptions untuk bisa cancel pending requests
+  private loansSubscription?: Subscription;
+  private autoReloadTimer?: Subscription;
+
   loans = signal<LoanVM[]>([]);
-  loading = this.loanFacade.loading;
+  // Local loading state, not shared with facade
+  isLoading = signal<boolean>(false);
   error = signal<string | null>(null);
   totalRecords = signal<number>(0);
+  lastRefreshTime = signal<number>(Date.now());
 
   // Workflow Modal State
   workflowModal = signal<{
@@ -62,20 +73,40 @@ export class LoanReviewComponent implements OnInit, OnDestroy {
   });
 
   searchQuery = signal<string>('');
+  branches = signal<Branch[]>([]);
+  selectedBranchId = signal<string>('');
   isExporting = signal(false);
 
   ngOnInit() {
-    this.loadLoans();
+    this.loadBranches();
+    
+    // Delay sedikit untuk memastikan view ready
+    setTimeout(() => {
+      this.loadLoans(true);
+    }, 100);
 
     // PUBLISHER/SUBSCRIBER: Listen for updates to refresh list
     this.eventBus.loanUpdated$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.loadLoans());
+      .subscribe(() => {
+        console.log('LoanReview: Event bus update received');
+        this.loadLoans(true);
+      });
+      
+    // Auto reload setiap 30 detik
+    this.autoReloadTimer = timer(30000, 30000)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        console.log('LoanReview: Auto reload triggered');
+        this.loadLoans(true);
+      });
   }
 
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+    this.loansSubscription?.unsubscribe();
+    this.autoReloadTimer?.unsubscribe();
   }
 
   onSearch(query: Event) {
@@ -84,7 +115,30 @@ export class LoanReviewComponent implements OnInit, OnDestroy {
     this.loadLoans();
   }
 
-  loadLoans() {
+  loadBranches() {
+    this.rbacService.getAllBranches().subscribe({
+      next: (branches) => this.branches.set(branches),
+      error: () => this.toast.show('Failed to load branches', 'error')
+    });
+  }
+
+  onBranchChange(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    this.selectedBranchId.set(select.value);
+    this.loadLoans(true);
+  }
+
+  refreshData() {
+    this.loadLoans(true);
+  }
+
+  loadLoans(force: boolean = false) {
+    // Cancel previous pending request
+    this.loansSubscription?.unsubscribe();
+
+    this.isLoading.set(true);
+    this.error.set(null);
+
     const params: any = {
       page: 0,
       size: 10
@@ -92,6 +146,8 @@ export class LoanReviewComponent implements OnInit, OnDestroy {
     const user = this.authService.currentUser();
     if (user?.branchId) {
       params.branchId = user.branchId;
+    } else if (this.selectedBranchId()) {
+      params.branchId = this.selectedBranchId();
     }
     params.status = 'SUBMITTED';
 
@@ -99,14 +155,40 @@ export class LoanReviewComponent implements OnInit, OnDestroy {
       params.search = this.searchQuery();
     }
 
-    this.loanFacade.getLatestLoans(params).subscribe({
+    // Cache-busting
+    if (force) {
+      params._t = Date.now();
+    }
+
+    console.log('LoanReview: Loading loans with params:', params);
+
+    this.loansSubscription = this.loanFacade.getLatestLoans(params).pipe(
+      retry({ count: 2, delay: 1000 }),
+      catchError((err) => {
+        console.error('LoanReview: Load loans error:', err);
+        this.error.set('Failed to load review queue. Please try again.');
+        return of({ content: [], totalElements: 0, totalPages: 0 });
+      }),
+      finalize(() => {
+        this.isLoading.set(false);
+        this.lastRefreshTime.set(Date.now());
+        this.cdr.markForCheck();
+      })
+    ).subscribe({
       next: (response) => {
-        this.loans.set(response.content ?? []);
+        console.log('LoanReview: Loans loaded:', response.content?.length, 'items');
+        this.loans.set([...(response.content ?? [])]);
         this.totalRecords.set(response.totalElements ?? 0);
-      },
-      error: (err) => {
-        console.error('Failed to load loans', err);
-        this.error.set('Failed to load review queue');
+        
+        // Auto reload jika data kosong tapi tidak ada error
+        if ((!response.content || response.content.length === 0) && !this.error()) {
+          console.log('LoanReview: Data empty, will retry in 3 seconds...');
+          setTimeout(() => {
+            if (this.loans().length === 0 && !this.isLoading()) {
+              this.loadLoans(true);
+            }
+          }, 3000);
+        }
       }
     });
   }
@@ -117,6 +199,8 @@ export class LoanReviewComponent implements OnInit, OnDestroy {
     const user = this.authService.currentUser();
     if (user?.branchId) {
       params.branchId = user.branchId;
+    } else if (this.selectedBranchId()) {
+      params.branchId = this.selectedBranchId();
     }
     params.status = 'SUBMITTED';
 
@@ -156,7 +240,7 @@ export class LoanReviewComponent implements OnInit, OnDestroy {
     const csvContent = [
       headers.join(','),
       ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
-    ].join('\\n');
+    ].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -263,12 +347,8 @@ export class LoanReviewComponent implements OnInit, OnDestroy {
     this.modal.update(m => ({ ...m, isOpen: false }));
   }
 
-
-
   onExecuteAction(notes: string) {
     if (this.modal().action) {
-      // If action expects argument, pass it. But action signature in modal is just () => void in some cases?
-      // Actually defined as (notes: string) => void | null.
       this.modal().action!(notes);
       this.closeModal();
     }
@@ -332,7 +412,9 @@ export class LoanReviewComponent implements OnInit, OnDestroy {
   // ========== Workflow Modal Methods ==========
 
   onViewWorkflowDetails(loan: any): void {
-    this.loanService.getLoanDetailForWorkflow(loan.id).subscribe({
+    this.loanService.getLoanDetailForWorkflow(loan.id).pipe(
+      retry({ count: 2, delay: 500 })
+    ).subscribe({
       next: (detail) => {
         const loanDetail: LoanDetailInfo = {
           id: detail.id,
@@ -359,6 +441,7 @@ export class LoanReviewComponent implements OnInit, OnDestroy {
           workflowSteps,
           availableActions: this.getAvailableActions(detail.loanStatus)
         });
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.toast.show('Failed to load loan details', 'error');
@@ -420,5 +503,10 @@ export class LoanReviewComponent implements OnInit, OnDestroy {
 
   onViewFullPage(loanId: string): void {
     this.router.navigate(['/dashboard/loans', loanId]);
+  }
+  
+  // Track by function
+  trackByLoanId(index: number, loan: LoanVM): string {
+    return loan.id;
   }
 }

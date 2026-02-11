@@ -136,7 +136,7 @@ export class LoanDetailComponent implements OnInit {
     viewLocationOnMap() {
         const loan = this.loan();
         if (loan?.latitude && loan?.longitude) {
-            const url = `https://www.openstreetmap.org/?mlat=${loan.latitude}&mlon=${loan.longitude}#map=15/${loan.latitude}/${loan.longitude}`;
+            const url = `https://www.google.com/maps?q=${loan.latitude},${loan.longitude}`;
             window.open(url, '_blank');
         }
     }

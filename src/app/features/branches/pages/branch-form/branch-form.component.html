@@ -7,15 +7,43 @@
                 class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-main transition-all">
                 Cancel
             </button>
-            <button type="button" (click)="onSubmit()" [disabled]="isSubmitting() || branchForm.invalid"
+            <button type="button" (click)="onSubmit()" [disabled]="isSubmitting() || isLoading() || branchForm.invalid"
                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-brand-main hover:bg-brand-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-main disabled:opacity-50 disabled:cursor-not-allowed transition-all">
-                <i *ngIf="isSubmitting()" class="pi pi-spin pi-spinner mr-2"></i>
+                <i *ngIf="isSubmitting() || isLoading()" class="pi pi-spin pi-spinner mr-2"></i>
                 {{ isEditMode() ? 'Save Changes' : 'Create Branch' }}
             </button>
         </div>
     </app-page-header>
 
-    <form [formGroup]="branchForm" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- Loading State -->
+    <div *ngIf="isLoading()" class="py-12 text-center">
+        <i class="pi pi-spinner pi-spin text-4xl text-brand-main mb-4"></i>
+        <p class="text-text-secondary">Loading branch details...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error() && !isLoading()" class="card py-16 flex flex-col items-center justify-center text-center">
+        <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-4">
+            <i class="pi pi-exclamation-circle text-4xl text-red-600"></i>
+        </div>
+        <h3 class="text-xl font-bold text-text-primary mb-2">Failed to Load Branch</h3>
+        <p class="text-text-secondary max-w-md mx-auto mb-2">{{ error() }}</p>
+        <p *ngIf="errorDetails()" class="text-xs text-text-muted font-mono bg-bg-muted px-3 py-1 rounded mb-6">
+            {{ errorDetails() }}
+        </p>
+        <div class="flex gap-3">
+            <button class="btn-primary bg-brand-main" (click)="retryLoad()">
+                <i class="pi pi-refresh mr-2"></i>
+                Try Again
+            </button>
+            <button class="btn-secondary" (click)="goBack()">
+                <i class="pi pi-arrow-left mr-2"></i>
+                Back to List
+            </button>
+        </div>
+    </div>
+
+    <form *ngIf="!isLoading() && !error()" [formGroup]="branchForm" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <!-- Main Content -->
         <div class="lg:col-span-7 space-y-6">
             <app-card title="Basic Information" icon="pi-building">

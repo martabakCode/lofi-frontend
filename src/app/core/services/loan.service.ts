@@ -139,8 +139,19 @@ export class LoanService {
         return crypto.randomUUID();
     }
 
+    private getNoCacheHeaders() {
+        return {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+        };
+    }
+
     getLoans(params: any): Observable<PaginatedResponse<Loan>> {
-        return this.http.get<ApiResponse<any>>(`${this.baseUrl}`, { params }).pipe(
+        return this.http.get<ApiResponse<any>>(`${this.baseUrl}`, { 
+            params,
+            headers: this.getNoCacheHeaders()
+        }).pipe(
             map(res => {
                 const data = res.data;
                 const items = data.items || [];
@@ -168,7 +179,9 @@ export class LoanService {
     }
 
     getLoanById(id: string): Observable<BackendLoanResponse> {
-        return this.http.get<ApiResponse<BackendLoanResponse>>(`${this.baseUrl}/${id}`).pipe(
+        return this.http.get<ApiResponse<BackendLoanResponse>>(`${this.baseUrl}/${id}`, {
+            headers: this.getNoCacheHeaders()
+        }).pipe(
             map(res => res.data)
         );
     }
@@ -273,7 +286,9 @@ export class LoanService {
 
     // Get full loan detail with all information for workflow modal
     getLoanDetailForWorkflow(loanId: string): Observable<BackendLoanResponse> {
-        return this.http.get<ApiResponse<BackendLoanResponse>>(`${this.baseUrl}/${loanId}`).pipe(
+        return this.http.get<ApiResponse<BackendLoanResponse>>(`${this.baseUrl}/${loanId}`, {
+            headers: this.getNoCacheHeaders()
+        }).pipe(
             map(res => res.data)
         );
     }

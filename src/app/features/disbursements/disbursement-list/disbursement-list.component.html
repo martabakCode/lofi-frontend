@@ -6,11 +6,26 @@
                 <i class="pi pi-wallet text-2xl"></i>
             </div>
             <div>
-                <h1 class="text-2xl font-bold text-text-primary m-0">Loan Disbursement</h1>
-                <p class="text-text-secondary m-0">Execute disbursement for approved loans</p>
+                <h1 class="text-2xl font-bold text-text-primary m-0">Loan Workflow</h1>
+                <p class="text-text-secondary m-0">
+                    Review, approve and disburse loans
+                    <span *ngIf="lastRefreshTime()" class="text-xs text-text-muted ml-2">
+                        (Updated: {{ lastRefreshTime() | date:'HH:mm:ss' }})
+                    </span>
+                </p>
             </div>
         </div>
         <div class="flex items-center gap-3">
+            <!-- Branch Filter -->
+            <select (change)="onBranchChange($event)"
+                class="form-select py-2 pl-3 pr-8 text-sm bg-bg-surface border-border-default rounded-lg focus:border-brand-main focus:ring-1 focus:ring-brand-main w-40 hidden md:block"
+                aria-label="Filter by Branch">
+                <option value="">All Branches</option>
+                <option *ngFor="let branch of branches()" [value]="branch.id">
+                    {{ branch.name }}
+                </option>
+            </select>
+
             <div class="relative hidden md:block group">
                 <i
                     class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-brand-main transition-colors"></i>
@@ -22,40 +37,124 @@
                 <i class="pi pi-download" [class.pi-spin]="isExporting()"></i>
             </button>
 
-            <button class="btn-secondary px-3" (click)="loadLoans()" title="Refresh" [disabled]="loading()">
-                <i class="pi pi-refresh" [class.pi-spin]="loading()"></i>
+            <!-- Refresh Button - Primary action -->
+            <button class="btn-primary bg-brand-main px-4" (click)="refreshData(true)" title="Force Refresh" 
+                [disabled]="isLoading() || isLoadingStats()">
+                <i class="pi pi-refresh mr-2" [class.pi-spin]="isLoading() || isLoadingStats()"></i>
+                <span class="hidden sm:inline">Refresh</span>
             </button>
         </div>
     </div>
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="card p-6 flex items-center gap-4">
-            <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
-                <i class="pi pi-clock text-xl"></i>
+        <!-- All Loans Card -->
+        <div class="card p-6 flex items-center gap-4 cursor-pointer hover:shadow-md transition-shadow"
+            [class.ring-2]="statusFilter() === 'ALL'" [class.ring-brand-main]="statusFilter() === 'ALL'"
+            (click)="onStatusFilterChange('ALL')">
+            <div class="w-12 h-12 bg-gray-100 text-gray-600 rounded-xl flex items-center justify-center">
+                <i class="pi pi-list text-xl"></i>
             </div>
-            <div>
-                <p class="text-xs font-bold text-text-muted uppercase tracking-wider m-0">Pending Disbursement</p>
-                <p class="text-2xl font-bold text-blue-600 m-0">{{ loans().length }}</p>
+            <div class="flex-1">
+                <p class="text-xs font-bold text-text-muted uppercase tracking-wider m-0">All Loans</p>
+                <div class="flex items-center gap-2">
+                    <p class="text-2xl font-bold text-gray-600 m-0">
+                        {{ isLoadingStats() ? '...' : (pendingReviewCount() + pendingApprovalCount() + pendingDisbursementCount()) }}
+                    </p>
+                    <i *ngIf="isLoadingStats()" class="pi pi-spin pi-spinner text-gray-400 text-sm"></i>
+                </div>
             </div>
         </div>
-        <div class="card p-6 flex items-center gap-4">
-            <div class="w-12 h-12 bg-primary-100 text-primary-600 rounded-xl flex items-center justify-center">
+
+        <!-- Pending Review Card -->
+        <div class="card p-6 flex items-center gap-4 cursor-pointer hover:shadow-md transition-shadow"
+            [class.ring-2]="statusFilter() === 'SUBMITTED'" [class.ring-blue-500]="statusFilter() === 'SUBMITTED'"
+            (click)="onStatusFilterChange('SUBMITTED')">
+            <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
+                <i class="pi pi-search text-xl"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-xs font-bold text-text-muted uppercase tracking-wider m-0">Pending Review</p>
+                <div class="flex items-center gap-2">
+                    <p class="text-2xl font-bold text-blue-600 m-0">
+                        {{ isLoadingStats() ? '...' : pendingReviewCount() }}
+                    </p>
+                    <i *ngIf="isLoadingStats()" class="pi pi-spin pi-spinner text-blue-400 text-sm"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Approval Card -->
+        <div class="card p-6 flex items-center gap-4 cursor-pointer hover:shadow-md transition-shadow"
+            [class.ring-2]="statusFilter() === 'REVIEWED'" [class.ring-amber-500]="statusFilter() === 'REVIEWED'"
+            (click)="onStatusFilterChange('REVIEWED')">
+            <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center">
+                <i class="pi pi-check-circle text-xl"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-xs font-bold text-text-muted uppercase tracking-wider m-0">Pending Approval</p>
+                <div class="flex items-center gap-2">
+                    <p class="text-2xl font-bold text-amber-600 m-0">
+                        {{ isLoadingStats() ? '...' : pendingApprovalCount() }}
+                    </p>
+                    <i *ngIf="isLoadingStats()" class="pi pi-spin pi-spinner text-amber-400 text-sm"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Disbursement Card -->
+        <div class="card p-6 flex items-center gap-4 cursor-pointer hover:shadow-md transition-shadow"
+            [class.ring-2]="statusFilter() === 'APPROVED'" [class.ring-green-500]="statusFilter() === 'APPROVED'"
+            (click)="onStatusFilterChange('APPROVED')">
+            <div class="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center">
                 <i class="pi pi-money-bill text-xl"></i>
             </div>
-            <div>
-                <p class="text-xs font-bold text-text-muted uppercase tracking-wider m-0">Total Amount</p>
-                <p class="text-2xl font-bold text-primary-600 m-0">{{ formatCurrency(totalAmount()) }}</p>
+            <div class="flex-1">
+                <p class="text-xs font-bold text-text-muted uppercase tracking-wider m-0">Pending Disbursement</p>
+                <div class="flex items-center gap-2">
+                    <p class="text-2xl font-bold text-green-600 m-0">
+                        {{ isLoadingStats() ? '...' : pendingDisbursementCount() }}
+                    </p>
+                    <i *ngIf="isLoadingStats()" class="pi pi-spin pi-spinner text-green-400 text-sm"></i>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Error Message -->
-    <div *ngIf="error()" class="error-alert">
-        <i class="pi pi-exclamation-triangle"></i>
-        <span>{{ error() }}</span>
-        <button class="btn-link" (click)="loadLoans()">Try Again</button>
+    <!-- Error Message with Retry -->
+    <div *ngIf="error()" class="error-alert flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <i class="pi pi-exclamation-triangle text-xl"></i>
+            <div>
+                <p class="font-semibold m-0">Error Loading Data</p>
+                <p class="text-sm m-0">{{ error() }}</p>
+            </div>
+        </div>
+        <button class="btn-primary bg-brand-main" (click)="refreshData(true)" [disabled]="isLoading()">
+            <i class="pi pi-refresh mr-1" [class.pi-spin]="isLoading()"></i>
+            Retry
+        </button>
     </div>
+
+    <!-- Data Mismatch Warning -->
+    <div *ngIf="hasDataMismatch()" class="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <i class="pi pi-exclamation-circle text-amber-600 text-xl"></i>
+            <div>
+                <p class="font-semibold text-amber-800 m-0">Data may be out of sync</p>
+                <p class="text-sm text-amber-700 m-0">Stats show loans exist but they're not loaded. Try refreshing.</p>
+            </div>
+        </div>
+        <button class="btn-primary bg-amber-600" (click)="refreshData(true)" [disabled]="isLoading()">
+            <i class="pi pi-refresh mr-1" [class.pi-spin]="isLoading()"></i>
+            Sync Now
+        </button>
+    </div>
+
+    <!-- Debug Info - Uncomment untuk debug -->
+    <!-- <div class="text-xs text-text-muted bg-bg-muted p-2 rounded font-mono">
+        Status: {{ statusFilter() }} | Loans: {{ loans().length }} | Loading: {{ isLoading() }} | Last: {{ lastRefreshTime() | date:'HH:mm:ss' }}
+    </div> -->
 
     <!-- Table Card -->
     <div class="table-card">
@@ -68,34 +167,45 @@
                         <th>Amount</th>
                         <th>Tenure</th>
                         <th>Applied Date</th>
+                        <th>Location</th>
                         <th>Status</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <!-- Loading State -->
-                    <tr *ngIf="loading()">
-                        <td colspan="7" class="loading-cell">
+                    <tr *ngIf="isLoading()">
+                        <td colspan="8" class="loading-cell">
                             <div class="loading-spinner">
-                                <i class="pi pi-spin pi-spinner"></i>
-                                <span>Loading approved loans...</span>
+                                <i class="pi pi-spin pi-spinner text-2xl mb-2"></i>
+                                <span>Loading loans...</span>
                             </div>
                         </td>
                     </tr>
 
                     <!-- Empty State -->
-                    <tr *ngIf="!loading() && loans().length === 0 && !error()">
-                        <td colspan="7" class="empty-cell">
+                    <tr *ngIf="!isLoading() && loans().length === 0 && !error()">
+                        <td colspan="8" class="empty-cell">
                             <div class="empty-state">
-                                <i class="pi pi-check-circle"></i>
-                                <span>All caught up!</span>
-                                <p>No loans pending disbursement</p>
+                                <i class="pi pi-inbox text-4xl mb-2 text-text-muted"></i>
+                                <span class="text-lg font-semibold">No applications found</span>
+                                <p class="text-text-secondary">New loan applications will appear here for your review.</p>
+                                <div class="flex gap-2 mt-3">
+                                    <button class="btn-primary bg-brand-main" (click)="refreshData(true)" [disabled]="isLoading()">
+                                        <i class="pi pi-refresh mr-1" [class.pi-spin]="isLoading()"></i>
+                                        Refresh Now
+                                    </button>
+                                    <button class="btn-secondary" (click)="onStatusFilterChange('ALL')">
+                                        <i class="pi pi-list mr-1"></i>
+                                        Show All
+                                    </button>
+                                </div>
                             </div>
                         </td>
                     </tr>
 
                     <!-- Data Rows -->
-                    <tr *ngFor="let loan of loans()" class="data-row">
+                    <tr *ngFor="let loan of loans(); trackBy: trackByLoanId" class="data-row">
                         <td>
                             <div class="customer-info">
                                 <div class="customer-avatar">
@@ -117,33 +227,80 @@
                             <span class="date-value">{{ loan.appliedDate | date:'mediumDate' }}</span>
                         </td>
                         <td>
+                            <div class="flex items-center gap-2">
+                                <ng-container *ngIf="loan.latitude && loan.longitude; else noLocation">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                        <i class="pi pi-map-marker text-xs"></i>
+                                        Available
+                                    </span>
+                                    <button class="text-brand-main hover:text-brand-dark text-xs flex items-center gap-1 transition-colors"
+                                        (click)="viewLocationOnMap(loan)" title="View on Google Maps">
+                                        <i class="pi pi-google"></i>
+                                    </button>
+                                </ng-container>
+                                <ng-template #noLocation>
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+                                        <i class="pi pi-map-marker text-xs"></i>
+                                        N/A
+                                    </span>
+                                </ng-template>
+                            </div>
+                        </td>
+                        <td>
                             <span class="status-badge" [class]="getStatusSeverity(loan.status)">
-                                <i class="pi pi-check-circle"></i>
+                                <i class="pi" [class.pi-send]="loan.status === 'SUBMITTED'"
+                                    [class.pi-search]="loan.status === 'REVIEWED'"
+                                    [class.pi-check-circle]="loan.status === 'APPROVED'"
+                                    [class.pi-wallet]="loan.status === 'DISBURSED'"></i>
                                 {{ loan.status }}
                             </span>
                         </td>
                         <td class="actions-cell">
+                            <!-- View Details Button - Always visible -->
                             <button class="btn-secondary mr-2" (click)="onViewWorkflowDetails(loan)"
-                                title="View Workflow Details">
-                                <i class="pi pi-info-circle"></i>
-                            </button>
-                            <button class="btn-secondary mr-2" [routerLink]="['/dashboard/loans', loan.id]"
-                                title="View Details">
+                                title="View Details & Workflow">
                                 <i class="pi pi-eye"></i>
+                                <span class="hidden sm:inline ml-1">Details</span>
                             </button>
-                            <button
+
+                            <!-- Review Button - Only for SUBMITTED loans -->
+                            <button *ngIf="canReview(loan)"
+                                class="mr-2 btn-primary bg-blue-600 hover:bg-blue-700 text-xs py-1.5 px-4 shadow-blue-600/20"
+                                (click)="onViewWorkflowDetails(loan)" [disabled]="processingId() === loan.id"
+                                title="Review Loan">
+                                <i class="pi mr-1" [class.pi-spin]="processingId() === loan.id"
+                                    [class.pi-spinner]="processingId() === loan.id"
+                                    [class.pi-search]="processingId() !== loan.id"></i>
+                                <span class="hidden sm:inline">Review</span>
+                            </button>
+
+                            <!-- Approve Button - Only for REVIEWED loans -->
+                            <button *ngIf="canApprove(loan)"
                                 class="mr-2 btn-primary bg-amber-600 hover:bg-amber-700 text-xs py-1.5 px-4 shadow-amber-600/20"
-                                (click)="onDisburseClick(loan)" [disabled]="processingId() === loan.id"
+                                (click)="onViewWorkflowDetails(loan)" [disabled]="processingId() === loan.id"
+                                title="Approve Loan">
+                                <i class="pi mr-1" [class.pi-spin]="processingId() === loan.id"
+                                    [class.pi-spinner]="processingId() === loan.id"
+                                    [class.pi-check-circle]="processingId() !== loan.id"></i>
+                                <span class="hidden sm:inline">Approve</span>
+                            </button>
+
+                            <!-- Disburse Button - Only for APPROVED loans -->
+                            <button *ngIf="canDisburse(loan)"
+                                class="mr-2 btn-primary bg-green-600 hover:bg-green-700 text-xs py-1.5 px-4 shadow-green-600/20"
+                                (click)="onViewWorkflowDetails(loan)" [disabled]="processingId() === loan.id"
                                 title="Disburse Loan">
-                                <i class="pi mr-2" [class.pi-spin]="processingId() === loan.id"
+                                <i class="pi mr-1" [class.pi-spin]="processingId() === loan.id"
                                     [class.pi-spinner]="processingId() === loan.id"
                                     [class.pi-send]="processingId() !== loan.id"></i>
-                                <span>{{ processingId() === loan.id ? 'Processing...' : 'Disburse' }}</span>
+                                <span class="hidden sm:inline">Disburse</span>
                             </button>
-                            <button
-                                class="btn-secondary text-red-500 hover:text-red-700 hover:bg-red-50 text-xs py-1.5 px-4"
-                                title="Print Agreement">
-                                <i class="pi pi-print"></i>
+
+                            <!-- Reject Button - Available for non-final statuses -->
+                            <button *ngIf="loan.status !== 'DISBURSED' && loan.status !== 'REJECTED' && loan.status !== 'COMPLETED'"
+                                class="btn-secondary text-red-500 hover:text-red-700 hover:bg-red-50 text-xs py-1.5 px-3"
+                                (click)="onReject(loan.id)" [disabled]="processingId() === loan.id" title="Reject Loan">
+                                <i class="pi pi-times-circle"></i>
                             </button>
                         </td>
                     </tr>
@@ -152,11 +309,11 @@
         </div>
     </div>
 
-    <!-- Disbursement Confirmation Modal -->
+    <!-- Confirmation Modal -->
     <app-confirmation-modal [isOpen]="modal().isOpen" [title]="modal().title" [message]="modal().message"
         [confirmLabel]="modal().confirmLabel" [confirmBtnClass]="modal().confirmBtnClass"
-        [requireNotes]="modal().requireNotes" [placeholder]="modal().placeholder"
-        (confirm)="executeDisbursement($event)" (close)="modal().isOpen = false">
+        [requireNotes]="modal().requireNotes" [placeholder]="modal().placeholder" (confirm)="onExecuteAction($event)"
+        (close)="closeModal()">
     </app-confirmation-modal>
 
     <!-- Loan Workflow Modal -->

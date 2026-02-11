@@ -4,11 +4,29 @@
     /* Colors */
     --color-primary-50: var(--primary-50);
     --color-primary-100: var(--primary-100);
+    --color-primary-200: var(--primary-200);
+    --color-primary-300: var(--primary-300);
+    --color-primary-400: var(--primary-400);
     --color-primary-500: var(--primary-500);
     --color-primary-600: var(--primary-600);
-    /* Add other primary shades if needed */
+    --color-primary-700: var(--primary-700);
+    --color-primary-800: var(--primary-800);
+    --color-primary-900: var(--primary-900);
+    --color-primary-950: var(--primary-950);
 
-    /* Surface Color Scale (for utility classes like bg-surface-700) */
+    /* Accent Colors */
+    --color-accent-100: var(--accent-100);
+    --color-accent-200: var(--accent-200);
+    --color-accent-300: var(--accent-300);
+    --color-accent-400: var(--accent-400);
+    --color-accent-500: var(--accent-500);
+    --color-accent-600: var(--accent-600);
+    --color-accent-700: var(--accent-700);
+    --color-accent-800: var(--accent-800);
+    --color-accent-900: var(--accent-900);
+    --color-accent-950: var(--accent-950);
+
+    /* Surface Color Scale */
     --color-surface-0: var(--surface-0);
     --color-surface-50: var(--surface-50);
     --color-surface-100: var(--surface-100);

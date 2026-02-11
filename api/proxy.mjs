@@ -8,13 +8,16 @@ export const config = {
 };
 
 const proxy = createProxyMiddleware({
-    target: 'http://34.51.203.228',
+    target: 'https://lofiapi.martabakcode.my.id',
     changeOrigin: true,
     secure: false,
+    pathRewrite: {
+        '^/api/proxy': '', // Remove /api/proxy prefix
+    },
     on: {
         proxyReq: (proxyReq, req, res) => {
             // spoof origin to trick backend
-            proxyReq.setHeader('Origin', 'http://34.51.203.228');
+            proxyReq.setHeader('Origin', 'https://lofiapi.martabakcode.my.id');
         },
         proxyRes: (proxyRes, req, res) => {
             // override CORS on response so browser allows it

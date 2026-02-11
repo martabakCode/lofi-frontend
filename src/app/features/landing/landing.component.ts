@@ -1,4 +1,4 @@
-import { Component, OnInit, PLATFORM_ID, Inject, inject } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, Inject, inject, AfterViewInit, ViewChildren, QueryList, ElementRef } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Meta, Title } from '@angular/platform-browser';
@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms';
     templateUrl: './landing.component.html',
     styleUrls: ['./landing.component.css']
 })
-export class LandingComponent implements OnInit {
+export class LandingComponent implements OnInit, AfterViewInit {
     private isBrowser: boolean;
     isMenuOpen = false;
     isLoaded = true; // Set to true immediately for "langsung muncul"
@@ -67,6 +67,15 @@ export class LandingComponent implements OnInit {
     simAmount: number | null = null;
     simTenor: number | null = null;
 
+    @ViewChildren('animateItem') animateItems!: QueryList<ElementRef>;
+
+    // Typewriter
+    typingText = '';
+    words = ['Menyederhanakan', 'Mempercepat', 'Mengamankan', 'Mengoptimalkan'];
+    wordIndex = 0;
+    isDeleting = false;
+    typeSpeed = 100;
+
     constructor(
         private router: Router,
         private meta: Meta,
@@ -89,7 +98,69 @@ export class LandingComponent implements OnInit {
                 this.isDarkMode = true;
                 document.documentElement.classList.add('dark');
             }
+            this.typeWriter();
         }
+    }
+
+    ngAfterViewInit() {
+        if (this.isBrowser) {
+            this.setupIntersectionObserver();
+        }
+    }
+
+    // Typewriter Effect
+    typeWriter() {
+        const currentWord = this.words[this.wordIndex];
+
+        if (this.isDeleting) {
+            this.typingText = currentWord.substring(0, this.typingText.length - 1);
+        } else {
+            this.typingText = currentWord.substring(0, this.typingText.length + 1);
+        }
+
+        let typeSpeed = this.isDeleting ? 50 : 100;
+
+        if (!this.isDeleting && this.typingText === currentWord) {
+            typeSpeed = 2000; // Pause at end of word
+            this.isDeleting = true;
+        } else if (this.isDeleting && this.typingText === '') {
+            this.isDeleting = false;
+            this.wordIndex = (this.wordIndex + 1) % this.words.length;
+            typeSpeed = 500; // Pause before typing new word
+        }
+
+        setTimeout(() => {
+            if (this.isBrowser) this.typeWriter();
+        }, typeSpeed);
+    }
+
+    // Intersection Observer for Scroll Animations
+    setupIntersectionObserver() {
+        const options = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                    observer.unobserve(entry.target); // Trigger once
+                }
+            });
+        }, options);
+
+        this.animateItems.changes.subscribe(() => {
+            this.animateItems.forEach(item => {
+                observer.observe(item.nativeElement);
+            });
+        });
+
+        // Initial observation
+        this.animateItems.forEach(item => {
+            observer.observe(item.nativeElement);
+        });
     }
 
     get selectedProduct() {

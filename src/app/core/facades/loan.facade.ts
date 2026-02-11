@@ -4,7 +4,7 @@ import { LoanStatusEngine } from '../patterns/loan-status-engine';
 import { LoanStatus, LoanSLA } from '../models/loan.models';
 import { LoanAdapter } from '../../features/loans/adapters/loan.adapter';
 import { LoanVM } from '../../features/loans/models/loan.models';
-import { finalize, map, Observable, tap } from 'rxjs';
+import { finalize, map, Observable, tap, catchError, throwError } from 'rxjs';
 import { DisbursementPayload } from '../patterns/disbursement-builder';
 import { ToastService } from '../services/toast.service';
 
@@ -41,13 +41,14 @@ export class LoanFacade {
                     totalPages: res.totalPages || 0
                 })),
                 tap({
-                    next: (res) => this.loansSignal.set(res.content),
-                    error: (err) => {
-                        this.errorSignal.set(err.message || 'Failed to load loans');
-                        this.toastService.show('Failed to load loans', 'error');
-                    },
-                    finalize: () => this.loadingSignal.set(false)
-                })
+                    next: (res) => this.loansSignal.set(res.content)
+                }),
+                catchError((err) => {
+                    this.errorSignal.set(err.message || 'Failed to load loans');
+                    this.toastService.show('Failed to load loans', 'error');
+                    return throwError(() => err);
+                }),
+                finalize(() => this.loadingSignal.set(false))
             );
     }
 

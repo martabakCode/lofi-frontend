@@ -13,11 +13,21 @@ import { ProfileMenuComponent } from './profile-menu.component';
     imports: [CommonModule, RouterLink, ThemeToggleComponent, NotificationPanelComponent, ProfileMenuComponent, FormsModule],
     template: `
     <header class="h-16 bg-bg-surface/80 border-b border-border-default flex items-center justify-between px-4 lg:px-8 z-40 sticky top-0 backdrop-blur-md transition-colors duration-200">
-        <!-- Left: Logo (mobile), Search & Mobile Toggle -->
+        <!-- Left: Logo (mobile/collapsed), Search & Mobile Toggle -->
         <div class="flex items-center gap-4 flex-1">
             <!-- Mobile Logo -->
             <a routerLink="/dashboard" class="lg:hidden flex items-center gap-2">
                 <img src="assets/logo.png" alt="LoFi Logo" class="w-7 h-7 rounded object-contain">
+            </a>
+            <!-- Collapsed Sidebar Logo (Desktop) - Shows when sidebar is minimized -->
+            <a routerLink="/dashboard" 
+                class="hidden lg:flex items-center gap-2 transition-all duration-300 overflow-hidden"
+                [class.w-0]="!isSidebarCollapsed()"
+                [class.opacity-0]="!isSidebarCollapsed()"
+                [class.w-auto]="isSidebarCollapsed()"
+                [class.opacity-100]="isSidebarCollapsed()">
+                <img src="assets/logo.png" alt="LoFi Logo" class="w-8 h-8 rounded object-contain">
+                <span class="font-bold text-text-primary whitespace-nowrap">Lofi<span class="text-brand-main">Admin</span></span>
             </a>
             <button (click)="onToggleSidebar.emit()" class="lg:hidden p-2 text-text-muted hover:bg-bg-muted rounded-lg transition-colors">
                 <i class="pi pi-bars text-xl"></i>
@@ -79,6 +89,7 @@ import { ProfileMenuComponent } from './profile-menu.component';
 })
 export class TopbarComponent {
     user = input<any>();
+    isSidebarCollapsed = input<boolean>(false);
     onToggleSidebar = output<void>();
 
     private router = inject(Router);

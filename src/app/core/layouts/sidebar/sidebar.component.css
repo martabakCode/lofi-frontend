@@ -125,6 +125,18 @@
     font-weight: 700;
     border-radius: 9999px;
     margin-left: auto;
+    transition: all 0.3s ease;
+}
+
+/* Collapsed badge - positioned absolute on icon */
+.collapsed-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    min-width: 16px;
+    height: 16px;
+    font-size: 9px;
+    margin-left: 0;
 }
 
 .logout-container {
@@ -165,16 +177,25 @@
     padding-right: 0;
 }
 
-.collapsed .menu-item span,
+.collapsed .menu-item span:not(.tooltip):not(.nav-badge),
 .collapsed .menu-label,
-.collapsed .logo-text,
-.collapsed .nav-badge {
+.collapsed .logo-text {
     display: none;
 }
 
 .collapsed .logo-container {
     justify-content: center;
     padding: 0;
+}
+
+/* Collapsed logout button */
+.collapsed .btn-logout {
+    justify-content: center;
+    padding: 0.75rem 0;
+}
+
+.collapsed .btn-logout span:not(.tooltip) {
+    display: none;
 }
 
 /* Desktop collapse toggle button with dark theme */
@@ -197,6 +218,45 @@
 
 .dark .btn-logout:hover {
     background: rgba(248, 113, 113, 0.1);
+}
+
+/* Tooltip styles for collapsed state */
+.tooltip {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    pointer-events: none;
+}
+
+.tooltip::before {
+    content: '';
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 6px solid transparent;
+    border-right-color: var(--bg-surface);
+}
+
+.menu-item:hover .tooltip,
+.btn-logout:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
 }
 
 /* Smooth transitions for theme switching */

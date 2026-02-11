@@ -1,2 +1,82 @@
-/* Using Tailwind utility classes only. 
-   Custom CSS removed as per user request. */
+@reference "../../../styles/tailwind.css";
+/* Custom Animations & Utilities */
+
+/* Scroll Animation Base State */
+.scroll-hidden {
+   opacity: 0;
+   transform: translateY(40px);
+   transition: all 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Stagger delays if needed by adding .delay-100 etc utility classes */
+
+/* Active State (Added by IntersectionObserver) */
+.in-view {
+   opacity: 1;
+   transform: translateY(0);
+}
+
+/* Cursor Blink Animation */
+@keyframes blink {
+
+   0%,
+   100% {
+      opacity: 1;
+   }
+
+   50% {
+      opacity: 0;
+   }
+}
+
+.animate-blink {
+   animation: blink 1s step-end infinite;
+}
+
+/* Floating Animation */
+@keyframes float {
+   0% {
+      transform: translateY(0px);
+   }
+
+   50% {
+      transform: translateY(-20px);
+   }
+
+   100% {
+      transform: translateY(0px);
+   }
+}
+
+.animate-float {
+   animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+   animation: float 8s ease-in-out infinite;
+   animation-delay: 2s;
+}
+
+/* Gentle Pulse for decorative elements */
+@keyframes gentle-pulse {
+
+   0%,
+   100% {
+      opacity: 0.3;
+      transform: scale(1);
+   }
+
+   50% {
+      opacity: 0.5;
+      transform: scale(1.05);
+   }
+}
+
+.animate-gentle-pulse {
+   animation: gentle-pulse 4s ease-in-out infinite;
+}
+
+/* Gradient Text Utility */
+.text-gradient {
+   @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-400;
+}

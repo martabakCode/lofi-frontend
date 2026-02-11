@@ -15,11 +15,26 @@
         <p>Loading branch details...</p>
     </div>
 
-    <div *ngIf="error()" class="bg-red-50 border border-red-200 rounded-lg p-6 text-center text-red-700">
-        <i class="pi pi-exclamation-triangle text-2xl mb-2"></i>
-        <h3 class="font-medium text-lg">Error Loading Branch</h3>
-        <p>{{ error() }}</p>
-        <button (click)="loadBranch()" class="mt-4 text-sm font-medium hover:underline">Try Again</button>
+    <!-- Error State -->
+    <div *ngIf="error()" class="card py-16 flex flex-col items-center justify-center text-center">
+        <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-4">
+            <i class="pi pi-exclamation-circle text-4xl text-red-600"></i>
+        </div>
+        <h3 class="text-xl font-bold text-text-primary mb-2">Failed to Load Branch</h3>
+        <p class="text-text-secondary max-w-md mx-auto mb-2">{{ error() }}</p>
+        <p *ngIf="errorDetails()" class="text-xs text-text-muted font-mono bg-bg-muted px-3 py-1 rounded mb-6">
+            {{ errorDetails() }}
+        </p>
+        <div class="flex gap-3">
+            <button class="btn-primary bg-brand-main" (click)="retryLoad()">
+                <i class="pi pi-refresh mr-2"></i>
+                Try Again
+            </button>
+            <button class="btn-secondary" (click)="goBack()">
+                <i class="pi pi-arrow-left mr-2"></i>
+                Back to List
+            </button>
+        </div>
     </div>
 
     <div *ngIf="!loading() && branch()" class="grid grid-cols-1 lg:grid-cols-12 gap-8">

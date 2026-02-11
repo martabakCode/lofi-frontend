@@ -8,6 +8,7 @@ import { Branch } from '../../../../core/models/rbac.models';
 import { LeafletMapComponent, MapLocation } from '../../../../shared/components/leaflet-map/leaflet-map.component';
 import { PageHeaderComponent } from '../../../../shared/components/page/page-header.component';
 import { CardComponent } from '../../../../shared/components/card/card.component';
+import { catchError, of, retry } from 'rxjs';
 
 @Component({
     selector: 'app-branch-form',
@@ -26,7 +27,9 @@ export class BranchFormComponent implements OnInit {
     // State signals
     isEditMode = signal(false);
     isSubmitting = signal(false);
+    isLoading = signal(false);
     error = signal<string | null>(null);
+    errorDetails = signal<string | null>(null);
     branchId = signal<string | null>(null);
 
     // Default Jakarta location
@@ -57,27 +60,48 @@ export class BranchFormComponent implements OnInit {
     }
 
     loadBranch(id: string) {
-        this.isSubmitting.set(true);
-        this.rbacService.getBranchById(id).subscribe({
+        this.isLoading.set(true);
+        this.error.set(null);
+        this.errorDetails.set(null);
+        
+        this.rbacService.getBranchById(id).pipe(
+            retry({ count: 2, delay: 1000 }),
+            catchError((err) => {
+                console.error('Failed to load branch:', err);
+                const message = err.error?.message || err.message || 'Failed to load branch';
+                this.error.set(message);
+                this.errorDetails.set(`Error: ${err.status} ${err.statusText}`);
+                this.isLoading.set(false);
+                return of(null);
+            })
+        ).subscribe({
             next: (branch) => {
-                this.branchForm.patchValue({
-                    name: branch.name,
-                    address: branch.address,
-                    city: branch.city,
-                    state: branch.state,
-                    zipCode: branch.zipCode,
-                    phone: branch.phone,
-                    longitude: branch.longitude || '',
-                    latitude: branch.latitude || ''
-                });
-                this.isSubmitting.set(false);
-            },
-            error: () => {
-                this.toastService.show('Failed to load branch', 'error');
-                this.isSubmitting.set(false);
-                this.router.navigate(['/dashboard/branches']);
+                if (branch) {
+                    this.branchForm.patchValue({
+                        name: branch.name,
+                        address: branch.address,
+                        city: branch.city,
+                        state: branch.state,
+                        zipCode: branch.zipCode,
+                        phone: branch.phone,
+                        longitude: branch.longitude || '',
+                        latitude: branch.latitude || ''
+                    });
+                }
+                this.isLoading.set(false);
             }
         });
+    }
+
+    retryLoad() {
+        const id = this.branchId();
+        if (id) {
+            this.loadBranch(id);
+        }
+    }
+
+    goBack() {
+        this.router.navigate(['/dashboard/branches']);
     }
 
     onLocationChange(location: MapLocation) {
@@ -126,7 +150,9 @@ export class BranchFormComponent implements OnInit {
                 },
                 error: (err) => {
                     this.isSubmitting.set(false);
-                    this.error.set(err.error?.message || 'Failed to update branch');
+                    const message = err.error?.message || err.message || 'Failed to update branch';
+                    this.error.set(message);
+                    this.errorDetails.set(`Error: ${err.status} ${err.statusText}`);
                     this.toastService.show('Failed to update branch', 'error');
                 }
             });
@@ -138,14 +164,12 @@ export class BranchFormComponent implements OnInit {
                 },
                 error: (err) => {
                     this.isSubmitting.set(false);
-                    this.error.set(err.error?.message || 'Failed to create branch');
+                    const message = err.error?.message || err.message || 'Failed to create branch';
+                    this.error.set(message);
+                    this.errorDetails.set(`Error: ${err.status} ${err.statusText}`);
                     this.toastService.show('Failed to create branch', 'error');
                 }
             });
         }
-    }
-
-    goBack() {
-        this.router.navigate(['/dashboard/branches']);
     }
 }

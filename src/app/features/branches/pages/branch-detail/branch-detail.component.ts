@@ -9,6 +9,7 @@ import { PageHeaderComponent } from '../../../../shared/components/page/page-hea
 import { CardComponent } from '../../../../shared/components/card/card.component';
 import { LeafletMapComponent } from '../../../../shared/components/leaflet-map/leaflet-map.component';
 import { DetailModalComponent } from '../../../../shared/components/detail-modal/detail-modal.component';
+import { catchError, of, retry } from 'rxjs';
 
 type StaffRole = 'ALL' | 'BRANCH_MANAGER' | 'MARKETING';
 
@@ -30,11 +31,13 @@ export class BranchDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private rbacService = inject(RbacService);
   private toastService = inject(ToastService);
+  private router = inject(Router);
 
   branchId = signal<string>('');
   branch = signal<Branch | null>(null);
   loading = signal(false);
   error = signal<string | null>(null);
+  errorDetails = signal<string | null>(null);
 
   // Staff State
   branchStaff = signal<User[]>([]);
@@ -92,29 +95,51 @@ export class BranchDetailComponent implements OnInit {
   loadBranch(): void {
     this.loading.set(true);
     this.error.set(null);
+    this.errorDetails.set(null);
 
-    this.rbacService.getBranchById(this.branchId()).subscribe({
-      next: (branch) => {
-        this.branch.set(branch);
+    this.rbacService.getBranchById(this.branchId()).pipe(
+      retry({ count: 2, delay: 1000 }),
+      catchError((err) => {
+        console.error('Failed to load branch:', err);
+        const message = err.error?.message || err.message || 'Failed to load branch';
+        this.error.set(message);
+        this.errorDetails.set(`Error: ${err.status} ${err.statusText}`);
         this.loading.set(false);
-      },
-      error: (err) => {
-        this.error.set(err.message || 'Failed to load branch details');
+        return of(null);
+      })
+    ).subscribe({
+      next: (branch) => {
+        if (branch) {
+          this.branch.set(branch);
+        }
         this.loading.set(false);
       }
     });
   }
 
+  retryLoad(): void {
+    this.loadBranch();
+    this.loadBranchStaff();
+  }
+
+  goBack(): void {
+    this.router.navigate(['/dashboard/branches']);
+  }
+
   loadBranchStaff() {
     this.loadingStaff.set(true);
-    this.rbacService.getBranchStaff(this.branchId()).subscribe({
+    this.rbacService.getBranchStaff(this.branchId()).pipe(
+      retry({ count: 2, delay: 1000 }),
+      catchError((err) => {
+        console.error('Failed to load branch staff:', err);
+        this.loadingStaff.set(false);
+        this.toastService.show('Failed to load branch staff', 'error');
+        return of([]);
+      })
+    ).subscribe({
       next: (staff) => {
         this.branchStaff.set(staff);
         this.loadingStaff.set(false);
-      },
-      error: () => {
-        this.loadingStaff.set(false);
-        this.toastService.show('Failed to load branch staff', 'error');
       }
     });
   }

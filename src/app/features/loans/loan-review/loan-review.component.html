@@ -7,10 +7,25 @@
             </div>
             <div>
                 <h1 class="text-2xl font-bold text-text-primary m-0">Loan Review Queue</h1>
-                <p class="text-text-secondary m-0">Initial review and scaling for new loan applications</p>
+                <p class="text-text-secondary m-0">
+                    Initial review for new loan applications
+                    <span *ngIf="lastRefreshTime()" class="text-xs text-text-muted ml-2">
+                        (Updated: {{ lastRefreshTime() | date:'HH:mm:ss' }})
+                    </span>
+                </p>
             </div>
         </div>
         <div class="flex items-center gap-3">
+            <!-- Branch Filter -->
+            <select (change)="onBranchChange($event)"
+                class="form-select py-2 pl-3 pr-8 text-sm bg-bg-surface border-border-default rounded-lg focus:border-brand-main focus:ring-1 focus:ring-brand-main w-40 hidden md:block"
+                aria-label="Filter by Branch">
+                <option value="">All Branches</option>
+                <option *ngFor="let branch of branches()" [value]="branch.id">
+                    {{ branch.name }}
+                </option>
+            </select>
+
             <div class="relative group">
                 <i
                     class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-brand-main transition-colors"></i>
@@ -20,32 +35,59 @@
             <button class="btn-secondary px-3" (click)="exportLoans()" title="Export" [disabled]="isExporting()">
                 <i class="pi pi-download" [class.pi-spin]="isExporting()"></i>
             </button>
-            <button class="btn-secondary px-3" (click)="loadLoans()" title="Refresh" [disabled]="loading()">
-                <i class="pi pi-refresh" [class.pi-spin]="loading()"></i>
+            <button class="btn-primary bg-brand-main px-3" (click)="refreshData()" title="Force Refresh" [disabled]="isLoading()">
+                <i class="pi pi-refresh mr-2" [class.pi-spin]="isLoading()"></i>
+                <span class="hidden sm:inline">Refresh</span>
             </button>
         </div>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error()" class="error-alert flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <i class="pi pi-exclamation-triangle text-xl"></i>
+            <div>
+                <p class="font-semibold m-0">Error Loading Data</p>
+                <p class="text-sm m-0">{{ error() }}</p>
+            </div>
+        </div>
+        <button class="btn-primary bg-brand-main" (click)="refreshData()" [disabled]="isLoading()">
+            <i class="pi pi-refresh mr-1" [class.pi-spin]="isLoading()"></i>
+            Retry
+        </button>
     </div>
 
     <!-- Stats Row -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="card p-6 flex flex-col gap-1">
             <span class="text-xs font-bold text-text-muted uppercase tracking-widest">Pending Review</span>
-            <span class="text-2xl font-bold text-brand-main">{{ totalRecords() }}</span>
+            <div class="flex items-center gap-2">
+                <span class="text-2xl font-bold text-brand-main">
+                    {{ isLoading() ? '...' : totalRecords() }}
+                </span>
+                <i *ngIf="isLoading()" class="pi pi-spin pi-spinner text-brand-main text-sm"></i>
+            </div>
         </div>
     </div>
 
     <!-- Empty State -->
-    <div *ngIf="loans().length === 0 && !loading() && !error()"
+    <div *ngIf="loans().length === 0 && !isLoading() && !error()"
         class="card py-20 flex flex-col items-center justify-center text-center">
         <div class="w-20 h-20 bg-bg-muted rounded-full flex items-center justify-center mb-4">
             <i class="pi pi-inbox text-4xl text-text-muted"></i>
         </div>
         <h3 class="text-xl font-bold text-text-primary">No applications found</h3>
-        <p class="text-text-secondary max-w-xs mx-auto">New loan applications will appear here for your review.</p>
+        <p class="text-text-secondary max-w-xs mx-auto mb-4">New loan applications will appear here for your review.</p>
+        <div class="flex gap-2">
+            <button class="btn-primary bg-brand-main" (click)="refreshData()" [disabled]="isLoading()">
+                <i class="pi pi-refresh mr-1" [class.pi-spin]="isLoading()"></i>
+                Refresh Now
+            </button>
+        </div>
     </div>
 
     <!-- Table Card -->
-    <div class="card" *ngIf="loans().length > 0 || loading()">
+    <div class="card" *ngIf="loans().length > 0 || isLoading()">
         <div class="table-container border-none rounded-none shadow-none">
             <table>
                 <thead>
@@ -60,7 +102,7 @@
                 </thead>
                 <tbody class="divide-y divide-border-muted">
                     <!-- Loading State -->
-                    <tr *ngIf="loading()">
+                    <tr *ngIf="isLoading()">
                         <td colspan="6" class="py-20 text-center">
                             <div class="flex flex-col items-center gap-3">
                                 <i class="pi pi-spin pi-spinner text-4xl text-brand-main"></i>
@@ -70,7 +112,7 @@
                     </tr>
 
                     <!-- Data Rows -->
-                    <tr *ngFor="let loan of loans()" class="group hover:bg-bg-muted/50 transition-colors">
+                    <tr *ngFor="let loan of loans(); trackBy: trackByLoanId" class="group hover:bg-bg-muted/50 transition-colors">
                         <td class="pl-6 py-4">
                             <div class="flex items-center gap-3">
                                 <div

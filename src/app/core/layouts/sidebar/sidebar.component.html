@@ -25,62 +25,70 @@
         <div class="menu-label">Main Navigation</div>
 
         <a routerLink="/dashboard" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }"
-            class="menu-item" title="Dashboard">
+            class="menu-item relative" title="Dashboard">
             <i class="pi pi-home"></i>
             <span>Dashboard</span>
+            <!-- Tooltip for collapsed state -->
+            <span class="tooltip" *ngIf="isCollapsed()">Dashboard</span>
         </a>
 
         <a routerLink="/dashboard/notifications/my" routerLinkActive="active-link"
-            class="menu-item flex justify-between items-center group" title="My Notifications">
-            <div class="flex items-center gap-3 w-full">
+            class="menu-item flex justify-between items-center group relative" title="My Notifications">
+            <div class="flex items-center gap-3 w-full" [class.justify-center]="isCollapsed()">
                 <i class="pi pi-bell"></i>
                 <span class="truncate flex-1">My Notifications</span>
                 @if (notificationFacade.unreadCount() > 0) {
-                <span class="nav-badge">
+                <span class="nav-badge" [class.collapsed-badge]="isCollapsed()">
                     {{ notificationFacade.unreadCount() }}
                 </span>
                 }
             </div>
+            <span class="tooltip" *ngIf="isCollapsed()">Notifications</span>
         </a>
 
         @if (isAdmin()) {
         <a routerLink="/dashboard/notifications/manage" routerLinkActive="active-link"
-            class="menu-item flex items-center group" title="Manage Notifications">
+            class="menu-item flex items-center group relative" title="Manage Notifications">
             <i class="pi pi-cog"></i>
             <span>Manage Notifications</span>
+            <span class="tooltip" *ngIf="isCollapsed()">Manage</span>
         </a>
         }
 
         <!-- Loan Management -->
         <ng-container *ngIf="hasAnyRole(['ROLE_CUSTOMER'])">
             <div class="menu-label mt-6">Loan Management</div>
-            <a routerLink="/dashboard/loans/apply" routerLinkActive="active-link" class="menu-item" title="Apply Loan">
+            <a routerLink="/dashboard/loans/apply" routerLinkActive="active-link" class="menu-item relative" title="Apply Loan">
                 <i class="pi pi-pencil"></i>
                 <span>Apply Loan</span>
+                <span class="tooltip" *ngIf="isCollapsed()">Apply</span>
             </a>
         </ng-container>
 
         <ng-container *ngIf="isAdmin() || hasAnyRole(['ROLE_MARKETING'])">
-            <a routerLink="/dashboard/loans/review" routerLinkActive="active-link" class="menu-item"
+            <a routerLink="/dashboard/loans/review" routerLinkActive="active-link" class="menu-item relative"
                 title="Loan Review">
                 <i class="pi pi-search-plus"></i>
                 <span>Loan Review</span>
+                <span class="tooltip" *ngIf="isCollapsed()">Review</span>
             </a>
         </ng-container>
 
         <ng-container *ngIf="isAdmin() || hasAnyRole(['ROLE_BRANCH_MANAGER', 'ROLE_BACK_OFFICE'])">
-            <a routerLink="/dashboard/loans/approval" routerLinkActive="active-link" class="menu-item"
+            <a routerLink="/dashboard/loans/approval" routerLinkActive="active-link" class="menu-item relative"
                 title="Loan Approval">
                 <i class="pi pi-check-square"></i>
                 <span>Loan Approval</span>
+                <span class="tooltip" *ngIf="isCollapsed()">Approval</span>
             </a>
         </ng-container>
 
         <ng-container *ngIf="isAdmin() || hasAnyRole(['ROLE_BACK_OFFICE'])">
-            <a routerLink="/dashboard/disbursements" routerLinkActive="active-link" class="menu-item"
+            <a routerLink="/dashboard/disbursements" routerLinkActive="active-link" class="menu-item relative"
                 title="Disbursements">
                 <i class="pi pi-money-bill"></i>
                 <span>Disbursements</span>
+                <span class="tooltip" *ngIf="isCollapsed()">Disburse</span>
             </a>
         </ng-container>
 
@@ -88,39 +96,45 @@
         <ng-container *ngIf="isAdmin()">
             <div class="menu-label mt-6">Configurations</div>
 
-            <a routerLink="/dashboard/products" routerLinkActive="active-link" class="menu-item" title="Products">
+            <a routerLink="/dashboard/products" routerLinkActive="active-link" class="menu-item relative" title="Products">
                 <i class="pi pi-box"></i>
                 <span>Products</span>
+                <span class="tooltip" *ngIf="isCollapsed()">Products</span>
             </a>
 
-            <a routerLink="/dashboard/users" routerLinkActive="active-link" class="menu-item" title="Staff & Roles">
+            <a routerLink="/dashboard/users" routerLinkActive="active-link" class="menu-item relative" title="Staff & Roles">
                 <i class="pi pi-users"></i>
                 <span>Staff & Roles</span>
+                <span class="tooltip" *ngIf="isCollapsed()">Staff</span>
             </a>
 
-            <a routerLink="/dashboard/branches" routerLinkActive="active-link" class="menu-item" title="Branches">
+            <a routerLink="/dashboard/branches" routerLinkActive="active-link" class="menu-item relative" title="Branches">
                 <i class="pi pi-map-marker"></i>
                 <span>Branches</span>
+                <span class="tooltip" *ngIf="isCollapsed()">Branches</span>
             </a>
 
-            <a routerLink="/dashboard/roles" routerLinkActive="active-link" class="menu-item" title="Permissions">
+            <a routerLink="/dashboard/roles" routerLinkActive="active-link" class="menu-item relative" title="Permissions">
                 <i class="pi pi-shield"></i>
                 <span>Permissions</span>
+                <span class="tooltip" *ngIf="isCollapsed()">Roles</span>
             </a>
         </ng-container>
 
         <!-- Account Section (Everyone) -->
         <div class="menu-label mt-6">Account Settings</div>
-        <a routerLink="/dashboard/profile" routerLinkActive="active-link" class="menu-item" title="My Profile">
+        <a routerLink="/dashboard/profile" routerLinkActive="active-link" class="menu-item relative" title="My Profile">
             <i class="pi pi-user"></i>
             <span>My Profile</span>
+            <span class="tooltip" *ngIf="isCollapsed()">Profile</span>
         </a>
     </nav>
 
     <div class="logout-container">
-        <button type="button" (click)="onLogout.emit()" class="btn-logout" title="Sign Out">
+        <button type="button" (click)="onLogout.emit()" class="btn-logout relative" title="Sign Out">
             <i class="pi pi-power-off"></i>
             <span>Sign Out</span>
+            <span class="tooltip" *ngIf="isCollapsed()">Logout</span>
         </button>
     </div>
 </aside>
