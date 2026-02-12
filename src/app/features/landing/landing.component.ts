@@ -57,7 +57,36 @@ export class LandingComponent implements OnInit, AfterViewInit {
         { title: 'Skalabilitas Tinggi', description: 'Sistem yang siap tumbuh bersama perkembangan bisnis Anda.' }
     ];
 
-    heroWords = "Sistem Digital yang Menyederhanakan Proses Anda".split(' ');
+    // Testimonials
+    testimonials = [
+        {
+            name: 'Budi Santoso',
+            role: 'CEO, FinTech Asia',
+            content: 'Lofi telah mengubah cara kami memproses pinjaman. Efisiensi meningkat 200% dalam 3 bulan pertama.',
+            avatar: 'https://i.pravatar.cc/150?u=budi'
+        },
+        {
+            name: 'Sarah Wijaya',
+            role: 'Operational Manager, Bank Mega',
+            content: 'Sistem validasi otomatisnya sangat akurat. Kami berhasil mengurangi risiko bad loan secara signifikan.',
+            avatar: 'https://i.pravatar.cc/150?u=sarah'
+        },
+        {
+            name: 'Michael Chen',
+            role: 'Director, Global Finance',
+            content: 'Interface yang sangat intuitif dan profesional. Tim kami tidak memerlukan waktu lama untuk beradaptasi.',
+            avatar: 'https://i.pravatar.cc/150?u=michael'
+        }
+    ];
+
+    // Contact Form
+    contactForm = {
+        name: '',
+        email: '',
+        message: ''
+    };
+
+    heroWords = "Enterprise Workflow System for Modern Business".split(' ');
 
     // Simulation State
     productFacade = inject(ProductFacade);
@@ -71,7 +100,7 @@ export class LandingComponent implements OnInit, AfterViewInit {
 
     // Typewriter
     typingText = '';
-    words = ['Nano Banana', 'Cerdas', 'Efisien', 'Terpercaya'];
+    words = ['Secure', 'Intelligent', 'Efficient', 'Reliable'];
     wordIndex = 0;
     isDeleting = false;
     typeSpeed = 100;
@@ -86,8 +115,8 @@ export class LandingComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit() {
-        this.title.setTitle('LoFi - Productivity, Focus, Calm Workflow System');
-        this.meta.updateTag({ name: 'description', content: 'Experience a calm, and highly focused loan approval workflow. LoFi simplifies digital processes with ease and music-like harmony.' });
+        this.title.setTitle('LoFi - Enterprise Loan Management System');
+        this.meta.updateTag({ name: 'description', content: 'Enterprise-grade loan management and workflow automation system.' });
 
         // Load products for calculator
         this.productFacade.loadProducts();
@@ -217,5 +246,10 @@ export class LandingComponent implements OnInit, AfterViewInit {
             this.simAmount = p.minAmount;
             this.simTenor = p.minTenor;
         }
+    }
+
+    submitContact() {
+        alert('Terima kasih! Pesan Anda telah kami terima. Tim kami akan segera menghubungi Anda.');
+        this.contactForm = { name: '', email: '', message: '' };
     }
 }

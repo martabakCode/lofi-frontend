@@ -1,13 +1,20 @@
 <div
     class="min-h-screen bg-bg-page text-text-primary font-sans transition-colors duration-500 relative overflow-hidden">
 
-    <!-- Background Decoration (Subtle) -->
-    <div class="absolute inset-0 pointer-events-none overflow-hidden opacity-50">
+    <!-- Background Decoration (Professional Abstract) -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden">
+        <!-- Office Background Overlay - Hero (Modern Building) -->
         <div
-            class="absolute top-[-10%] left-[-5%] w-[40%] h-[40%] rounded-full bg-primary-100/30 dark:bg-primary-900/10 blur-[120px]">
+            class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center opacity-[0.05] dark:opacity-[0.1]">
+        </div>
+
+        <div class="absolute inset-0 bg-gradient-to-b from-bg-page via-transparent to-bg-page"></div>
+
+        <div
+            class="absolute top-[-10%] right-[-5%] w-[50%] h-[50%] rounded-full bg-primary-100/20 dark:bg-primary-900/10 blur-[120px]">
         </div>
         <div
-            class="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-primary-200/30 dark:bg-primary-900/10 blur-[120px]">
+            class="absolute bottom-[-10%] left-[-5%] w-[50%] h-[50%] rounded-full bg-blue-100/20 dark:bg-blue-900/10 blur-[120px]">
         </div>
     </div>
 
@@ -15,9 +22,8 @@
     <nav class="sticky top-0 z-50 bg-bg-surface/90 backdrop-blur-sm border-b border-border-default transition-colors">
         <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer" (click)="scrollToSection('hero')">
-                <img src="logo.png" alt="LoFi Logo" class="w-8 h-8 rounded object-contain">
-                <span class="text-xl font-bold tracking-tight text-text-primary">LoFi <span
-                        class="text-primary-600 text-[10px] align-top">Nano</span></span>
+                <img src="assets/logo.png" alt="Logo" class="w-6 h-6 object-contain">
+                <span class="text-xl font-bold tracking-tight text-text-primary">Lofi</span>
             </div>
 
             <div
@@ -46,24 +52,24 @@
         <!-- Content -->
         <div class="relative z-10">
             <div #animateItem
-                class="scroll-hidden inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-50 dark:bg-primary-900/10 text-primary-700 dark:text-primary-400 text-[10px] font-black uppercase tracking-widest mb-8 border border-primary-100 dark:border-primary-800/30 shadow-sm backdrop-blur-sm">
+                class="scroll-hidden inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-50 dark:bg-primary-900/10 text-primary-700 dark:text-primary-400 text-[10px] font-bold uppercase tracking-widest mb-8 border border-primary-100 dark:border-primary-800/30 shadow-sm backdrop-blur-sm">
                 <span class="relative flex h-2 w-2">
                     <span
                         class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-primary-500"></span>
                 </span>
-                Powered by Nano Banana Tech 🍌
+                Enterprise Financial System
             </div>
 
             <h1 #animateItem
-                class="scroll-hidden text-5xl md:text-7xl font-black tracking-tighter leading-[1.1] mb-8 bg-clip-text text-transparent bg-gradient-to-r from-text-primary via-slate-700 to-text-primary animation-shine transition-colors duration-1000 delay-100">
+                class="scroll-hidden text-5xl md:text-7xl font-black tracking-tighter leading-[1.1] mb-8 bg-clip-text text-transparent bg-gradient-to-r from-text-primary via-slate-400 dark:via-slate-200 to-text-primary animation-shine transition-colors duration-1000 delay-100">
                 Solusi Keuangan <br>
                 <span class="text-primary-600 inline-block min-w-[300px]">{{ typingText }}<span
                         class="animate-blink font-light text-primary-400">|</span></span>
             </h1>
 
             <p #animateItem class="scroll-hidden text-lg text-text-secondary leading-relaxed mb-10 max-w-lg delay-200">
-                Bantu Nano Banana hadir untuk mempercepat pertumbuhan finansial Anda.
+                Lofi hadir untuk mempercepat pertumbuhan finansial Anda.
                 Automasi persetujuan dan dokumentasi dalam satu platform yang cerdas.
             </p>
 
@@ -105,16 +111,11 @@
         <div class="relative perspective-1000">
             <!-- Decorative Blobs -->
             <div
-                class="absolute -top-20 -right-20 w-72 h-72 bg-purple-400/20 rounded-full blur-3xl animate-gentle-pulse">
+                class="absolute -top-20 -right-20 w-72 h-72 bg-purple-400/20 rounded-full blur-3xl animate-gentle-pulse mix-blend-multiply dark:mix-blend-normal">
             </div>
             <div
-                class="absolute -bottom-20 -left-20 w-72 h-72 bg-primary-400/20 rounded-full blur-3xl animate-gentle-pulse animation-delay-2000">
+                class="absolute -bottom-20 -left-20 w-72 h-72 bg-primary-400/20 rounded-full blur-3xl animate-gentle-pulse animation-delay-2000 mix-blend-multiply dark:mix-blend-normal">
             </div>
-
-            <!-- Floating Financial Elements -->
-            <div class="absolute top-0 right-10 text-6xl animate-float delay-100 z-20">💰</div>
-            <div class="absolute bottom-20 left-10 text-5xl animate-float-delayed z-20">🍌</div>
-            <div class="absolute top-1/2 -right-10 text-4xl animate-bounce z-20">📈</div>
 
             <!-- Main Composition -->
             <div #animateItem class="scroll-hidden relative z-10 transition-opacty delay-200 duration-1000">
@@ -125,50 +126,42 @@
 
                 <!-- Main Card (Glassmorphism) -->
                 <div
-                    class="relative bg-bg-surface/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/20 dark:border-slate-700/50 p-8 animate-float transition-all hover:rotate-1 hover:scale-[1.02] duration-500 group overflow-hidden">
+                    class="relative bg-bg-surface/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/20 dark:border-white/10 p-8 animate-float transition-all hover:rotate-1 hover:scale-[1.02] duration-500 group overflow-hidden">
 
                     <!-- Shine Effect -->
                     <div
                         class="absolute inset-0 bg-gradient-to-tr from-white/30 via-transparent to-transparent pointer-events-none">
                     </div>
 
-                    <!-- Placeholder for Nano Banana Hero Image -->
+                    <!-- Professional Hero Image -->
                     <div
-                        class="w-full aspect-square rounded-2xl bg-gradient-to-br from-primary-100 via-primary-50 to-white dark:from-slate-800 dark:to-slate-900 flex flex-col items-center justify-center relative overflow-hidden">
+                        class="w-full aspect-square rounded-2xl overflow-hidden relative group-hover:scale-[1.02] transition-transform duration-700">
 
-                        <!-- CSS Art: Abstract Nano Banana Character -->
-                        <div class="relative w-40 h-40">
-                            <!-- Banana Body (Simple CSS shape if image fails) -->
-                            <div
-                                class="absolute inset-0 bg-yellow-400 rounded-full rotate-45 transform skew-x-12 shadow-inner">
-                            </div>
-                            <div class="absolute top-10 left-10 w-8 h-8 bg-white rounded-full z-10">
-                                <div class="w-3 h-3 bg-black rounded-full absolute top-2 right-2 animate-blink"></div>
-                            </div>
-                            <div class="absolute top-10 right-10 w-8 h-8 bg-white rounded-full z-10">
-                                <div class="w-3 h-3 bg-black rounded-full absolute top-2 right-2 animate-blink"></div>
-                            </div>
-                            <div class="absolute bottom-10 left-10 w-20 h-4 bg-black/20 rounded-full rotate-12"></div>
+                        <!-- Real Office Image -->
+                        <img src="https://images.unsplash.com/photo-1604328698692-f76ea9498e76?q=80&w=1000&auto=format&fit=crop"
+                            alt="Enterprise Office"
+                            class="absolute inset-0 w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-500">
 
-                            <!-- Tie Code -->
-                            <div
-                                class="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-20 bg-red-500 clip-path-polygon">
-                            </div>
+                        <!-- Gradient Overlay -->
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-bg-surface via-transparent to-transparent opacity-80">
                         </div>
 
-                        <div class="mt-8 text-center relative z-10">
-                            <h3 class="text-2xl font-black text-text-primary">Nano Banana</h3>
-                            <p class="text-sm text-text-secondary">Your Financial Assistant</p>
+                        <div class="absolute bottom-0 inset-x-0 p-8 text-center relative z-10">
+                            <h3 class="text-2xl font-bold text-text-primary tracking-tight mb-1">Lofi Finance</h3>
+                            <p class="text-sm text-text-secondary font-medium">Enterprise Solution</p>
                         </div>
 
-                        <!-- Floating Coins CSS -->
+                        <!-- Floating Badge inside image -->
                         <div
-                            class="absolute top-10 left-10 w-8 h-8 rounded-full bg-yellow-500 border-2 border-yellow-300 animate-bounce delay-75 shadow-lg flex items-center justify-center text-xs font-bold text-yellow-900">
-                            $</div>
-                        <div
-                            class="absolute bottom-20 right-10 w-10 h-10 rounded-full bg-yellow-500 border-2 border-yellow-300 animate-float delay-150 shadow-lg flex items-center justify-center text-sm font-bold text-yellow-900">
-                            Rp</div>
-
+                            class="absolute top-6 right-6 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold shadow-lg border border-white/20 flex items-center gap-2">
+                            <span class="relative flex h-2 w-2">
+                                <span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                            </span>
+                            Live System
+                        </div>
                     </div>
 
                     <!-- Bottom Stats Bar -->
@@ -192,11 +185,11 @@
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600">
-                                🍌
+                                <i class="pi pi-verified"></i>
                             </div>
                             <div>
-                                <div class="text-xs font-bold text-text-muted">Banana Pts</div>
-                                <div class="font-black text-primary-600">8,450</div>
+                                <div class="text-xs font-bold text-text-muted">Trust Score</div>
+                                <div class="font-black text-primary-600">99.9%</div>
                             </div>
                         </div>
                     </div>
@@ -222,8 +215,13 @@
     </header>
 
     <!-- Problem-Solution Section -->
-    <section id="problem" class="bg-bg-muted/50 py-32 border-y border-border-muted transition-colors">
-        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
+    <section id="problem" class="relative py-32 border-y border-border-muted transition-colors overflow-hidden">
+        <!-- Background Image (Busy Office/Chaos) -->
+        <div
+            class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center opacity-[0.03] dark:opacity-[0.05]">
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-20 items-center relative z-10">
             <div #animateItem class="scroll-hidden">
                 <h2 class="text-xs font-black uppercase tracking-[0.4em] text-primary-600 mb-6 flex items-center gap-2">
                     <span class="w-8 h-[2px] bg-primary-600"></span>
@@ -247,25 +245,23 @@
             </div>
             <div #animateItem class="scroll-hidden delay-300">
                 <div
-                    class="bg-bg-surface p-10 md:p-14 rounded-[3rem] shadow-2xl border border-border-default transition-all hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-2 relative overflow-hidden group">
-
-                    <!-- Decorative BG -->
+                    class="bg-bg-surface p-10 md:p-14 rounded-[3rem] shadow-2xl dark:shadow-[0_20px_60px_-10px_rgba(0,0,0,0.7)] border border-border-default dark:border-white/5 transition-all hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-2 relative overflow-hidden group">
                     <div
-                        class="absolute -top-24 -right-24 w-64 h-64 bg-green-400/10 rounded-full blur-3xl group-hover:bg-green-400/20 transition-all">
+                        class="absolute -top-24 -right-24 w-64 h-64 bg-primary-400/20 rounded-full blur-3xl group-hover:bg-primary-400/30 transition-all">
                     </div>
 
                     <h2
-                        class="text-xs font-black uppercase tracking-[0.4em] text-green-600 mb-6 font-bold flex items-center gap-2 relative z-10">
-                        <span class="w-8 h-[2px] bg-green-600"></span>
-                        Solusi Nano Banana
+                        class="text-xs font-black uppercase tracking-[0.4em] text-primary-600 mb-6 font-bold flex items-center gap-2 relative z-10">
+                        <span class="w-8 h-[2px] bg-primary-600"></span>
+                        Solusi Lofi Finance
                     </h2>
                     <h3 class="text-4xl md:text-5xl font-black mb-10 leading-tight relative z-10 text-text-primary">
-                        Kecepatan tanpa <span class="text-green-600">kompromi.</span></h3>
+                        Kecepatan tanpa <span class="text-primary-600">kompromi.</span></h3>
                     <ul class="space-y-6 relative z-10">
                         <li *ngFor="let s of solutions" class="flex gap-4 items-center group">
                             <div
-                                class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center transition-transform group-hover:rotate-[360deg] duration-700 shrink-0 shadow-sm">
-                                <span class="text-green-600 font-bold">✓</span>
+                                class="w-10 h-10 rounded-full bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center transition-transform group-hover:rotate-[360deg] duration-700 shrink-0 shadow-sm border border-primary-100 dark:border-primary-800">
+                                <span class="text-primary-600 font-bold">✓</span>
                             </div>
                             <span class="text-lg font-bold text-text-primary">{{ s.text }}</span>
                         </li>
@@ -276,10 +272,15 @@
     </section>
 
     <!-- How It Works Section -->
-    <section id="how-it-works" class="py-32 max-w-7xl mx-auto px-6">
-        <div class="text-center mb-24 max-w-3xl mx-auto">
+    <section id="how-it-works" class="relative py-32 max-w-7xl mx-auto px-6 overflow-hidden">
+        <!-- Background Image (Workflow/Planning) -->
+        <div
+            class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center opacity-[0.02] pointer-events-none">
+        </div>
+
+        <div class="text-center mb-24 max-w-3xl mx-auto relative z-10">
             <h2 #animateItem class="scroll-hidden text-4xl md:text-5xl font-black mb-6 text-text-primary">Bagaimana
-                <span class="text-primary-600">Nano Banana</span> Bekerja?
+                <span class="text-primary-600">Lofi</span> Bekerja?
             </h2>
             <p #animateItem class="scroll-hidden delay-100 opacity-50 font-medium text-xl text-text-secondary">4 langkah
                 sederhana menuju
@@ -287,7 +288,7 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div *ngFor="let step of steps; let i = index" #animateItem
-                class="scroll-hidden relative group p-6 rounded-3xl hover:bg-bg-muted/50 transition-colors duration-500"
+                class="scroll-hidden relative group p-6 rounded-3xl hover:bg-bg-muted/50 dark:hover:bg-white/5 transition-colors duration-500"
                 [style.transitionDuration]="(500 + (i * 200)) + 'ms'">
 
                 <div
@@ -328,77 +329,93 @@
             </div>
 
             <div #animateItem
-                class="scroll-hidden delay-200 bg-bg-surface rounded-[2.5rem] shadow-2xl border border-border-default overflow-hidden relative z-10">
-                <div class="grid grid-cols-1 md:grid-cols-2">
+                class="scroll-hidden delay-200 bg-bg-surface rounded-3xl md:rounded-[2.5rem] shadow-xl dark:shadow-none border border-border-default overflow-hidden relative z-10">
+                <div class="grid grid-cols-1 lg:grid-cols-12">
                     <!-- Input Area -->
-                    <div class="p-10 space-y-8 border-b md:border-b-0 md:border-r border-border-default">
-                        <!-- Product Selection -->
-                        <div class="space-y-3">
-                            <label class="text-xs font-bold uppercase tracking-wider text-text-muted">Pilih
-                                Produk</label>
-                            <div class="relative group">
-                                <select [(ngModel)]="simSelectedProductId" (change)="onProductChange()"
-                                    class="w-full bg-bg-muted border border-border-default rounded-2xl px-5 py-4 font-bold text-lg outline-none focus:border-primary-600 focus:ring-4 focus:ring-primary-600/10 transition-all cursor-pointer appearance-none text-text-primary pr-10">
-                                    <option value="" disabled selected>Pilih salah satu...</option>
-                                    <option *ngFor="let p of products()" [value]="p.id">
-                                        {{ p.name }} ({{ p.interestRate }}%)
-                                    </option>
-                                </select>
-                                <div
-                                    class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-50 group-hover:translate-x-1 transition-transform text-text-primary">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
-                                        fill="currentColor">
-                                        <path fill-rule="evenodd"
-                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                            clip-rule="evenodd" />
-                                    </svg>
+                    <div
+                        class="lg:col-span-7 p-6 md:p-10 lg:p-12 space-y-8 md:space-y-10 border-b lg:border-b-0 lg:border-r border-border-default bg-bg-surface">
+                        <!-- Product Selection as Cards -->
+                        <div class="space-y-4">
+                            <label
+                                class="text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-2 mb-4">
+                                <i class="pi pi-box"></i> Pilih Produk Pembiayaan
+                            </label>
+
+                            <!-- Larger Cards, 1 col mobile, 2 col tablet+ -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+                                <div *ngFor="let p of products()"
+                                    (click)="simSelectedProductId = p.id; onProductChange()"
+                                    [class.ring-2]="simSelectedProductId === p.id"
+                                    [class.ring-primary-500]="simSelectedProductId === p.id"
+                                    [class.bg-primary-50]="simSelectedProductId === p.id"
+                                    [class.dark:bg-primary-900/20]="simSelectedProductId === p.id"
+                                    [class.border-transparent]="simSelectedProductId === p.id"
+                                    class="cursor-pointer border border-border-default rounded-2xl p-6 transition-all duration-200 hover:bg-bg-muted hover:scale-[1.01] active:scale-[0.98] relative flex flex-col justify-between min-h-[160px]">
+
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div
+                                            class="w-12 h-12 rounded-full bg-bg-muted flex items-center justify-center text-2xl">
+                                            🏦
+                                        </div>
+                                        <div *ngIf="simSelectedProductId === p.id"
+                                            class="text-primary-600 animate-scale-in">
+                                            <i class="pi pi-check-circle text-xl"></i>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h4 class="text-lg font-bold text-text-primary mb-2 line-clamp-1">{{ p.name }}
+                                        </h4>
+                                        <p class="text-sm text-text-secondary leading-relaxed">Bunga fix <span
+                                                class="font-bold text-text-primary">{{ p.interestRate }}%</span> / tahun
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Sliders Section -->
-                        <div *ngIf="selectedProduct"
-                            class="space-y-8 animate-in fade-in slide-in-from-left-4 duration-500">
-
+                        <div *ngIf="selectedProduct" class="space-y-8 md:space-y-10 animate-fade-in relative">
                             <!-- Loan Amount Slider -->
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-end">
+                            <div class="space-y-6">
+                                <div class="flex flex-col sm:flex-row justify-between sm:items-end gap-2">
                                     <label class="text-xs font-bold uppercase tracking-wider text-text-muted">Jumlah
                                         Pinjaman</label>
-                                    <div class="text-right">
-                                        <span class="text-2xl font-black text-primary-600 tracking-tight">{{ simAmount |
-                                            currency:'IDR':'symbol':'1.0-0' }}</span>
+                                    <div class="text-left sm:text-right">
+                                        <span class="text-3xl font-black text-text-primary tracking-tight">
+                                            {{ simAmount | currency:'IDR':'symbol':'1.0-0' }}
+                                        </span>
                                     </div>
                                 </div>
 
                                 <input type="range" [(ngModel)]="simAmount" [min]="selectedProduct.minAmount"
                                     [max]="selectedProduct.maxAmount" [step]="1000000"
-                                    class="w-full h-2 bg-bg-muted rounded-full appearance-none cursor-pointer accent-primary-600 hover:accent-primary-500 transition-all">
+                                    class="w-full h-2 bg-bg-muted rounded-full appearance-none cursor-pointer accent-primary-600 hover:accent-primary-500 transition-all focus:outline-none focus:ring-2 focus:ring-primary-500/50">
 
                                 <div
-                                    class="flex justify-between text-[10px] font-bold text-text-muted opacity-60 uppercase tracking-widest">
-                                    <span>Min: {{ selectedProduct.minAmount | currency:'IDR':'symbol':'1.0-0' }}</span>
-                                    <span>Max: {{ selectedProduct.maxAmount | currency:'IDR':'symbol':'1.0-0' }}</span>
+                                    class="flex justify-between text-[10px] font-bold text-text-muted uppercase tracking-widest">
+                                    <span>{{ selectedProduct.minAmount | currency:'IDR':'symbol':'1.0-0' }}</span>
+                                    <span>{{ selectedProduct.maxAmount | currency:'IDR':'symbol':'1.0-0' }}</span>
                                 </div>
                             </div>
 
                             <!-- Tenor Slider -->
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-end">
-                                    <label
-                                        class="text-xs font-bold uppercase tracking-wider text-text-muted">Tenor</label>
-                                    <div class="text-right">
-                                        <span class="text-2xl font-black text-primary-600 tracking-tight">{{ simTenor }}
-                                            <span class="text-sm text-text-secondary font-medium">Bulan</span></span>
+                            <div class="space-y-6">
+                                <div class="flex flex-col sm:flex-row justify-between sm:items-end gap-2">
+                                    <label class="text-xs font-bold uppercase tracking-wider text-text-muted">Tenor
+                                        (Bulan)</label>
+                                    <div class="text-left sm:text-right">
+                                        <span class="text-3xl font-black text-text-primary tracking-tight">{{ simTenor
+                                            }} <span class="text-sm text-text-secondary font-medium">Bulan</span></span>
                                     </div>
                                 </div>
 
                                 <input type="range" [(ngModel)]="simTenor" [min]="selectedProduct.minTenor"
                                     [max]="selectedProduct.maxTenor" [step]="1"
-                                    class="w-full h-2 bg-bg-muted rounded-full appearance-none cursor-pointer accent-primary-600 hover:accent-primary-500 transition-all">
+                                    class="w-full h-2 bg-bg-muted rounded-full appearance-none cursor-pointer accent-primary-600 hover:accent-primary-500 transition-all focus:outline-none focus:ring-2 focus:ring-primary-500/50">
 
                                 <div
-                                    class="flex justify-between text-[10px] font-bold text-text-muted opacity-60 uppercase tracking-widest">
+                                    class="flex justify-between text-[10px] font-bold text-text-muted uppercase tracking-widest">
                                     <span>{{ selectedProduct.minTenor }} Bulan</span>
                                     <span>{{ selectedProduct.maxTenor }} Bulan</span>
                                 </div>
@@ -407,61 +424,83 @@
 
                         <!-- Empty State for Sliders -->
                         <div *ngIf="!selectedProduct"
-                            class="py-12 border-2 border-dashed border-border-default rounded-2xl flex flex-col items-center justify-center text-center opacity-40">
-                            <span class="text-4xl mb-2 animate-bounce">👆</span>
-                            <p class="text-sm font-bold text-text-secondary">Pilih produk diatas untuk memulai simulasi
+                            class="py-12 border-2 border-dashed border-border-default rounded-2xl flex flex-col items-center justify-center text-center opacity-60 bg-bg-muted/30 min-h-[200px]">
+                            <span class="text-4xl mb-4 animate-bounce">👆</span>
+                            <p class="text-sm font-bold text-text-secondary">Pilih produk di atas untuk memulai simulasi
                             </p>
                         </div>
                     </div>
 
-                    <!-- Result Area -->
+                    <!-- Result Area (Clean Apple HIG Style) -->
                     <div
-                        class="p-10 bg-primary-600 text-white flex flex-col justify-center relative overflow-hidden group">
-                        <!-- BG Decoration -->
-                        <div
-                            class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:scale-110 transition-transform duration-700">
-                        </div>
-                        <div
-                            class="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2">
-                        </div>
+                        class="lg:col-span-5 p-8 md:p-12 bg-gray-50 dark:bg-slate-900/50 flex flex-col justify-center relative overflow-hidden transition-colors">
 
                         <div *ngIf="simulationResult; else emptyState"
                             class="relative z-10 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <div>
-                                <p class="text-xs font-bold uppercase tracking-wider opacity-60 mb-2">Estimasi Cicilan
-                                    Bulanan</p>
-                                <p class="text-5xl font-black tracking-tighter">
+
+                            <!-- Main Result Card -->
+                            <div
+                                class="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-sm border border-border-default">
+                                <p class="text-xs font-bold uppercase tracking-wider text-text-muted mb-4">Estimasi
+                                    Cicilan</p>
+                                <p class="text-4xl lg:text-5xl font-black tracking-tighter text-text-primary mb-2">
                                     {{ simulationResult.monthlyInstallment | currency:'IDR':'symbol':'1.0-0' }}
                                 </p>
+                                <p class="text-sm text-text-secondary font-medium">/ bulan</p>
                             </div>
 
-                            <div class="space-y-4 pt-8 border-t border-white/20">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-sm font-medium opacity-80">Produk</span>
-                                    <span class="font-bold">{{ selectedProduct?.name }}</span>
+                            <!-- Details List -->
+                            <div class="space-y-5 px-2">
+                                <div
+                                    class="flex justify-between items-center text-sm border-b border-border-default pb-3 border-dashed">
+                                    <span class="text-text-secondary">Produk</span>
+                                    <span class="font-bold text-text-primary">{{ selectedProduct?.name }}</span>
                                 </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-sm font-medium opacity-80">Tenor</span>
-                                    <span class="font-bold">{{ simTenor }} Bulan</span>
+                                <div
+                                    class="flex justify-between items-center text-sm border-b border-border-default pb-3 border-dashed">
+                                    <span class="text-text-secondary">Pokok Pinjaman</span>
+                                    <span class="font-bold text-text-primary">{{ simAmount |
+                                        currency:'IDR':'symbol':'1.0-0' }}</span>
                                 </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-sm font-medium opacity-80">Total Pembayaran</span>
-                                    <span class="font-bold text-lg">{{ simulationResult.totalPayment |
+                                <div
+                                    class="flex justify-between items-center text-sm border-b border-border-default pb-3 border-dashed">
+                                    <span class="text-text-secondary">Tenor</span>
+                                    <span class="font-bold text-text-primary">{{ simTenor }} Bulan</span>
+                                </div>
+                                <div class="flex justify-between items-center pt-2">
+                                    <span class="text-sm font-bold text-text-secondary">Total Pembayaran</span>
+                                    <span class="font-bold text-lg text-primary-600">{{ simulationResult.totalPayment |
                                         currency:'IDR':'symbol':'1.0-0' }}</span>
                                 </div>
                             </div>
 
-                            <p class="text-[10px] opacity-40 mt-6 leading-tight">
-                                *Simulasi ini hanya estimasi. Total pembayaran dapat berubah sesuai dengan tanggal jatuh
-                                tempo dan biaya administrasi lainnya.
-                            </p>
+                            <!-- Disclaimer -->
+                            <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl flex gap-3 items-start">
+                                <i class="pi pi-info-circle text-blue-500 mt-0.5"></i>
+                                <p class="text-[10px] text-blue-600 dark:text-blue-300 leading-relaxed font-medium">
+                                    Estimasi hanya simulasi awal. Bunga dan biaya dapat berubah sesuai hasil analisis
+                                    kredit.
+                                </p>
+                            </div>
+
+                            <button
+                                class="w-full bg-primary-600 text-white font-bold py-4 rounded-2xl hover:bg-primary-700 active:scale-[0.98] transition-all shadow-lg shadow-primary-600/20">
+                                Ajukan Sekarang
+                            </button>
                         </div>
 
                         <ng-template #emptyState>
-                            <div class="text-center opacity-40 relative z-10">
-                                <span class="text-6xl mb-4 block filter grayscale opacity-50">🧮</span>
-                                <p class="font-bold max-w-xs mx-auto">Lengkapi data produk, jumlah pinjaman, dan tenor
-                                    untuk melihat hasil.</p>
+                            <div
+                                class="text-center opacity-40 relative z-10 flex flex-col items-center justify-center h-full min-h-[300px]">
+                                <div
+                                    class="w-24 h-24 bg-bg-surface rounded-full flex items-center justify-center mb-6 shadow-sm border border-border-default">
+                                    <span class="text-4xl grayscale opacity-50">🧮</span>
+                                </div>
+                                <h3 class="text-xl font-bold mb-2 text-text-primary">Hasil Simulasi</h3>
+                                <p
+                                    class="text-sm font-medium max-w-[240px] mx-auto text-text-secondary leading-relaxed">
+                                    Hasil perhitungan cicilan akan muncul di sini secara otomatis.
+                                </p>
                             </div>
                         </ng-template>
                     </div>
@@ -470,30 +509,49 @@
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="bg-primary-950 py-32 text-white overflow-hidden relative">
-        <!-- Grid BG -->
-        <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 hidden"></div>
+    <!-- Features Section (Refactored for Light/Dark) -->
+    <section id="features"
+        class="py-32 relative overflow-hidden transition-colors bg-slate-50 dark:bg-primary-950 text-slate-900 dark:text-white">
+        <!-- Background Image with Gradient Overlay -->
+        <div
+            class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center opacity-[0.03] dark:opacity-10 mix-blend-luminosity">
+        </div>
 
-        <!-- Banana Decoration -->
-        <div class="absolute -right-20 top-20 text-[20rem] opacity-5 rotate-12 pointer-events-none select-none">🍌</div>
+        <!-- Gradient adjustments for both themes -->
+        <div
+            class="absolute inset-0 bg-gradient-to-r from-slate-50/90 via-slate-50/80 to-transparent dark:from-primary-950 dark:via-primary-950/90 dark:to-transparent">
+        </div>
+
+        <!-- Professional Decoration (Dark mode only usually, but good for enterprise feel) -->
+        <div
+            class="absolute -right-20 top-20 text-[20rem] opacity-5 rotate-12 pointer-events-none select-none text-primary-900 dark:text-white">
+            <i class="pi pi-globe"></i>
+        </div>
 
         <div class="max-w-7xl mx-auto px-6 relative z-10">
             <div class="mb-20 text-center md:text-left">
-                <h2 #animateItem class="scroll-hidden text-5xl font-black mb-4 tracking-tight">Fitur Nano Banana</h2>
-                <p #animateItem class="scroll-hidden delay-100 text-white/60 font-medium text-xl">Teknologi modern untuk
-                    kebutuhan bisnis masa kini.</p>
+                <h2 #animateItem
+                    class="scroll-hidden text-5xl font-black mb-4 tracking-tight text-slate-900 dark:text-white">Fitur
+                    Unggulan</h2>
+                <p #animateItem
+                    class="scroll-hidden delay-100 text-slate-600 dark:text-slate-300 font-medium text-xl max-w-2xl leading-relaxed">
+                    Teknologi modern untuk kebutuhan bisnis masa kini.
+                </p>
             </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div *ngFor="let f of features; let i = index" #animateItem
-                    class="scroll-hidden bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-3xl hover:bg-white/10 transition-all hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary-500/20 group"
+                    class="scroll-hidden bg-white dark:bg-white/5 backdrop-blur-md border border-slate-200 dark:border-white/10 p-8 rounded-3xl hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary-500/10 dark:hover:shadow-primary-500/20 transition-all duration-500 group"
                     [style.transitionDuration]="(500 + i*100) + 'ms'">
+
                     <div
-                        class="w-14 h-14 bg-gradient-to-br from-primary-400 to-primary-600 text-white rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-primary-500/30 group-hover:scale-110 transition-transform duration-300">
+                        class="w-14 h-14 bg-primary-100 dark:bg-gradient-to-br dark:from-primary-400 dark:to-primary-600 text-primary-600 dark:text-white rounded-2xl flex items-center justify-center mb-6 shadow-sm dark:shadow-lg dark:shadow-primary-500/30 group-hover:scale-110 transition-transform duration-300">
                         <span class="text-xl">⚡</span>
                     </div>
-                    <h4 class="text-xl font-bold mb-3 tracking-tight">{{ f.title }}</h4>
-                    <p class="text-sm text-white/60 leading-relaxed font-medium">{{ f.description }}</p>
+
+                    <h4 class="text-xl font-bold mb-3 tracking-tight text-slate-900 dark:text-white">{{ f.title }}</h4>
+                    <p class="text-sm text-slate-600 dark:text-white/60 leading-relaxed font-medium">{{ f.description }}
+                    </p>
                 </div>
             </div>
         </div>
@@ -512,7 +570,7 @@
                         class="scroll-hidden delay-100 text-5xl font-black mb-12 tracking-tighter leading-tight text-text-primary">
                         Alasan
                         Mengapa Bisnis Anda
-                        Membutuhkan Nano Banana.</h3>
+                        Membutuhkan Lofi.</h3>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10">
                         <div *ngFor="let b of benefits; let i = index" [class.delay-100]="i%2!=0" #animateItem
@@ -562,18 +620,123 @@
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="py-32 text-center transition-colors">
+    <!-- Contact Section -->
+    <section id="contact" class="py-32 bg-bg-surface border-t border-border-default relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-20">
+                <!-- Contact Info -->
+                <div #animateItem class="scroll-hidden">
+                    <h2 class="text-xs font-black uppercase tracking-[0.4em] text-primary-600 mb-6">Hubungi Kami</h2>
+                    <h3 class="text-4xl md:text-5xl font-black mb-8 text-text-primary leading-tight">
+                        Siap Memulai <br>Transformasi?
+                    </h3>
+                    <p class="text-lg text-text-secondary mb-12 max-w-md">
+                        Tim ahli kami siap membantu Anda merancang solusi workflow terbaik untuk perusahaan Anda.
+                    </p>
+
+                    <div class="space-y-8">
+                        <div class="flex items-start gap-6 group">
+                            <div
+                                class="w-12 h-12 rounded-2xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center text-primary-600 group-hover:scale-110 transition-transform">
+                                <i class="pi pi-map-marker text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-text-primary mb-1">Kantor Pusat</h4>
+                                <p class="text-text-secondary">SCBD District 8, Treasury Tower Lt. 20<br>Jakarta
+                                    Selatan, 12190</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-6 group">
+                            <div
+                                class="w-12 h-12 rounded-2xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center text-primary-600 group-hover:scale-110 transition-transform">
+                                <i class="pi pi-envelope text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-text-primary mb-1">Email</h4>
+                                <p class="text-text-secondary">hello@lofi-enterprise.com</p>
+                                <p class="text-text-secondary">support@lofi-enterprise.com</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-6 group">
+                            <div
+                                class="w-12 h-12 rounded-2xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center text-primary-600 group-hover:scale-110 transition-transform">
+                                <i class="pi pi-phone text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-text-primary mb-1">Telepon</h4>
+                                <p class="text-text-secondary">+62 21 500 555</p>
+                                <p class="text-xs text-text-muted mt-1">Senin - Jumat, 09:00 - 17:00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div #animateItem class="scroll-hidden delay-200">
+                    <form (submit)="submitContact()"
+                        class="bg-bg-muted dark:bg-slate-800/50 p-8 md:p-10 rounded-[2.5rem] border border-border-default dark:border-white/5 shadow-xl dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden">
+                        <!-- Form Bg -->
+                        <div
+                            class="absolute top-0 right-0 w-64 h-64 bg-primary-400/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none">
+                        </div>
+
+                        <div class="space-y-6 relative z-10">
+                            <div>
+                                <label
+                                    class="block text-xs font-bold uppercase tracking-wider text-text-muted mb-2">Nama
+                                    Lengkap</label>
+                                <input type="text" [(ngModel)]="contactForm.name" name="name" required
+                                    class="w-full bg-bg-surface border border-border-default rounded-xl px-5 py-4 outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all text-text-primary font-medium placeholder:text-text-muted/50"
+                                    placeholder="John Doe">
+                            </div>
+
+                            <div>
+                                <label
+                                    class="block text-xs font-bold uppercase tracking-wider text-text-muted mb-2">Email
+                                    Bisnis</label>
+                                <input type="email" [(ngModel)]="contactForm.email" name="email" required
+                                    class="w-full bg-bg-surface border border-border-default rounded-xl px-5 py-4 outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all text-text-primary font-medium placeholder:text-text-muted/50"
+                                    placeholder="john@company.com">
+                            </div>
+
+                            <div>
+                                <label
+                                    class="block text-xs font-bold uppercase tracking-wider text-text-muted mb-2">Pesan</label>
+                                <textarea rows="4" [(ngModel)]="contactForm.message" name="message" required
+                                    class="w-full bg-bg-surface border border-border-default rounded-xl px-5 py-4 outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all text-text-primary font-medium placeholder:text-text-muted/50 resize-none"
+                                    placeholder="Ceritakan kebutuhan bisnis Anda..."></textarea>
+                            </div>
+
+                            <button type="submit"
+                                class="w-full bg-primary-600 text-white font-bold py-4 rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-600/20 flex items-center justify-center gap-2 group">
+                                <span>Kirim Pesan</span>
+                                <i class="pi pi-send group-hover:translate-x-1 transition-transform"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="py-32 text-center transition-colors relative">
         <div #animateItem
-            class="scroll-hidden max-w-4xl mx-auto px-6 bg-bg-muted py-24 rounded-[3rem] border border-border-default shadow-2xl relative overflow-hidden group">
+            class="scroll-hidden max-w-4xl mx-auto px-6 bg-bg-muted dark:bg-slate-800/50 py-24 rounded-[3rem] border border-border-default dark:border-white/10 shadow-2xl dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden group">
+
+            <!-- Bg Image -->
             <div
-                class="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000 skew-x-12">
+                class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center opacity-10 group-hover:opacity-15 transition-opacity duration-700">
+            </div>
+
+            <div
+                class="absolute inset-0 bg-gradient-to-r from-bg-surface/80 via-bg-surface/50 to-bg-surface/80 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000 skew-x-12">
             </div>
 
             <h2 class="text-4xl md:text-6xl font-black mb-8 tracking-tighter relative z-10 text-text-primary">Mulai
                 Transformasi <span class="text-primary-600">Hari Ini</span></h2>
             <p class="text-lg opacity-60 mb-12 max-w-xl mx-auto font-medium relative z-10 text-text-secondary">
-                Dapatkan demo eksklusif dan lihat bagaimana Nano Banana dapat mengubah alur kerja internal Anda menjadi
+                Dapatkan demo eksklusif dan lihat bagaimana Lofi dapat mengubah alur kerja internal Anda menjadi
                 keunggulan kompetitif.
             </p>
             <button
@@ -583,31 +746,105 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="py-20 border-t border-border-default bg-bg-surface transition-colors">
+    <!-- Footer (Improved) -->
+    <footer class="py-20 border-t border-border-default bg-slate-50 dark:bg-[#020617] transition-colors relative z-10">
         <div class="max-w-7xl mx-auto px-6">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-8 mb-16">
-                <div class="flex items-center gap-2">
-                    <div
-                        class="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center shadow-lg transform -rotate-6">
-                        <span class="text-white font-black text-xl">L</span>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-16">
+
+                <!-- Brand -->
+                <div class="lg:col-span-1">
+                    <div class="flex items-center gap-2 mb-6">
+                        <img src="assets/logo.png" alt="Logo" class="w-8 h-8 object-contain">
+                        <span class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">LoFi</span>
                     </div>
-                    <span class="text-2xl font-black tracking-tight text-text-primary">LoFi <span
-                            class="text-sm text-primary-600">Nano</span></span>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6 font-medium max-w-xs">
+                        Platform manajemen finansial terintegrasi untuk akselerasi pertumbuhan bisnis Anda.
+                    </p>
+                    <div class="flex gap-3">
+                        <button aria-label="Twitter"
+                            class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-primary-50 hover:border-primary-200 hover:text-primary-600 transition-all duration-300 group">
+                            <i class="pi pi-twitter group-hover:scale-110 transition-transform"></i>
+                        </button>
+                        <button aria-label="LinkedIn"
+                            class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-primary-50 hover:border-primary-200 hover:text-primary-600 transition-all duration-300 group">
+                            <i class="pi pi-linkedin group-hover:scale-110 transition-transform"></i>
+                        </button>
+                        <button aria-label="Instagram"
+                            class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-primary-50 hover:border-primary-200 hover:text-primary-600 transition-all duration-300 group">
+                            <i class="pi pi-instagram group-hover:scale-110 transition-transform"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="flex gap-12 text-xs font-bold uppercase tracking-widest opacity-40 text-text-secondary">
-                    <a (click)="scrollToSection('hero')"
-                        class="hover:opacity-100 cursor-pointer transition-opacity">Beranda</a>
-                    <a class="hover:opacity-100 cursor-pointer transition-opacity">Tentang</a>
-                    <a class="hover:opacity-100 cursor-pointer transition-opacity">Blog</a>
-                    <a class="hover:opacity-100 cursor-pointer transition-opacity">Kontak</a>
+
+                <!-- Links 1 -->
+                <div>
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-6 text-sm uppercase tracking-wider">Produk
+                    </h4>
+                    <ul class="space-y-4 text-sm font-medium text-slate-600 dark:text-slate-400">
+                        <li><a href="#"
+                                class="hover:text-primary-600 hover:translate-x-1 transition-all inline-block">Credit
+                                Scoring</a></li>
+                        <li><a href="#"
+                                class="hover:text-primary-600 hover:translate-x-1 transition-all inline-block">Loan
+                                Management</a></li>
+                        <li><a href="#"
+                                class="hover:text-primary-600 hover:translate-x-1 transition-all inline-block">Risk
+                                Analytics</a></li>
+                        <li><a href="#"
+                                class="hover:text-primary-600 hover:translate-x-1 transition-all inline-block">API
+                                Integration</a></li>
+                    </ul>
+                </div>
+
+                <!-- Links 2 -->
+                <div>
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-6 text-sm uppercase tracking-wider">
+                        Perusahaan</h4>
+                    <ul class="space-y-4 text-sm font-medium text-slate-600 dark:text-slate-400">
+                        <li><a href="#"
+                                class="hover:text-primary-600 hover:translate-x-1 transition-all inline-block">Tentang
+                                Kami</a></li>
+                        <li><a href="#"
+                                class="hover:text-primary-600 hover:translate-x-1 transition-all inline-block">Karir</a>
+                        </li>
+                        <li><a href="#"
+                                class="hover:text-primary-600 hover:translate-x-1 transition-all inline-block">Blog</a>
+                        </li>
+                        <li><a href="#"
+                                class="hover:text-primary-600 hover:translate-x-1 transition-all inline-block">Pusat
+                                Bantuan</a></li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter -->
+                <div>
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-6 text-sm uppercase tracking-wider">
+                        Berlangganan</h4>
+                    <p class="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed font-medium">Dapatkan
+                        insight finansial terbaru langsung di inbox Anda.</p>
+                    <div class="flex gap-2 relative">
+                        <input type="email" placeholder="Email Anda"
+                            class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10 w-full transition-all text-slate-900 dark:text-white placeholder:text-slate-400">
+                        <button
+                            class="absolute right-1 top-1 bottom-1 bg-primary-600 text-white w-10 md:w-auto md:px-4 rounded-lg hover:bg-primary-700 transition-colors text-sm font-bold flex items-center justify-center shadow-md shadow-primary-500/20">
+                            <span class="hidden md:block">Join</span>
+                            <i class="pi pi-send md:hidden text-xs"></i>
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-500 mt-3">Kami menghargai privasi Anda.
+                        Unsubscribe kapan saja.</p>
                 </div>
             </div>
+
             <div
-                class="pt-8 border-t border-border-default flex justify-between items-center gap-4 text-[10px] uppercase font-black tracking-[0.3em] opacity-30 text-text-disabled">
-                <span>&copy; 2026 LOFI INC.</span>
-                <span class="hidden sm:block">SISTEM ALUR KERJA TERPADU</span>
-                <span>STATUS: STABLE</span>
+                class="pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-slate-500 dark:text-slate-500 font-medium">
+                <span class="opacity-80">&copy; 2026 LOFI INC. All rights reserved.</span>
+                <div class="flex gap-8">
+                    <a href="#" class="hover:text-slate-900 dark:hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-slate-900 dark:hover:text-white transition-colors">Terms of
+                        Service</a>
+                    <a href="#" class="hover:text-slate-900 dark:hover:text-white transition-colors">Cookie Settings</a>
+                </div>
             </div>
         </div>
     </footer>
