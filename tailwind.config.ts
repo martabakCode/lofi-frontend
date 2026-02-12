@@ -77,6 +77,7 @@ export default {
                 },
                 // Background Colors
                 bg: {
+                    page: 'var(--bg-page)',
                     primary: 'var(--bg-page)',
                     secondary: 'var(--bg-page)',
                     muted: 'var(--bg-muted)',

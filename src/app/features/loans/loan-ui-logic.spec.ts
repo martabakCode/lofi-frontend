@@ -4,7 +4,9 @@ import { LoanReviewComponent } from './loan-review/loan-review.component';
 import { LoanApprovalComponent } from './loan-approval/loan-approval.component';
 import { LoanFacade } from '../../core/facades/loan.facade';
 import { By } from '@angular/platform-browser';
-import { signal } from '@angular/core';
+import { signal, NO_ERRORS_SCHEMA } from '@angular/core';
+import { provideRouter, ActivatedRoute } from '@angular/router';
+import { of } from 'rxjs';
 
 describe('Loan UI Logic Tests', () => {
     let facadeMock: any;
@@ -12,10 +14,10 @@ describe('Loan UI Logic Tests', () => {
     beforeEach(() => {
         facadeMock = {
             loading: signal(false),
-            getLatestLoans: jasmine.createSpy('getLatestLoans').and.returnValue({ subscribe: () => { } }),
-            canPerformAction: jasmine.createSpy('canPerformAction').and.returnValue(false),
-            approveLoan: jasmine.createSpy('approveLoan').and.returnValue({ subscribe: () => { } }),
-            rollbackLoan: jasmine.createSpy('rollbackLoan').and.returnValue({ subscribe: () => { } })
+            getLatestLoans: jest.fn().mockReturnValue({ subscribe: () => { } }),
+            canPerformAction: jest.fn().mockReturnValue(false),
+            approveLoan: jest.fn().mockReturnValue({ subscribe: () => { } }),
+            rollbackLoan: jest.fn().mockReturnValue({ subscribe: () => { } })
         };
     });
 
@@ -27,8 +29,11 @@ describe('Loan UI Logic Tests', () => {
             await TestBed.configureTestingModule({
                 imports: [LoanApprovalComponent],
                 providers: [
+                    provideRouter([]),
+                    { provide: ActivatedRoute, useValue: { params: of({}) } },
                     { provide: LoanFacade, useValue: facadeMock }
-                ]
+                ],
+                schemas: [NO_ERRORS_SCHEMA]
             }).compileComponents();
 
             fixture = TestBed.createComponent(LoanApprovalComponent);
@@ -37,20 +42,20 @@ describe('Loan UI Logic Tests', () => {
 
         it('should only show Approve/Reject buttons', () => {
             component.loans.set([
-                { id: '1', status: 'REVIEWED', amount: 1000000, customerName: 'Test' }
+                { id: '1', status: 'REVIEWED', amount: 1000000, customerName: 'Test' } as any
             ]);
             fixture.detectChanges();
 
             const approveBtn = fixture.debugElement.query(By.css('button.bg-amber-600')); // Tailwind class for Approve
             const rejectBtn = fixture.debugElement.query(By.css('button.text-red-500')); // Tailwind class for Reject
 
-            expect(approveBtn).toBeTruthy('Approve button should be visible');
-            expect(rejectBtn).toBeTruthy('Reject button should be visible');
+            expect(approveBtn).toBeTruthy();
+            expect(rejectBtn).toBeTruthy();
         });
 
         it('should filter for REVIEWED status loans only', () => {
             component.loadLoans();
-            expect(facadeMock.getLatestLoans).toHaveBeenCalledWith(jasmine.objectContaining({ status: 'REVIEWED' }));
+            expect(facadeMock.getLatestLoans).toHaveBeenCalledWith(expect.objectContaining({ status: 'REVIEWED' }));
         });
     });
 
@@ -62,8 +67,11 @@ describe('Loan UI Logic Tests', () => {
             await TestBed.configureTestingModule({
                 imports: [LoanReviewComponent],
                 providers: [
+                    provideRouter([]),
+                    { provide: ActivatedRoute, useValue: { params: of({}) } },
                     { provide: LoanFacade, useValue: facadeMock }
-                ]
+                ],
+                schemas: [NO_ERRORS_SCHEMA]
             }).compileComponents();
 
             fixture = TestBed.createComponent(LoanReviewComponent);
@@ -72,7 +80,7 @@ describe('Loan UI Logic Tests', () => {
 
         it('should show Review button for SUBMITTED loans', () => {
             component.loans.set([
-                { id: '1', status: 'SUBMITTED', customerName: 'New Applicant' }
+                { id: '1', status: 'SUBMITTED', customerName: 'New Applicant' } as any
             ]);
             fixture.detectChanges();
 
@@ -83,12 +91,12 @@ describe('Loan UI Logic Tests', () => {
 
         it('should NOT show Approve button directly in list', () => {
             component.loans.set([
-                { id: '1', status: 'SUBMITTED', customerName: 'New Applicant' }
+                { id: '1', status: 'SUBMITTED', customerName: 'New Applicant' } as any
             ]);
             fixture.detectChanges();
 
             const approveBtn = fixture.debugElement.query(By.css('.bg-green-600')); // Typical approve class
-            expect(approveBtn).toBeFalsy('Approve button should not be in the list view for Marketing');
+            expect(approveBtn).toBeFalsy();
         });
     });
 });

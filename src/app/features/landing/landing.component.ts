@@ -71,7 +71,7 @@ export class LandingComponent implements OnInit, AfterViewInit {
 
     // Typewriter
     typingText = '';
-    words = ['Menyederhanakan', 'Mempercepat', 'Mengamankan', 'Mengoptimalkan'];
+    words = ['Nano Banana', 'Cerdas', 'Efisien', 'Terpercaya'];
     wordIndex = 0;
     isDeleting = false;
     typeSpeed = 100;

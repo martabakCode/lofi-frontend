@@ -7,6 +7,8 @@ import { LoanVM } from '../../features/loans/models/loan.models';
 import { finalize, map, Observable, tap, catchError, throwError } from 'rxjs';
 import { DisbursementPayload } from '../patterns/disbursement-builder';
 import { ToastService } from '../services/toast.service';
+import { AuthService } from '../services/auth.service';
+import { SlaService } from '../services/sla.service';
 
 @Injectable({
     providedIn: 'root'
@@ -14,6 +16,8 @@ import { ToastService } from '../services/toast.service';
 export class LoanFacade {
     private loanService = inject(LoanService);
     private toastService = inject(ToastService);
+    private authService = inject(AuthService); // Added for role checks
+    private slaService = inject(SlaService);   // Added for SLA tracking
 
     // State signals
     private loansSignal = signal<LoanVM[]>([]);
@@ -67,21 +71,21 @@ export class LoanFacade {
 
     /**
      * OBSERVER PATTERN: Get real-time SLA status for a loan
+     * Now uses injected SlaService for proper testing.
      */
     getLoanSLA(submittedAt: string): Observable<LoanSLA> {
-        const { SlaService } = require('../services/sla.service');
-        return new SlaService().getSlaStatus(submittedAt);
+        return this.slaService.getSlaStatus(submittedAt);
     }
 
     /**
      * COMPOSITE PATTERN: Check if action is allowed based on status engine
+     * Now uses injected AuthService for role verification.
      */
     canPerformAction(status: LoanStatus, action: 'APPROVE' | 'ROLLBACK'): boolean {
         const node = LoanStatusEngine.getNode(status);
         if (!node) return false;
 
-        const { AuthService } = require('../services/auth.service');
-        const userRoles = new AuthService().getUserRoles();
+        const userRoles = this.authService.getUserRoles();
 
         if (action === 'APPROVE') {
             return node.canApprove(userRoles);

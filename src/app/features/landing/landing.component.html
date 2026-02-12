@@ -12,15 +12,16 @@
     </div>
 
     <!-- Navigation -->
-    <nav
-        class="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700 transition-colors">
+    <nav class="sticky top-0 z-50 bg-bg-surface/90 backdrop-blur-sm border-b border-border-default transition-colors">
         <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer" (click)="scrollToSection('hero')">
                 <img src="logo.png" alt="LoFi Logo" class="w-8 h-8 rounded object-contain">
-                <span class="text-xl font-bold tracking-tight">LoFi</span>
+                <span class="text-xl font-bold tracking-tight text-text-primary">LoFi <span
+                        class="text-primary-600 text-[10px] align-top">Nano</span></span>
             </div>
 
-            <div class="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-widest opacity-60">
+            <div
+                class="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-widest opacity-60 text-text-secondary">
                 <a (click)="scrollToSection('problem')"
                     class="hover:text-primary-600 cursor-pointer transition-colors">Masalah</a>
                 <a (click)="scrollToSection('how-it-works')"
@@ -31,7 +32,7 @@
 
             <div class="flex items-center gap-4">
                 <button (click)="toggleTheme()"
-                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all hover:bg-slate-200 dark:hover:bg-slate-700">
+                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-bg-muted border border-border-default transition-all hover:bg-bg-surface text-text-primary">
                     <span *ngIf="isDarkMode">🌞</span>
                     <span *ngIf="!isDarkMode">🌚</span>
                 </button>
@@ -51,26 +52,26 @@
                         class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-primary-500"></span>
                 </span>
-                Sistem Alur Kerja Terpadu 2.0
+                Powered by Nano Banana Tech 🍌
             </div>
 
             <h1 #animateItem
-                class="scroll-hidden text-5xl md:text-7xl font-black tracking-tighter leading-[1.1] mb-8 bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-white dark:via-slate-200 dark:to-slate-400 transition-colors duration-1000 delay-100">
-                Sistem Digital yang <br>
+                class="scroll-hidden text-5xl md:text-7xl font-black tracking-tighter leading-[1.1] mb-8 bg-clip-text text-transparent bg-gradient-to-r from-text-primary via-slate-700 to-text-primary animation-shine transition-colors duration-1000 delay-100">
+                Solusi Keuangan <br>
                 <span class="text-primary-600 inline-block min-w-[300px]">{{ typingText }}<span
                         class="animate-blink font-light text-primary-400">|</span></span>
             </h1>
 
-            <p #animateItem class="scroll-hidden text-lg opacity-60 leading-relaxed mb-10 max-w-lg delay-200">
-                Automasi persetujuan dan dokumentasi dalam satu platform yang tenang, efisien, dan transparan. Fokus
-                pada pertumbuhan bisnis, biarkan kami menangani birokrasi.
+            <p #animateItem class="scroll-hidden text-lg text-text-secondary leading-relaxed mb-10 max-w-lg delay-200">
+                Bantu Nano Banana hadir untuk mempercepat pertumbuhan finansial Anda.
+                Automasi persetujuan dan dokumentasi dalam satu platform yang cerdas.
             </p>
 
             <div #animateItem class="scroll-hidden flex flex-wrap gap-4 delay-300">
                 <button (click)="scrollToSection('features')"
-                    class="relative overflow-hidden bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-8 py-4 rounded-2xl font-bold transition-all hover:scale-105 active:scale-95 shadow-lg shadow-slate-900/20 dark:shadow-white/10 group">
+                    class="relative overflow-hidden bg-text-primary text-bg-surface px-8 py-4 rounded-2xl font-bold transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary-500/20 group">
                     <span class="relative z-10 flex items-center gap-2">
-                        Pelajari Fitur
+                        Mulai Sekarang
                         <span class="text-lg transition-transform group-hover:translate-x-1">→</span>
                     </span>
                     <div
@@ -78,13 +79,29 @@
                     </div>
                 </button>
                 <button (click)="scrollToSection('simulation')"
-                    class="px-8 py-4 rounded-2xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
+                    class="px-8 py-4 rounded-2xl font-bold text-text-secondary hover:bg-bg-muted transition-all border border-transparent hover:border-border-default">
                     Simulasi Pembayaran
                 </button>
             </div>
+
+            <!-- Statistics Ticker -->
+            <div class="mt-12 flex gap-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+                <div>
+                    <div class="text-2xl font-black text-primary-600">98%</div>
+                    <div class="text-xs font-bold uppercase tracking-wider text-text-muted">Approval Rate</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-black text-primary-600">24/7</div>
+                    <div class="text-xs font-bold uppercase tracking-wider text-text-muted">Support</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-black text-primary-600">⚡10m</div>
+                    <div class="text-xs font-bold uppercase tracking-wider text-text-muted">Fast Cair</div>
+                </div>
+            </div>
         </div>
 
-        <!-- Visual / Image -->
+        <!-- Visual / Image Area -->
         <div class="relative perspective-1000">
             <!-- Decorative Blobs -->
             <div
@@ -94,88 +111,92 @@
                 class="absolute -bottom-20 -left-20 w-72 h-72 bg-primary-400/20 rounded-full blur-3xl animate-gentle-pulse animation-delay-2000">
             </div>
 
-            <!-- Main Card Stack -->
+            <!-- Floating Financial Elements -->
+            <div class="absolute top-0 right-10 text-6xl animate-float delay-100 z-20">💰</div>
+            <div class="absolute bottom-20 left-10 text-5xl animate-float-delayed z-20">🍌</div>
+            <div class="absolute top-1/2 -right-10 text-4xl animate-bounce z-20">📈</div>
+
+            <!-- Main Composition -->
             <div #animateItem class="scroll-hidden relative z-10 transition-opacty delay-200 duration-1000">
-                <!-- Back Card -->
+                <!-- Back Card (Decorative) -->
                 <div
-                    class="absolute top-4 -right-4 w-full h-full bg-slate-100 dark:bg-slate-800 rounded-[2.5rem] rotate-6 opacity-60 border border-slate-200 dark:border-slate-700 animate-float-delayed">
+                    class="absolute top-6 -right-6 w-full h-full bg-bg-muted rounded-[2.5rem] rotate-6 opacity-60 border border-border-default animate-float-delayed">
                 </div>
 
-                <!-- Main Card -->
+                <!-- Main Card (Glassmorphism) -->
                 <div
-                    class="relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/50 dark:border-slate-700/50 p-8 animate-float transition-all hover:rotate-1 hover:scale-[1.02] duration-500 group">
-                    <!-- Glass Shine -->
+                    class="relative bg-bg-surface/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/20 dark:border-slate-700/50 p-8 animate-float transition-all hover:rotate-1 hover:scale-[1.02] duration-500 group overflow-hidden">
+
+                    <!-- Shine Effect -->
                     <div
-                        class="absolute inset-0 bg-gradient-to-tr from-white/40 via-transparent to-transparent rounded-[2.5rem] pointer-events-none">
+                        class="absolute inset-0 bg-gradient-to-tr from-white/30 via-transparent to-transparent pointer-events-none">
                     </div>
 
-                    <!-- Inner UI Mockup -->
-                    <div class="space-y-6">
-                        <!-- Header -->
-                        <div
-                            class="flex items-center justify-between pb-6 border-b border-slate-100 dark:border-slate-800">
-                            <div class="flex items-center gap-3">
-                                <div
-                                    class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
-                                        fill="currentColor">
-                                        <path fill-rule="evenodd"
-                                            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                                            clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <div class="h-2 w-24 bg-slate-200 dark:bg-slate-700 rounded mb-1"></div>
-                                    <div class="h-2 w-16 bg-slate-100 dark:bg-slate-800 rounded"></div>
-                                </div>
-                            </div>
-                            <div
-                                class="px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/20 text-green-600 text-[10px] font-bold uppercase">
-                                Active</div>
-                        </div>
+                    <!-- Placeholder for Nano Banana Hero Image -->
+                    <div
+                        class="w-full aspect-square rounded-2xl bg-gradient-to-br from-primary-100 via-primary-50 to-white dark:from-slate-800 dark:to-slate-900 flex flex-col items-center justify-center relative overflow-hidden">
 
-                        <!-- Graph Area -->
-                        <div
-                            class="h-32 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-end justify-between px-4 pb-2 group-hover:bg-slate-100 dark:group-hover:bg-slate-700/50 transition-colors overflow-hidden relative">
-                            <!-- Animated Bars -->
+                        <!-- CSS Art: Abstract Nano Banana Character -->
+                        <div class="relative w-40 h-40">
+                            <!-- Banana Body (Simple CSS shape if image fails) -->
                             <div
-                                class="w-1/6 bg-primary-200 dark:bg-primary-900/40 rounded-t-lg h-[40%] group-hover:h-[60%] transition-all duration-700 delay-100">
+                                class="absolute inset-0 bg-yellow-400 rounded-full rotate-45 transform skew-x-12 shadow-inner">
                             </div>
-                            <div
-                                class="w-1/6 bg-primary-300 dark:bg-primary-800/40 rounded-t-lg h-[60%] group-hover:h-[80%] transition-all duration-700 delay-200">
+                            <div class="absolute top-10 left-10 w-8 h-8 bg-white rounded-full z-10">
+                                <div class="w-3 h-3 bg-black rounded-full absolute top-2 right-2 animate-blink"></div>
                             </div>
-                            <div
-                                class="w-1/6 bg-primary-400 dark:bg-primary-700/40 rounded-t-lg h-[30%] group-hover:h-[90%] transition-all duration-700 delay-300">
+                            <div class="absolute top-10 right-10 w-8 h-8 bg-white rounded-full z-10">
+                                <div class="w-3 h-3 bg-black rounded-full absolute top-2 right-2 animate-blink"></div>
                             </div>
+                            <div class="absolute bottom-10 left-10 w-20 h-4 bg-black/20 rounded-full rotate-12"></div>
+
+                            <!-- Tie Code -->
                             <div
-                                class="w-1/6 bg-primary-500 dark:bg-primary-600/40 rounded-t-lg h-[70%] group-hover:h-[50%] transition-all duration-700 delay-75">
-                            </div>
-                            <div
-                                class="w-1/6 bg-primary-600 dark:bg-primary-500 rounded-t-lg h-[50%] group-hover:h-[75%] transition-all duration-700">
+                                class="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-20 bg-red-500 clip-path-polygon">
                             </div>
                         </div>
 
-                        <!-- List Items -->
-                        <div class="space-y-3 pt-2">
+                        <div class="mt-8 text-center relative z-10">
+                            <h3 class="text-2xl font-black text-text-primary">Nano Banana</h3>
+                            <p class="text-sm text-text-secondary">Your Financial Assistant</p>
+                        </div>
+
+                        <!-- Floating Coins CSS -->
+                        <div
+                            class="absolute top-10 left-10 w-8 h-8 rounded-full bg-yellow-500 border-2 border-yellow-300 animate-bounce delay-75 shadow-lg flex items-center justify-center text-xs font-bold text-yellow-900">
+                            $</div>
+                        <div
+                            class="absolute bottom-20 right-10 w-10 h-10 rounded-full bg-yellow-500 border-2 border-yellow-300 animate-float delay-150 shadow-lg flex items-center justify-center text-sm font-bold text-yellow-900">
+                            Rp</div>
+
+                    </div>
+
+                    <!-- Bottom Stats Bar -->
+                    <div
+                        class="mt-6 flex items-center justify-between p-4 rounded-xl bg-bg-muted/50 border border-border-default">
+                        <div class="flex items-center gap-3">
                             <div
-                                class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-default">
-                                <div
-                                    class="w-8 h-8 rounded-lg bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center text-orange-500 text-xs">
-                                    ⚡</div>
-                                <div class="flex-1">
-                                    <div class="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded mb-1"></div>
-                                    <div class="h-1.5 w-2/3 bg-slate-50 dark:bg-slate-900 rounded"></div>
-                                </div>
+                                class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                </svg>
                             </div>
+                            <div>
+                                <div class="text-xs font-bold text-text-muted">Portfolio</div>
+                                <div class="font-black text-green-600">+24.5%</div>
+                            </div>
+                        </div>
+                        <div class="h-8 w-[1px] bg-border-default"></div>
+                        <div class="flex items-center gap-3">
                             <div
-                                class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-default">
-                                <div
-                                    class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center text-blue-500 text-xs">
-                                    💎</div>
-                                <div class="flex-1">
-                                    <div class="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded mb-1"></div>
-                                    <div class="h-1.5 w-1/2 bg-slate-50 dark:bg-slate-900 rounded"></div>
-                                </div>
+                                class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600">
+                                🍌
+                            </div>
+                            <div>
+                                <div class="text-xs font-bold text-text-muted">Banana Pts</div>
+                                <div class="font-black text-primary-600">8,450</div>
                             </div>
                         </div>
                     </div>
@@ -183,7 +204,7 @@
 
                 <!-- Floating Badge -->
                 <div
-                    class="absolute -bottom-6 -right-6 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-100 dark:border-slate-700 animate-bounce cursor-pointer hover:scale-110 transition-transform">
+                    class="absolute -bottom-6 -right-6 bg-surface-0 p-4 rounded-2xl shadow-xl flex items-center gap-3 border border-border-default animate-bounce cursor-pointer hover:scale-110 transition-transform">
                     <div
                         class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white shadow-lg shadow-green-500/30">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -192,8 +213,8 @@
                         </svg>
                     </div>
                     <div>
-                        <div class="text-[10px] font-bold uppercase text-slate-400">Status</div>
-                        <div class="font-black text-slate-800 dark:text-slate-100">Approved</div>
+                        <div class="text-[10px] font-bold uppercase text-text-muted">Status</div>
+                        <div class="font-black text-text-primary">Approved</div>
                     </div>
                 </div>
             </div>
@@ -201,32 +222,32 @@
     </header>
 
     <!-- Problem-Solution Section -->
-    <section id="problem"
-        class="bg-slate-50/50 dark:bg-slate-800/20 py-32 border-y border-slate-200 dark:border-slate-700 transition-colors">
+    <section id="problem" class="bg-bg-muted/50 py-32 border-y border-border-muted transition-colors">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
             <div #animateItem class="scroll-hidden">
                 <h2 class="text-xs font-black uppercase tracking-[0.4em] text-primary-600 mb-6 flex items-center gap-2">
                     <span class="w-8 h-[2px] bg-primary-600"></span>
                     Masalah Umum
                 </h2>
-                <h3 class="text-4xl md:text-5xl font-black mb-10 leading-tight">Proses lama yang <span
+                <h3 class="text-4xl md:text-5xl font-black mb-10 leading-tight text-text-primary">Proses lama yang <span
                         class="text-red-500 line-through decoration-4 decoration-red-500/30">menghambat</span>
                     pertumbuhan.</h3>
                 <ul class="space-y-6">
                     <li *ngFor="let p of problems; let i = index"
-                        class="flex gap-4 items-center group p-4 rounded-2xl hover:bg-white dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-700 hover:shadow-lg">
+                        class="flex gap-4 items-center group p-4 rounded-2xl hover:bg-bg-surface transition-all border border-transparent hover:border-border-default hover:shadow-lg">
                         <div
                             class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center transition-transform group-hover:scale-110 shrink-0">
                             <span class="text-red-600 font-bold">✕</span>
                         </div>
-                        <span class="text-lg font-medium opacity-70 group-hover:opacity-100 transition-opacity">{{
+                        <span
+                            class="text-lg font-medium text-text-secondary group-hover:text-text-primary transition-opacity">{{
                             p.text }}</span>
                     </li>
                 </ul>
             </div>
             <div #animateItem class="scroll-hidden delay-300">
                 <div
-                    class="bg-white dark:bg-slate-800 p-10 md:p-14 rounded-[3rem] shadow-2xl border border-slate-200 dark:border-slate-700 transition-all hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-2 relative overflow-hidden group">
+                    class="bg-bg-surface p-10 md:p-14 rounded-[3rem] shadow-2xl border border-border-default transition-all hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-2 relative overflow-hidden group">
 
                     <!-- Decorative BG -->
                     <div
@@ -236,17 +257,17 @@
                     <h2
                         class="text-xs font-black uppercase tracking-[0.4em] text-green-600 mb-6 font-bold flex items-center gap-2 relative z-10">
                         <span class="w-8 h-[2px] bg-green-600"></span>
-                        Solusi LoFi
+                        Solusi Nano Banana
                     </h2>
-                    <h3 class="text-4xl md:text-5xl font-black mb-10 leading-tight relative z-10">Kecepatan tanpa <span
-                            class="text-green-600">kompromi.</span></h3>
+                    <h3 class="text-4xl md:text-5xl font-black mb-10 leading-tight relative z-10 text-text-primary">
+                        Kecepatan tanpa <span class="text-green-600">kompromi.</span></h3>
                     <ul class="space-y-6 relative z-10">
                         <li *ngFor="let s of solutions" class="flex gap-4 items-center group">
                             <div
                                 class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center transition-transform group-hover:rotate-[360deg] duration-700 shrink-0 shadow-sm">
                                 <span class="text-green-600 font-bold">✓</span>
                             </div>
-                            <span class="text-lg font-bold text-slate-800 dark:text-slate-200">{{ s.text }}</span>
+                            <span class="text-lg font-bold text-text-primary">{{ s.text }}</span>
                         </li>
                     </ul>
                 </div>
@@ -257,13 +278,16 @@
     <!-- How It Works Section -->
     <section id="how-it-works" class="py-32 max-w-7xl mx-auto px-6">
         <div class="text-center mb-24 max-w-3xl mx-auto">
-            <h2 #animateItem class="scroll-hidden text-4xl md:text-5xl font-black mb-6">Bagaimana LoFi Bekerja?</h2>
-            <p #animateItem class="scroll-hidden delay-100 opacity-50 font-medium text-xl">4 langkah sederhana menuju
+            <h2 #animateItem class="scroll-hidden text-4xl md:text-5xl font-black mb-6 text-text-primary">Bagaimana
+                <span class="text-primary-600">Nano Banana</span> Bekerja?
+            </h2>
+            <p #animateItem class="scroll-hidden delay-100 opacity-50 font-medium text-xl text-text-secondary">4 langkah
+                sederhana menuju
                 efisiensi mutlak.</p>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div *ngFor="let step of steps; let i = index" #animateItem
-                class="scroll-hidden relative group p-6 rounded-3xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-500"
+                class="scroll-hidden relative group p-6 rounded-3xl hover:bg-bg-muted/50 transition-colors duration-500"
                 [style.transitionDuration]="(500 + (i * 200)) + 'ms'">
 
                 <div
@@ -271,15 +295,15 @@
                 </div>
 
                 <div
-                    class="relative w-20 h-20 bg-white dark:bg-slate-800 border-2 border-primary-100 dark:border-primary-900 text-primary-600 rounded-2xl flex items-center justify-center text-3xl font-black mb-8 shadow-xl shadow-primary-900/5 group-hover:-translate-y-2 group-hover:rotate-6 transition-all duration-300">
+                    class="relative w-20 h-20 bg-bg-surface border-2 border-primary-100 dark:border-primary-900 text-primary-600 rounded-2xl flex items-center justify-center text-3xl font-black mb-8 shadow-xl shadow-primary-900/5 group-hover:-translate-y-2 group-hover:rotate-6 transition-all duration-300">
                     {{ i + 1 }}
                 </div>
-                <h4 class="relative text-xl font-bold mb-3">{{ step.title }}</h4>
-                <p class="relative text-sm opacity-60 leading-relaxed">{{ step.description }}</p>
+                <h4 class="relative text-xl font-bold mb-3 text-text-primary">{{ step.title }}</h4>
+                <p class="relative text-sm text-text-secondary opacity-80 leading-relaxed">{{ step.description }}</p>
 
                 <!-- Line decoration for desktop -->
                 <div *ngIf="i < 3"
-                    class="hidden md:block absolute top-[4.5rem] left-[calc(100%-1rem)] w-[calc(100%+2rem)] h-[2px] bg-slate-100 dark:bg-slate-800 -z-10 overflow-hidden">
+                    class="hidden md:block absolute top-[4.5rem] left-[calc(100%-1rem)] w-[calc(100%+2rem)] h-[2px] bg-border-muted -z-10 overflow-hidden">
                     <div
                         class="w-full h-full bg-primary-200/50 dark:bg-primary-800/50 -translate-x-full group-hover:translate-x-0 transition-transform duration-700 delay-100">
                     </div>
@@ -289,8 +313,7 @@
     </section>
 
     <!-- Simuasi Kredit Section -->
-    <section id="simulation"
-        class="py-32 bg-slate-50 dark:bg-slate-900 border-y border-slate-200 dark:border-slate-700 transition-colors overflow-hidden">
+    <section id="simulation" class="py-32 bg-bg-muted border-y border-border-default transition-colors overflow-hidden">
         <div class="max-w-4xl mx-auto px-6 relative">
             <!-- BG Blobs -->
             <div
@@ -298,31 +321,31 @@
             </div>
 
             <div class="text-center mb-16 relative z-10">
-                <h2 #animateItem class="scroll-hidden text-4xl font-black mb-4">Simulasi Kredit</h2>
-                <p #animateItem class="scroll-hidden delay-100 opacity-60 font-medium">Perhitungan ini bersifat estimasi
-                    dan dapat berbeda pada proses
-                    pengajuan sebenarnya.</p>
+                <h2 #animateItem class="scroll-hidden text-4xl font-black mb-4 text-text-primary">Simulasi Kredit</h2>
+                <p #animateItem class="scroll-hidden delay-100 opacity-60 font-medium text-text-secondary">Perhitungan
+                    ini bersifat estimasi
+                    dan dapat berbeda pada proses pengajuan sebenarnya.</p>
             </div>
 
             <div #animateItem
-                class="scroll-hidden delay-200 bg-white dark:bg-slate-800 rounded-[2.5rem] shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden relative z-10">
+                class="scroll-hidden delay-200 bg-bg-surface rounded-[2.5rem] shadow-2xl border border-border-default overflow-hidden relative z-10">
                 <div class="grid grid-cols-1 md:grid-cols-2">
                     <!-- Input Area -->
-                    <div
-                        class="p-10 space-y-8 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-700">
+                    <div class="p-10 space-y-8 border-b md:border-b-0 md:border-r border-border-default">
                         <!-- Product Selection -->
                         <div class="space-y-3">
-                            <label class="text-xs font-bold uppercase tracking-wider opacity-60">Pilih Produk</label>
+                            <label class="text-xs font-bold uppercase tracking-wider text-text-muted">Pilih
+                                Produk</label>
                             <div class="relative group">
                                 <select [(ngModel)]="simSelectedProductId" (change)="onProductChange()"
-                                    class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-2xl px-5 py-4 font-bold text-lg outline-none focus:border-primary-600 focus:ring-4 focus:ring-primary-600/10 transition-all cursor-pointer appearance-none text-text-primary pr-10">
+                                    class="w-full bg-bg-muted border border-border-default rounded-2xl px-5 py-4 font-bold text-lg outline-none focus:border-primary-600 focus:ring-4 focus:ring-primary-600/10 transition-all cursor-pointer appearance-none text-text-primary pr-10">
                                     <option value="" disabled selected>Pilih salah satu...</option>
                                     <option *ngFor="let p of products()" [value]="p.id">
                                         {{ p.name }} ({{ p.interestRate }}%)
                                     </option>
                                 </select>
                                 <div
-                                    class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-50 group-hover:translate-x-1 transition-transform">
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-50 group-hover:translate-x-1 transition-transform text-text-primary">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                         fill="currentColor">
                                         <path fill-rule="evenodd"
@@ -340,7 +363,7 @@
                             <!-- Loan Amount Slider -->
                             <div class="space-y-4">
                                 <div class="flex justify-between items-end">
-                                    <label class="text-xs font-bold uppercase tracking-wider opacity-60">Jumlah
+                                    <label class="text-xs font-bold uppercase tracking-wider text-text-muted">Jumlah
                                         Pinjaman</label>
                                     <div class="text-right">
                                         <span class="text-2xl font-black text-primary-600 tracking-tight">{{ simAmount |
@@ -350,10 +373,10 @@
 
                                 <input type="range" [(ngModel)]="simAmount" [min]="selectedProduct.minAmount"
                                     [max]="selectedProduct.maxAmount" [step]="1000000"
-                                    class="w-full h-2 bg-slate-200 dark:bg-slate-600 rounded-full appearance-none cursor-pointer accent-primary-600 hover:accent-primary-500 transition-all">
+                                    class="w-full h-2 bg-bg-muted rounded-full appearance-none cursor-pointer accent-primary-600 hover:accent-primary-500 transition-all">
 
                                 <div
-                                    class="flex justify-between text-[10px] font-bold opacity-40 uppercase tracking-widest">
+                                    class="flex justify-between text-[10px] font-bold text-text-muted opacity-60 uppercase tracking-widest">
                                     <span>Min: {{ selectedProduct.minAmount | currency:'IDR':'symbol':'1.0-0' }}</span>
                                     <span>Max: {{ selectedProduct.maxAmount | currency:'IDR':'symbol':'1.0-0' }}</span>
                                 </div>
@@ -362,19 +385,20 @@
                             <!-- Tenor Slider -->
                             <div class="space-y-4">
                                 <div class="flex justify-between items-end">
-                                    <label class="text-xs font-bold uppercase tracking-wider opacity-60">Tenor</label>
+                                    <label
+                                        class="text-xs font-bold uppercase tracking-wider text-text-muted">Tenor</label>
                                     <div class="text-right">
                                         <span class="text-2xl font-black text-primary-600 tracking-tight">{{ simTenor }}
-                                            <span class="text-sm text-text-primary/60 font-medium">Bulan</span></span>
+                                            <span class="text-sm text-text-secondary font-medium">Bulan</span></span>
                                     </div>
                                 </div>
 
                                 <input type="range" [(ngModel)]="simTenor" [min]="selectedProduct.minTenor"
                                     [max]="selectedProduct.maxTenor" [step]="1"
-                                    class="w-full h-2 bg-slate-200 dark:bg-slate-600 rounded-full appearance-none cursor-pointer accent-primary-600 hover:accent-primary-500 transition-all">
+                                    class="w-full h-2 bg-bg-muted rounded-full appearance-none cursor-pointer accent-primary-600 hover:accent-primary-500 transition-all">
 
                                 <div
-                                    class="flex justify-between text-[10px] font-bold opacity-40 uppercase tracking-widest">
+                                    class="flex justify-between text-[10px] font-bold text-text-muted opacity-60 uppercase tracking-widest">
                                     <span>{{ selectedProduct.minTenor }} Bulan</span>
                                     <span>{{ selectedProduct.maxTenor }} Bulan</span>
                                 </div>
@@ -383,9 +407,10 @@
 
                         <!-- Empty State for Sliders -->
                         <div *ngIf="!selectedProduct"
-                            class="py-12 border-2 border-dashed border-slate-200 dark:border-slate-600 rounded-2xl flex flex-col items-center justify-center text-center opacity-40">
+                            class="py-12 border-2 border-dashed border-border-default rounded-2xl flex flex-col items-center justify-center text-center opacity-40">
                             <span class="text-4xl mb-2 animate-bounce">👆</span>
-                            <p class="text-sm font-bold">Pilih produk diatas untuk memulai simulasi</p>
+                            <p class="text-sm font-bold text-text-secondary">Pilih produk diatas untuk memulai simulasi
+                            </p>
                         </div>
                     </div>
 
@@ -450,9 +475,12 @@
         <!-- Grid BG -->
         <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 hidden"></div>
 
+        <!-- Banana Decoration -->
+        <div class="absolute -right-20 top-20 text-[20rem] opacity-5 rotate-12 pointer-events-none select-none">🍌</div>
+
         <div class="max-w-7xl mx-auto px-6 relative z-10">
             <div class="mb-20 text-center md:text-left">
-                <h2 #animateItem class="scroll-hidden text-5xl font-black mb-4 tracking-tight">Fitur Unggulan</h2>
+                <h2 #animateItem class="scroll-hidden text-5xl font-black mb-4 tracking-tight">Fitur Nano Banana</h2>
                 <p #animateItem class="scroll-hidden delay-100 text-white/60 font-medium text-xl">Teknologi modern untuk
                     kebutuhan bisnis masa kini.</p>
             </div>
@@ -472,7 +500,7 @@
     </section>
 
     <!-- Benefits Section -->
-    <section id="benefits" class="py-32 bg-white dark:bg-slate-900 transition-colors">
+    <section id="benefits" class="py-32 bg-bg-surface transition-colors">
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex flex-col lg:flex-row gap-20 items-center">
                 <div class="lg:w-1/2">
@@ -481,9 +509,10 @@
                         Manfaat
                         Nyata</h2>
                     <h3 #animateItem
-                        class="scroll-hidden delay-100 text-5xl font-black mb-12 tracking-tighter leading-tight">Alasan
+                        class="scroll-hidden delay-100 text-5xl font-black mb-12 tracking-tighter leading-tight text-text-primary">
+                        Alasan
                         Mengapa Bisnis Anda
-                        Membutuhkan LoFi.</h3>
+                        Membutuhkan Nano Banana.</h3>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10">
                         <div *ngFor="let b of benefits; let i = index" [class.delay-100]="i%2!=0" #animateItem
@@ -492,11 +521,11 @@
                                 <span
                                     class="w-3 h-3 rounded-full bg-primary-600 shadow-sm shadow-primary-500/20 group-hover:scale-150 transition-transform"></span>
                                 <h4
-                                    class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 group-hover:text-primary-600 transition-colors">
+                                    class="text-xl font-bold tracking-tight text-text-primary group-hover:text-primary-600 transition-colors">
                                     {{ b.title }}
                                 </h4>
                             </div>
-                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-bold">
+                            <p class="text-sm text-text-secondary leading-relaxed font-bold">
                                 {{ b.description }}
                             </p>
                         </div>
@@ -506,7 +535,7 @@
                 <div class="lg:w-1/2 w-full grid grid-cols-2 gap-4">
                     <div class="space-y-4 pt-12">
                         <div #animateItem
-                            class="scroll-hidden delay-300 h-64 rounded-3xl bg-slate-900 dark:bg-slate-800 flex flex-col justify-end p-8 text-white group shadow-xl transition-all hover:bg-slate-800 dark:hover:bg-slate-700 hover:-translate-y-2">
+                            class="scroll-hidden delay-300 h-64 rounded-3xl bg-slate-900 flex flex-col justify-end p-8 text-white group shadow-xl transition-all hover:bg-slate-800 hover:-translate-y-2">
                             <span class="text-4xl mb-4 text-primary-500">🔒</span>
                             <span class="text-sm font-bold uppercase tracking-widest opacity-60">Secure Vault</span>
                         </div>
@@ -517,7 +546,7 @@
                     </div>
                     <div class="space-y-4">
                         <div #animateItem
-                            class="scroll-hidden h-48 rounded-3xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-4xl shadow-inner group hover:shadow-lg transition-all">
+                            class="scroll-hidden h-48 rounded-3xl bg-bg-muted border border-border-default flex items-center justify-center text-4xl shadow-inner group hover:shadow-lg transition-all text-text-primary">
                             <div class="group-hover:scale-150 transition-transform duration-500">⚡</div>
                         </div>
                         <div #animateItem
@@ -536,15 +565,15 @@
     <!-- CTA Section -->
     <section class="py-32 text-center transition-colors">
         <div #animateItem
-            class="scroll-hidden max-w-4xl mx-auto px-6 bg-slate-100 dark:bg-slate-800 py-24 rounded-[3rem] border border-slate-200 dark:border-slate-700 shadow-2xl relative overflow-hidden group">
+            class="scroll-hidden max-w-4xl mx-auto px-6 bg-bg-muted py-24 rounded-[3rem] border border-border-default shadow-2xl relative overflow-hidden group">
             <div
                 class="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000 skew-x-12">
             </div>
 
-            <h2 class="text-4xl md:text-6xl font-black mb-8 tracking-tighter relative z-10">Mulai Transformasi <span
-                    class="text-primary-600">Hari Ini</span></h2>
-            <p class="text-lg opacity-60 mb-12 max-w-xl mx-auto font-medium relative z-10">
-                Dapatkan demo eksklusif dan lihat bagaimana LoFi dapat mengubah alur kerja internal Anda menjadi
+            <h2 class="text-4xl md:text-6xl font-black mb-8 tracking-tighter relative z-10 text-text-primary">Mulai
+                Transformasi <span class="text-primary-600">Hari Ini</span></h2>
+            <p class="text-lg opacity-60 mb-12 max-w-xl mx-auto font-medium relative z-10 text-text-secondary">
+                Dapatkan demo eksklusif dan lihat bagaimana Nano Banana dapat mengubah alur kerja internal Anda menjadi
                 keunggulan kompetitif.
             </p>
             <button
@@ -555,7 +584,7 @@
     </section>
 
     <!-- Footer -->
-    <footer class="py-20 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 transition-colors">
+    <footer class="py-20 border-t border-border-default bg-bg-surface transition-colors">
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex flex-col md:flex-row justify-between items-center gap-8 mb-16">
                 <div class="flex items-center gap-2">
@@ -563,9 +592,10 @@
                         class="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center shadow-lg transform -rotate-6">
                         <span class="text-white font-black text-xl">L</span>
                     </div>
-                    <span class="text-2xl font-black tracking-tight">LoFi</span>
+                    <span class="text-2xl font-black tracking-tight text-text-primary">LoFi <span
+                            class="text-sm text-primary-600">Nano</span></span>
                 </div>
-                <div class="flex gap-12 text-xs font-bold uppercase tracking-widest opacity-40">
+                <div class="flex gap-12 text-xs font-bold uppercase tracking-widest opacity-40 text-text-secondary">
                     <a (click)="scrollToSection('hero')"
                         class="hover:opacity-100 cursor-pointer transition-opacity">Beranda</a>
                     <a class="hover:opacity-100 cursor-pointer transition-opacity">Tentang</a>
@@ -574,7 +604,7 @@
                 </div>
             </div>
             <div
-                class="pt-8 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center gap-4 text-[10px] uppercase font-black tracking-[0.3em] opacity-30">
+                class="pt-8 border-t border-border-default flex justify-between items-center gap-4 text-[10px] uppercase font-black tracking-[0.3em] opacity-30 text-text-disabled">
                 <span>&copy; 2026 LOFI INC.</span>
                 <span class="hidden sm:block">SISTEM ALUR KERJA TERPADU</span>
                 <span>STATUS: STABLE</span>

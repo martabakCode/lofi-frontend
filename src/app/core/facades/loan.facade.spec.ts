@@ -1,9 +1,10 @@
-import { TestBed } from '@angular/core/testing';
-import { of, asyncScheduler } from 'rxjs';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { of, delay } from 'rxjs';
 import { LoanFacade } from './loan.facade';
 import { LoanService } from '../services/loan.service';
 import { AuthService } from '../services/auth.service';
 import { SlaService } from '../services/sla.service';
+import { ToastService } from '../services/toast.service';
 import { LoanStatus } from '../models/loan.models';
 import { DisbursementPayload } from '../patterns/disbursement-builder';
 
@@ -12,6 +13,7 @@ describe('LoanFacade', () => {
     let loanServiceMock: jest.Mocked<LoanService>;
     let authServiceMock: jest.Mocked<AuthService>;
     let slaServiceMock: jest.Mocked<SlaService>;
+    let toastServiceMock: jest.Mocked<ToastService>;
 
     const mockLoan = {
         id: 'loan-1',
@@ -53,12 +55,18 @@ describe('LoanFacade', () => {
             }))
         } as unknown as jest.Mocked<SlaService>;
 
+        toastServiceMock = {
+            show: jest.fn()
+        } as unknown as jest.Mocked<ToastService>;
+
         TestBed.configureTestingModule({
             providers: [
                 LoanFacade,
                 { provide: LoanService, useValue: loanServiceMock },
                 { provide: AuthService, useValue: authServiceMock },
-                { provide: SlaService, useValue: slaServiceMock }
+
+                { provide: SlaService, useValue: slaServiceMock },
+                { provide: ToastService, useValue: toastServiceMock }
             ]
         });
 
@@ -66,27 +74,28 @@ describe('LoanFacade', () => {
     });
 
     describe('getLatestLoans', () => {
-        it('should fetch loans with default pagination', (done) => {
+        it('should fetch loans with default pagination', fakeAsync(() => {
             facade.getLatestLoans().subscribe(response => {
                 expect(response.content).toHaveLength(1);
                 expect(loanServiceMock.getLoans).toHaveBeenCalledWith({ page: 0, size: 10 });
-                done();
             });
-        });
+            tick();
+        }));
 
-        it('should set loading to true while fetching and false after', (done) => {
-            // Use async observable to test loading state properly
-            loanServiceMock.getLoans.mockReturnValue(of({ content: [] }, asyncScheduler));
+        it('should set loading to true while fetching and false after', fakeAsync(() => {
+            // Use delay to simulate network latency
+            loanServiceMock.getLoans.mockReturnValue(of({ content: [] }).pipe(delay(100)));
 
             expect(facade.loading()).toBe(false);
 
-            facade.getLatestLoans().subscribe(() => {
-                expect(facade.loading()).toBe(false);
-                done();
-            });
+            facade.getLatestLoans().subscribe();
 
             expect(facade.loading()).toBe(true);
-        });
+
+            tick(100);
+
+            expect(facade.loading()).toBe(false);
+        }));
     });
 
     describe('canPerformAction', () => {
@@ -111,16 +120,19 @@ describe('LoanFacade', () => {
     });
 
     describe('applyLoan', () => {
-        it('should set loading state during apply', (done) => {
-            loanServiceMock.applyLoan.mockReturnValue(of(mockLoan as any, asyncScheduler));
+        it('should set loading state during apply', fakeAsync(() => {
+            loanServiceMock.applyLoan.mockReturnValue(of(mockLoan as any).pipe(delay(100)));
 
-            facade.applyLoan({}).subscribe(() => {
-                expect(facade.loading()).toBe(false);
-                done();
-            });
+            expect(facade.loading()).toBe(false);
+
+            facade.applyLoan({}).subscribe();
 
             expect(facade.loading()).toBe(true);
-        });
+
+            tick(100);
+
+            expect(facade.loading()).toBe(false);
+        }));
     });
 
     describe('submitLoan', () => {

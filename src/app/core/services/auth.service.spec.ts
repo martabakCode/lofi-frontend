@@ -92,12 +92,25 @@ describe('AuthService', () => {
     });
 
     describe('logout', () => {
-        it('should clear tokens and user data', () => {
-            service.logout();
+        it('should clear tokens and user data', (done) => {
+            // Arrange
+            tokenStorageMock.getToken.mockReturnValue('valid-token');
+            service.token.set('valid-token');
+            service.currentUser.set(mockUserInfo);
 
-            expect(tokenStorageMock.clearToken).toHaveBeenCalled();
-            expect(service.currentUser()).toBeNull();
-            expect(service.token()).toBeNull();
+            // Act
+            service.logout().subscribe(() => {
+                // Assert
+                expect(tokenStorageMock.clearToken).toHaveBeenCalled();
+                expect(service.currentUser()).toBeNull();
+                expect(service.token()).toBeNull();
+                done();
+            });
+
+            // Mock HTTP request
+            const req = httpMock.expectOne(`${environment.apiUrl}/auth/logout`);
+            expect(req.request.method).toBe('POST');
+            req.flush({ success: true, message: 'Logged out' });
         });
     });
 
