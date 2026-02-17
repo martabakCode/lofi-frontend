@@ -12,7 +12,8 @@ import { Subject, takeUntil, forkJoin, of, catchError, finalize, retry, timer, S
 import { Router } from '@angular/router';
 import { LoanVM } from '../../loans/models/loan.models';
 import { RbacService } from '../../../core/services/rbac.service';
-import { Branch } from '../../../core/models/rbac.models';
+import { Branch, ROLES } from '../../../core/models/rbac.models';
+import { AuthService } from '../../../core/services/auth.service';
 
 type WorkflowStatus = 'SUBMITTED' | 'REVIEWED' | 'APPROVED';
 
@@ -37,6 +38,7 @@ export class DisbursementComponent implements OnInit, OnDestroy {
   private toast = inject(ToastService);
   private router = inject(Router);
   private rbacService = inject(RbacService);
+  private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
   private destroy$ = new Subject<void>();
 
@@ -85,7 +87,10 @@ export class DisbursementComponent implements OnInit, OnDestroy {
   branches = signal<Branch[]>([]);
   selectedBranchId = signal<string>('');
   isExporting = signal(false);
-  
+
+  // Role verification helper
+  isBackOffice = computed(() => this.authService.hasRole(ROLES.BACK_OFFICE));
+
   // Status filter - default ke APPROVED agar langsung ada data
   statusFilter = signal<WorkflowStatus | 'ALL'>('APPROVED');
 
@@ -103,7 +108,7 @@ export class DisbursementComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadBranches();
-    
+
     // Delay sedikit untuk memastikan view sudah ready
     setTimeout(() => {
       this.refreshData(true); // Force refresh saat init
@@ -116,7 +121,7 @@ export class DisbursementComponent implements OnInit, OnDestroy {
         console.log('Event bus: loan updated, refreshing...');
         this.refreshData(true); // Force refresh
       });
-      
+
     // Auto reload setiap 30 detik untuk memastikan data up-to-date
     this.autoReloadTimer = timer(30000, 30000)
       .pipe(takeUntil(this.destroy$))
@@ -163,11 +168,11 @@ export class DisbursementComponent implements OnInit, OnDestroy {
   loadStats(force: boolean = false) {
     // Cancel previous pending request
     this.statsSubscription?.unsubscribe();
-    
+
     this.isLoadingStats.set(true);
-    
+
     const baseParams: any = {};
-    if (this.selectedBranchId()) {
+    if (this.selectedBranchId() && !this.isBackOffice()) {
       baseParams.branchId = this.selectedBranchId();
     }
 
@@ -247,7 +252,7 @@ export class DisbursementComponent implements OnInit, OnDestroy {
       params.search = this.searchQuery();
     }
 
-    if (this.selectedBranchId()) {
+    if (this.selectedBranchId() && !this.isBackOffice()) {
       params.branchId = this.selectedBranchId();
     }
 
@@ -280,7 +285,7 @@ export class DisbursementComponent implements OnInit, OnDestroy {
         }
         // Pastikan selalu set array baru untuk trigger signal
         this.loans.set([...(response.content ?? [])]);
-        
+
         // Auto reload sekali lagi jika data kosong tapi tidak ada error (mungkin race condition)
         if ((!response.content || response.content.length === 0) && !this.error()) {
           console.log('Data empty, will auto reload in 3 seconds...');
@@ -659,7 +664,7 @@ export class DisbursementComponent implements OnInit, OnDestroy {
   hasDataMismatch(): boolean {
     const currentStatus = this.statusFilter();
     let expectedCount = 0;
-    
+
     switch (currentStatus) {
       case 'SUBMITTED':
         expectedCount = this.pendingReviewCount();
@@ -674,7 +679,7 @@ export class DisbursementComponent implements OnInit, OnDestroy {
         expectedCount = this.pendingReviewCount() + this.pendingApprovalCount() + this.pendingDisbursementCount();
         break;
     }
-    
+
     return expectedCount > 0 && this.loans().length === 0 && !this.isLoading() && !this.error();
   }
 }

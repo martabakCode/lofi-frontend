@@ -17,7 +17,7 @@
         </div>
         <div class="flex items-center gap-3">
             <!-- Branch Filter -->
-            <select (change)="onBranchChange($event)"
+            <select (change)="onBranchChange($event)" *ngIf="!isBackOffice()"
                 class="form-select py-2 pl-3 pr-8 text-sm bg-bg-surface border-border-default rounded-lg focus:border-brand-main focus:ring-1 focus:ring-brand-main w-40 hidden md:block"
                 aria-label="Filter by Branch">
                 <option value="">All Branches</option>
@@ -38,7 +38,7 @@
             </button>
 
             <!-- Refresh Button - Primary action -->
-            <button class="btn-primary bg-brand-main px-4" (click)="refreshData(true)" title="Force Refresh" 
+            <button class="btn-primary bg-brand-main px-4" (click)="refreshData(true)" title="Force Refresh"
                 [disabled]="isLoading() || isLoadingStats()">
                 <i class="pi pi-refresh mr-2" [class.pi-spin]="isLoading() || isLoadingStats()"></i>
                 <span class="hidden sm:inline">Refresh</span>
@@ -59,7 +59,8 @@
                 <p class="text-xs font-bold text-text-muted uppercase tracking-wider m-0">All Loans</p>
                 <div class="flex items-center gap-2">
                     <p class="text-2xl font-bold text-gray-600 m-0">
-                        {{ isLoadingStats() ? '...' : (pendingReviewCount() + pendingApprovalCount() + pendingDisbursementCount()) }}
+                        {{ isLoadingStats() ? '...' : (pendingReviewCount() + pendingApprovalCount() +
+                        pendingDisbursementCount()) }}
                     </p>
                     <i *ngIf="isLoadingStats()" class="pi pi-spin pi-spinner text-gray-400 text-sm"></i>
                 </div>
@@ -137,7 +138,8 @@
     </div>
 
     <!-- Data Mismatch Warning -->
-    <div *ngIf="hasDataMismatch()" class="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center justify-between">
+    <div *ngIf="hasDataMismatch()"
+        class="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center justify-between">
         <div class="flex items-center gap-3">
             <i class="pi pi-exclamation-circle text-amber-600 text-xl"></i>
             <div>
@@ -189,9 +191,11 @@
                             <div class="empty-state">
                                 <i class="pi pi-inbox text-4xl mb-2 text-text-muted"></i>
                                 <span class="text-lg font-semibold">No applications found</span>
-                                <p class="text-text-secondary">New loan applications will appear here for your review.</p>
+                                <p class="text-text-secondary">New loan applications will appear here for your review.
+                                </p>
                                 <div class="flex gap-2 mt-3">
-                                    <button class="btn-primary bg-brand-main" (click)="refreshData(true)" [disabled]="isLoading()">
+                                    <button class="btn-primary bg-brand-main" (click)="refreshData(true)"
+                                        [disabled]="isLoading()">
                                         <i class="pi pi-refresh mr-1" [class.pi-spin]="isLoading()"></i>
                                         Refresh Now
                                     </button>
@@ -229,17 +233,20 @@
                         <td>
                             <div class="flex items-center gap-2">
                                 <ng-container *ngIf="loan.latitude && loan.longitude; else noLocation">
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
                                         <i class="pi pi-map-marker text-xs"></i>
                                         Available
                                     </span>
-                                    <button class="text-brand-main hover:text-brand-dark text-xs flex items-center gap-1 transition-colors"
+                                    <button
+                                        class="text-brand-main hover:text-brand-dark text-xs flex items-center gap-1 transition-colors"
                                         (click)="viewLocationOnMap(loan)" title="View on Google Maps">
                                         <i class="pi pi-google"></i>
                                     </button>
                                 </ng-container>
                                 <ng-template #noLocation>
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
                                         <i class="pi pi-map-marker text-xs"></i>
                                         N/A
                                     </span>
@@ -297,7 +304,8 @@
                             </button>
 
                             <!-- Reject Button - Available for non-final statuses -->
-                            <button *ngIf="loan.status !== 'DISBURSED' && loan.status !== 'REJECTED' && loan.status !== 'COMPLETED'"
+                            <button
+                                *ngIf="loan.status !== 'DISBURSED' && loan.status !== 'REJECTED' && loan.status !== 'COMPLETED'"
                                 class="btn-secondary text-red-500 hover:text-red-700 hover:bg-red-50 text-xs py-1.5 px-3"
                                 (click)="onReject(loan.id)" [disabled]="processingId() === loan.id" title="Reject Loan">
                                 <i class="pi pi-times-circle"></i>
